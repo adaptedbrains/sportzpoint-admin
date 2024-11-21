@@ -1,0 +1,41 @@
+"use client";
+
+import localFont from "next/font/local";
+import "./globals.css";
+import Navbar from "@/components/Navbar";
+import Sidebar from "@/components/Sidebar";
+import { useState } from "react";
+import useSidebarStore from "@/store/useSidebarStore";
+
+const geistSans = localFont({
+  src: "./fonts/GeistVF.woff",
+  variable: "--font-geist-sans",
+  weight: "100 900",
+});
+const geistMono = localFont({
+  src: "./fonts/GeistMonoVF.woff",
+  variable: "--font-geist-mono",
+  weight: "100 900",
+});
+
+
+export default function RootLayout({ children }) {
+  const { collapsed, toggleSidebar } = useSidebarStore();
+
+  
+  return (
+    <html lang="en">
+      <body
+        className={`bg-gray-300  ${geistSans.variable} ${geistMono.variable} antialiased`}
+      >
+        <Navbar />
+        <Sidebar collapsed={collapsed} toggleSidebar={toggleSidebar}  />
+        <div   className={`${collapsed ? 'ml-16' : 'ml-64'} p-0 transition-all duration-300`}
+        >
+
+        {children}
+        </div>
+      </body>
+    </html>
+  );
+}
