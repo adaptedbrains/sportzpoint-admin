@@ -1,4 +1,4 @@
-'use client'
+'use client';
 import React, { useEffect, useRef } from 'react';
 import Quill from 'quill';
 import 'quill/dist/quill.snow.css';
@@ -9,7 +9,7 @@ const RichTextEditor = () => {
   const editorRef = useRef(null);
 
   useEffect(() => {
-    // Register the table module
+    // Register the Better Table module
     Quill.register(
       {
         'modules/better-table': QuillBetterTable,
@@ -17,22 +17,54 @@ const RichTextEditor = () => {
       true
     );
 
+    // Initialize Quill Editor
     const quill = new Quill(editorRef.current, {
       theme: 'snow',
       modules: {
-        toolbar: [
-          ['bold', 'italic', 'underline'],
-          [{ header: [1, 2, 3, false] }],
-          ['blockquote', 'code-block'],
-          [{ list: 'ordered' }, { list: 'bullet' }],
-          [{ script: 'sub' }, { script: 'super' }],
-          [{ indent: '-1' }, { indent: '+1' }],
-          [{ direction: 'rtl' }],
-          ['link', 'image'],
-          ['clean'], // Remove formatting
-          ['fullscreen'], // Fullscreen support
-          ['better-table'], // Table support
-        ],
+        toolbar: {
+          container: [
+            ['bold', 'italic', 'underline'],
+            [{ header: [1, 2, 3, false] }],
+            ['blockquote', 'code-block'],
+            [{ list: 'ordered' }, { list: 'bullet' }],
+            ['link', 'image'],
+            [
+              {
+                table: ['insertTable', 'insertColumnRight', 'insertColumnLeft', 'insertRowUp', 'insertRowDown', 'deleteTable'], // Dropdown for table options
+              },
+            ],
+            ['clean'], // Remove formatting
+          ],
+          handlers: {
+            table: function (value) {
+              const betterTable = quill.getModule('better-table');
+
+              // Handle each dropdown value for table operations
+              switch (value) {
+                case 'insertTable':
+                  betterTable.insertTable(3, 3); // Insert a 3x3 table
+                  break;
+                case 'insertColumnRight':
+                  betterTable.insertColumnRight();
+                  break;
+                case 'insertColumnLeft':
+                  betterTable.insertColumnLeft();
+                  break;
+                case 'insertRowUp':
+                  betterTable.insertRowUp();
+                  break;
+                case 'insertRowDown':
+                  betterTable.insertRowDown();
+                  break;
+                case 'deleteTable':
+                  betterTable.deleteTable();
+                  break;
+                default:
+                  console.log('No table action selected');
+              }
+            },
+          },
+        },
         'better-table': {
           operationMenu: {
             items: {
@@ -53,18 +85,13 @@ const RichTextEditor = () => {
         },
       },
     });
-
-    // Enable full-screen mode manually (optional feature)
-    const toolbar = quill.getModule('toolbar');
-    toolbar.addHandler('fullscreen', () => {
-      document.body.requestFullscreen();
-    });
   }, []);
 
   return (
-    <div>
-      <div ref={editorRef} style={{ height: '500px' }} />
+    <div className='rounded-2xl'>
+      <div ref={editorRef} style={{ minHeight: '300px' }} />
       <button
+      className='mx-5'
         onClick={() => {
           const editorContent = editorRef.current.querySelector('.ql-editor').innerHTML;
           console.log(editorContent); // Save the editor's content

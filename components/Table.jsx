@@ -7,7 +7,7 @@ import ActionMenu from "./ActionMenu";
 import { useRouter } from "next/navigation";
 
 export default function Table() {
-    const router = useRouter();
+  const router = useRouter();
 
   const articles = [
     {
@@ -19,7 +19,7 @@ export default function Table() {
       wordCount: 591,
       seoScore: 93,
       publishedAt: "19 Nov 2024 16:07",
-      type:"articles"
+      type: "articles",
     },
     {
       title: "Clippers dominate second quarter to defeat the in-form Warriors.",
@@ -29,7 +29,7 @@ export default function Table() {
       wordCount: 326,
       seoScore: 93,
       publishedAt: "19 Nov 2024 15:29",
-      type:"articles"
+      type: "articles",
     },
     {
       title: "The most Valuable U21 Football Players in 2024",
@@ -39,7 +39,7 @@ export default function Table() {
       wordCount: 637,
       seoScore: 100,
       publishedAt: "18 Nov 2024 22:11",
-      type:"articles"
+      type: "articles",
     },
   ];
   const [filter, setFilter] = useState("Published");
@@ -58,10 +58,9 @@ export default function Table() {
   const handleEndDateChange = (event) => {
     setEndDate(event.target.value);
   };
-  const actionText=(text)=>{
-    setAction(text)
-
-  }
+  const actionText = (text) => {
+    setAction(text);
+  };
   return (
     <>
       <div className="bg-white p-4 rounded-lg mb-1">
@@ -200,7 +199,7 @@ export default function Table() {
                 <td className="px-4 py-2 border border-gray text-sm ">
                   {article.author}
                 </td>
-                <td className="px-4 py-2 text-center border border-gray-300 text-sm" >
+                <td className="px-4 py-2 text-center border border-gray-300 text-sm">
                   {article.views}
                 </td>
                 <td className="px-4 py-2 text-center border border-gray-300 text-sm">
@@ -220,26 +219,29 @@ export default function Table() {
                 <td className="px-4 py-2 border border-gray-300 text-sm">
                   {article.publishedAt}
                 </td>
-                <td className="px-4 py-2 text-center border border-gray-300 relative" >
+                <td className="px-4 py-2 text-center border border-gray-300 relative">
                   <div className="flex justify-center space-x-2">
-                    <FaEdit className="text-blue-500 cursor-pointer" onClick={()=>
-                        {
-                            const type = article?.type ?? 'defaultType';  // Provide a default if undefined
-  const views = article?.views ?? '0';  // Provide a default if undefined
-  router.push(`/posts/${type}/${views}`);
-                            
-                        }
-                        
-                        
-                        } />
+                    <FaEdit
+                      className="text-blue-500 cursor-pointer"
+                      onClick={() => {
+                        const type = article?.type ?? "defaultType"; // Provide a default if undefined
+                        const views = article?.views ?? "0"; // Provide a default if undefined
+                        router.push(`/posts/${type}/${views}`);
+                      }}
+                    />
                     <FaEye className="text-blue-500 cursor-pointer" />
                     <GoLink className="text-blue-500 cursor-pointer" />
-                  
-                    <FaEllipsisV className="text-blue-500 cursor-pointer" onClick={()=>actionText(article.views)} />
+
+                    <FaEllipsisV
+                      className="text-blue-500 cursor-pointer"
+                      onClick={() => actionText(article.views)}
+                    />
                   </div>
-                  {Action===article.views && <div  className=" absolute shadow-2xl z-10 bottom-8 end-0">
-                    <ActionMenu actionText={actionText} />
-                  </div>}
+                  {Action === article.views && (
+                    <div className=" absolute shadow-2xl z-10 bottom-8 end-0">
+                      <ActionMenu actionText={actionText} />
+                    </div>
+                  )}
                 </td>
               </tr>
             ))}
