@@ -1,14 +1,19 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 
 function RestOfPostEdit() {
   const [primaryCategory, setPrimaryCategory] = useState('');
   const [additionalCategory, setAdditionalCategory] = useState('');
   const [tags, setTags] = useState([]);
-
   const [credits, setCredits] = useState('');
   const [focusKeyphrase, setFocusKeyphrase] = useState('');
-  const categories = [
+  const [categoriesList, setCategoriesList] = useState([]);
+  const [categoryInput, setCategoryInput] = useState('');
+  const [filteredCategories, setFilteredCategories] = useState([]);
+  const [categoryOption, setCategoryOption] = useState('');
+
+  // Use useMemo to memoize the categories array
+  const categories = useMemo(() => [
     'Autos & Vehicles',
     'Comedy',
     'Education',
@@ -24,11 +29,7 @@ function RestOfPostEdit() {
     'Science & Technology',
     'Sports',
     'Travel & Events',
-  ];
-  const [categoriesList, setCategoriesList] = useState([]);
-  const [categoryInput, setCategoryInput] = useState('');
-  const [filteredCategories, setFilteredCategories] = useState(categories); // State for filtered categories
-  const [categoryOption, setCategoryOption] = useState('');
+  ], []); // Empty dependency array ensures the categories are not recalculated on every render
 
   const handlePrimaryCategoryChange = (e) => {
     setPrimaryCategory(e.target.value);
@@ -58,7 +59,7 @@ function RestOfPostEdit() {
           : categories
       );
     }
-  }, [categoryInput, categoryOption]);
+  }, [categoryInput, categoryOption, categories]);
 
   const handleCategoryClick = (item) => {
     setCategoriesList((prev) =>
@@ -112,7 +113,7 @@ function RestOfPostEdit() {
           </ul>
         )}
         <div className="flex w-full items-center relative flex-col">
-          <label className="w-full text-start text-zinc-700 ">Addtional Category </label>
+          <label className="w-full text-start text-zinc-700">Additional Category </label>
           <input
             type="text"
             className="border focus:outline-none px-4 py-1 rounded w-2/3 text-zinc-800"
@@ -147,7 +148,7 @@ function RestOfPostEdit() {
         </label>
         <select
           id="tags"
-          multiple // Enable multiple selection
+          multiple
           value={tags}
           onChange={handleTagsChange}
           className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-200 focus:border-indigo-500 sm:text-sm"

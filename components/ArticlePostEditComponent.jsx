@@ -1,4 +1,5 @@
 'use client';
+import Image from 'next/image';
 import React, { useState } from 'react';
 import { FaPlusCircle } from 'react-icons/fa';
 
@@ -143,10 +144,17 @@ const ArticlePostEditComponent = () => {
             className="flex items-center justify-center w-full h-full"
           >
             {featuredImage ? (
-              <img src={featuredImage} alt="Featured" className="object-cover w-full h-full rounded-md" />
+             <Image
+             src={featuredImage}
+             alt="Featured"
+             
+             width={500}          
+             height={100}      
+             className="object-cover w-full h-full rounded-md"
+           />
             ) : (
               <>
-                <FaPlusCircle className="w-6 h-6 text-gray-400" />
+                
                 <p className="mt-2 text-sm text-gray-500 text-center">
                   Add Featured Image
                   <br />
