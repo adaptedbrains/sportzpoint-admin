@@ -21,7 +21,7 @@ const geistMono = localFont({
 
 
 export default function RootLayout({ children }) {
-  const { collapsed, toggleSidebar } = useSidebarStore();
+  const { collapsed} = useSidebarStore();
 
   
   return (
@@ -30,7 +30,7 @@ export default function RootLayout({ children }) {
         className={`bg-gray-300  ${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <Navbar />
-        <Sidebar collapsed={collapsed} toggleSidebar={toggleSidebar}  />
+        <Sidebar />
         <div   className={`${collapsed ? 'ml-16' : 'ml-64'} p-0 transition-all duration-300`}
         >
 

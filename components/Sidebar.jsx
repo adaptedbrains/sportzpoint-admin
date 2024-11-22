@@ -10,8 +10,11 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { FaHome, FaRegEdit, FaUsers, FaCog } from "react-icons/fa";
 import { motion } from "framer-motion";
+import useSidebarStore from "@/store/useSidebarStore";
 
-const Sidebar = ({toggleSidebar,collapsed}) => {
+const Sidebar = () => {
+  const { collapsed, toggleSidebar} = useSidebarStore();
+
   const [option, setOption] = useState("");
 
   
@@ -39,6 +42,7 @@ const Sidebar = ({toggleSidebar,collapsed}) => {
             className="relative"
             onMouseEnter={() => setOption(item.name)}
             onMouseLeave={() => setOption("")}
+            onClick={()=>toggleSidebar(true)}
           >
             <Link href={item.link}>
               <div
@@ -74,7 +78,7 @@ const Sidebar = ({toggleSidebar,collapsed}) => {
       </ul>
       {/* Sidebar Toggle Button */}
       <button
-        onClick={toggleSidebar}
+        onClick={()=>toggleSidebar(!collapsed )}
         className="p-4 text-gray-500 hover:text-gray-700"
         aria-label="Toggle Sidebar"
       >
