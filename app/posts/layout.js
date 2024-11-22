@@ -1,9 +1,7 @@
 'use client'
-import PostSideBar from "@/components/PostSideBar";
-import useSidebarStore from "@/store/useSidebarStore";
+import PostSideBar from "../../components/PostSideBar";
 
 export default function PostsLayout({ children }) {
-    const { collapsed } = useSidebarStore();
 
   return (
     <div className="relative mt-10 ">

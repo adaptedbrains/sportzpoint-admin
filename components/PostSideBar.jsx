@@ -17,27 +17,27 @@ import { BiBookBookmark } from 'react-icons/bi';
 const contentTypes = [
   {
     name: 'Article',
-    href: 'posts/article',
+    href: '/posts/article',
     icon: <RiArticleLine />,
   },
   {
     name: 'Video',
-    href: 'posts/video',
+    href: '/posts/video',
     icon: <CiVideoOn />    ,
   },
   {
     name: 'Web Story',
-    href: 'posts/web-story',
+    href: '/posts/web-story',
     icon: <BsBook />,
   },
   {
     name: 'Photo Gallery',
-    href: 'posts/photo-gallery',
+    href: '/posts/photo-gallery',
     icon: <BsImages />,
   },
   {
     name: 'Live Blog',
-    href: 'posts/live-blog',
+    href: '/posts/live-blog',
     icon: <BsBroadcastPin />,
   }
 ];
@@ -52,7 +52,7 @@ const statuses = [
 const PostSideBar = () => {
   return (
     <motion.div
-      className="w-full bg-gray-100 h-screen px-3 pt-3"
+      className="w-full bg-zinc-100 h-screen px-3 pt-3"
       initial={{ x: '-100%' }} // Start position from left
       animate={{ x: 0 }} // Animate to the normal position
       transition={{ duration: 0.5, ease: 'easeOut' }} // Set the duration and easing
