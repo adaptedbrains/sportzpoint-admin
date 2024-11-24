@@ -26,6 +26,7 @@ const Sidebar = () => {
     { name: "Categories", icon: TbCategoryPlus, link: "/#" },
     { name: "Tags", icon: IoPricetagsOutline, link: "/#" },
     { name: "Configuration", icon: FaCog, link: "/#" },
+    { name: "Team", icon: FaUsers, link: "/team" },
   ];
 
   return (
