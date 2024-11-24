@@ -1,8 +1,10 @@
 "use client";
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import RichTextEditor from '../../../components/RichTextEditor';
 
 const LiveBlogPage = () => {
+  const router = useRouter();
   const [ongoingBlogs, setOngoingBlogs] = useState([]);
   const [allBlogs, setAllBlogs] = useState([]);
   const [activeStatus, setActiveStatus] = useState('all');
@@ -81,6 +83,10 @@ const LiveBlogPage = () => {
       // Add your completion logic here
       console.log('Completing live blog:', blogId);
     }
+  };
+
+  const handleEdit = (blogId) => {
+    router.push(`/posts/live-blog/create?type=live-blog&id=${blogId}`);
   };
 
   const UpdateModal = () => (
@@ -167,6 +173,17 @@ const LiveBlogPage = () => {
 
   return (
     <div className="p-6">
+      {/* Updated Add Blog Button */}
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-bold text-gray-800">Live Blogs</h1>
+        <button
+          onClick={() => router.push('/posts/live-blog/create')}
+          className="px-4 py-2 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700 transition-colors duration-200"
+        >
+          Add Blog
+        </button>
+      </div>
+
       {/* Status Filters */}
       <div className="flex gap-2 mb-6">
         {['All', 'Published', 'Draft', 'Pending Approval', 'Scheduled'].map((status) => (
@@ -186,7 +203,23 @@ const LiveBlogPage = () => {
 
       {/* Ongoing Live Blogs */}
       <div className="mb-8">
-        <h2 className="text-xl font-semibold text-gray-800 mb-4">Ongoing Live Blogs</h2>
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-xl font-semibold text-gray-800">Ongoing Live Blogs</h2>
+          <div className="flex items-center gap-2">
+            <button className="px-3 py-1.5 text-sm text-gray-600 hover:text-gray-900">
+              <span className="sr-only">Filter</span>
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 0 1-.659 1.591l-5.432 5.432a2.25 2.25 0 0 0-.659 1.591v2.927a2.25 2.25 0 0 1-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 0 0-.659-1.591L3.659 7.409A2.25 2.25 0 0 1 3 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0 1 12 3Z" />
+              </svg>
+            </button>
+            <button className="px-3 py-1.5 text-sm text-gray-600 hover:text-gray-900">
+              <span className="sr-only">Sort</span>
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M3 7.5 7.5 3m0 0L12 7.5M7.5 3v13.5m13.5 0L16.5 21m0 0L12 16.5m4.5 4.5V7.5" />
+              </svg>
+            </button>
+          </div>
+        </div>
         <div className="bg-white rounded-lg shadow-sm border border-gray-200">
           <div className="overflow-x-auto">
             <table className="w-full">
@@ -247,6 +280,13 @@ const LiveBlogPage = () => {
                         >
                           Complete
                         </button>
+                        <button
+                          onClick={() => handleEdit(blog.id)}
+                          className="px-2 py-1 text-blue-600 hover:bg-blue-50 rounded-md text-sm"
+                          title="Edit"
+                        >
+                          Edit
+                        </button>
                       </div>
                     </td>
                   </tr>
@@ -259,7 +299,23 @@ const LiveBlogPage = () => {
 
       {/* All Live Blog Posts */}
       <div>
-        <h2 className="text-xl font-semibold text-gray-800 mb-4">All Live Blog Posts</h2>
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-xl font-semibold text-gray-800">All Live Blog Posts</h2>
+          <div className="flex items-center gap-2">
+            <button className="px-3 py-1.5 text-sm text-gray-600 hover:text-gray-900">
+              <span className="sr-only">Filter</span>
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 0 1-.659 1.591l-5.432 5.432a2.25 2.25 0 0 0-.659 1.591v2.927a2.25 2.25 0 0 1-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 0 0-.659-1.591L3.659 7.409A2.25 2.25 0 0 1 3 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0 1 12 3Z" />
+              </svg>
+            </button>
+            <button className="px-3 py-1.5 text-sm text-gray-600 hover:text-gray-900">
+              <span className="sr-only">Sort</span>
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M3 7.5 7.5 3m0 0L12 7.5M7.5 3v13.5m13.5 0L16.5 21m0 0L12 16.5m4.5 4.5V7.5" />
+              </svg>
+            </button>
+          </div>
+        </div>
         <div className="bg-white rounded-lg shadow-sm border border-gray-200">
           <div className="overflow-x-auto">
             <table className="w-full">
@@ -306,7 +362,7 @@ const LiveBlogPage = () => {
                       <td className="px-6 py-4 text-sm text-gray-700">{blog.lastUpdated}</td>
                       <td className="px-6 py-4 text-sm">
                         <button
-                          onClick={() => {/* Add edit action */}}
+                          onClick={() => handleEdit(blog.id)}
                           className="px-3 py-1 text-gray-700 hover:bg-gray-100 rounded-md text-sm transition-colors duration-200"
                         >
                           Edit
