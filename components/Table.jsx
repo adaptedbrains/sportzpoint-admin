@@ -5,6 +5,7 @@ import { FaEdit, FaEye, FaEllipsisV } from "react-icons/fa";
 import { GoLink } from "react-icons/go";
 import ActionMenu from "./ActionMenu";
 import { useRouter } from "next/navigation";
+import CalendarModal from './CalendarModal';
 
 export default function Table() {
   const router = useRouter();
@@ -61,6 +62,13 @@ export default function Table() {
   const actionText = (text) => {
     setAction(text);
   };
+
+  const handleDateRangeChange = ({ startDate, endDate }) => {
+    // Handle the date range selection here
+    console.log('Date Range:', { startDate, endDate });
+    // Update your table data based on the selected date range
+  };
+
   return (
     <>
       <div className="bg-white p-4 rounded-lg mb-1">
@@ -71,40 +79,8 @@ export default function Table() {
               +
             </button>
           </div>
-          <div className="flex items-center">
-            <input
-              type="date"
-              value={startDate}
-              onChange={handleStartDateChange}
-              className="border border-gray-300 rounded-md px-2 mr-2"
-            />
-            <input
-              type="date"
-              value={endDate}
-              onChange={handleEndDateChange}
-              className="border border-gray-300 rounded-md px-2 mr-2"
-            />
-            <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={1.5}
-                stroke="currentColor"
-                className="w-4 h-4"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                />
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.386-1.386l-5.159-5.159a2.25 2.25 0 010-3.182l5.159-5.159m-1.386 1.386l-5.159 5.159a2.25 2.25 0 000 3.182l5.159 5.159M8.25 10.5l4.5 4.5m-4.5-4.5l4.5-4.5"
-                />
-              </svg>
-            </button>
+          <div className="flex items-center gap-4 mb-4">
+            <CalendarModal onApply={handleDateRangeChange} />
           </div>
         </div>
 
