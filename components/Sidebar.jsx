@@ -22,10 +22,11 @@ const Sidebar = () => {
   const menuItems = [
     { name: "Home", icon: FaHome, link: "/#" },
     { name: "Posts", icon: FaRegEdit, link: "/posts" },
-    { name: "Media Library", icon: MdOutlinePermMedia, link: "/#" },
-    { name: "Categories", icon: TbCategoryPlus, link: "/#" },
-    { name: "Tags", icon: IoPricetagsOutline, link: "/#" },
-    { name: "Configuration", icon: FaCog, link: "/#" },
+    { name: "Media Library", icon: MdOutlinePermMedia, link: "/media" },
+    { name: "Categories", icon: TbCategoryPlus, link: "/categories" },
+    { name: "Tags", icon: IoPricetagsOutline, link: "/tags" },
+    { name: "Configuration", icon: FaCog, link: "/configuration" },
+    { name: "Team", icon: FaUsers, link: "/team" },
   ];
 
   return (

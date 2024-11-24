@@ -8,6 +8,9 @@ import Navbar from "../components/Navbar";
 import Sidebar from "../components/Sidebar";
 import useSidebarStore from "../store/useSidebarStore";
 
+import 'quill/dist/quill.snow.css';
+import 'quill-better-table/dist/quill-better-table.css';
+
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
   variable: "--font-geist-sans",
