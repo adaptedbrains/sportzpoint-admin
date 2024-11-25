@@ -1,8 +1,10 @@
 "use client";
 import { useState, useEffect } from 'react';
 import RichTextEditor from '../../../components/RichTextEditor';
+import useLivePost from '@/store/liveBlogStore';
 
 const LiveBlogPage = () => {
+  const {fetchLiveBlogData}=useLivePost()
   const [ongoingBlogs, setOngoingBlogs] = useState([]);
   const [allBlogs, setAllBlogs] = useState([]);
   const [activeStatus, setActiveStatus] = useState('all');
@@ -11,6 +13,16 @@ const LiveBlogPage = () => {
 
   // Updated mock data with all required properties
   useEffect(() => {
+
+
+
+
+
+    fetchLiveBlogData
+
+
+
+
     const mockOngoingBlogs = [
       { 
         id: 1, 
@@ -85,6 +97,7 @@ const LiveBlogPage = () => {
 
   const UpdateModal = () => (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+     
       <div className="bg-white rounded-lg p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-semibold">Push Live Update</h2>
@@ -167,7 +180,7 @@ const LiveBlogPage = () => {
 
   return (
     <div className="p-6">
-      {/* Status Filters */}
+      
       <div className="flex gap-2 mb-6">
         {['All', 'Published', 'Draft', 'Pending Approval', 'Scheduled'].map((status) => (
           <button

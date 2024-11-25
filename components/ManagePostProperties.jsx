@@ -9,12 +9,9 @@ function ManagePostProperties() {
 
   return (
     <div className='flex flex-col gap-2'>
+      "Hiiiiii"
       <ArticlePostEditComponent/>
-      <div className='bg-white rounded'>
-
-        <RichTextEditor/>
-      </div>
-      <RestOfPostEdit />
+      
       </div>
    
   );
