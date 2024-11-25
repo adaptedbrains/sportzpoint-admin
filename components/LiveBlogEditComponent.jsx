@@ -1,9 +1,10 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 
-const LiveBlogEditComponent = () => {
+// Separate the content that uses useSearchParams
+const LiveBlogContent = () => {
   const searchParams = useSearchParams();
   const id = searchParams.get('id');
   
@@ -113,6 +114,15 @@ const LiveBlogEditComponent = () => {
         {/* ... Featured image component ... */}
       </div>
     </div>
+  );
+};
+
+// Main component with Suspense boundary
+const LiveBlogEditComponent = () => {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <LiveBlogContent />
+    </Suspense>
   );
 };
 
