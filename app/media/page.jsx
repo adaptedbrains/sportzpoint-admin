@@ -1,16 +1,12 @@
 "use client";
-import { useState, Suspense } from 'react';
+import { useState } from 'react';
 import { FaUpload, FaSearch, FaEllipsisH } from 'react-icons/fa';
 import { BsGrid, BsList } from 'react-icons/bs';
-import Image from 'next/image'
-import { useSearchParams } from 'next/navigation';
 
-// Create a component that uses useSearchParams
-const MediaContent = () => {
-  const searchParams = useSearchParams();
+const MediaLibrary = () => {
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
   const [activeFilter, setActiveFilter] = useState('all');
-  const [viewType, setViewType] = useState('grid');
+  const [viewType, setViewType] = useState('grid'); // 'grid' or 'list'
 
   // Using placeholder images from picsum.photos with sports-related images
   const mediaItems = [
@@ -136,12 +132,10 @@ const MediaContent = () => {
                 className="group relative bg-white rounded-lg overflow-hidden border border-gray-200 hover:border-blue-500 transition-all duration-200"
               >
                 <div className="aspect-square relative">
-                  <Image 
+                  <img
                     src={item.url}
                     alt={item.title}
-                    width={400}
-                    height={400}
-                    priority={true}
+                    className="w-full h-full object-cover"
                   />
                   <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-30 transition-opacity duration-200" />
                   <button className="absolute top-2 right-2 p-1.5 bg-white rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-200">
@@ -160,12 +154,10 @@ const MediaContent = () => {
                 className="flex items-center space-x-4 p-3 bg-white rounded-lg border border-gray-200 hover:border-blue-500 transition-all duration-200"
               >
                 <div className="aspect-square w-16 h-16">
-                  <Image 
+                  <img
                     src={item.url}
                     alt={item.title}
-                    width={16}
-                    height={16}
-                    priority={true}
+                    className="w-full h-full object-cover"
                   />
                 </div>
                 <div className="flex flex-col">
@@ -220,15 +212,6 @@ const MediaContent = () => {
         )}
       </div>
     </div>
-  );
-};
-
-// Main component wrapped with Suspense
-const MediaLibrary = () => {
-  return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <MediaContent />
-    </Suspense>
   );
 };
 

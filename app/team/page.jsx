@@ -1,69 +1,32 @@
 "use client";
 import { useState, useEffect } from 'react';
 
-const API_URL = "https://sportzpoint-be.onrender.com";
-
 const TeamPage = () => {
   const [teamMembers, setTeamMembers] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
 
   useEffect(() => {
-    fetchTeamMembers();
+    const mockTeamMembers = [
+      { id: 1, name: 'John Doe', email: 'john@example.com', role: 'Admin' },
+      { id: 2, name: 'Jane Smith', email: 'jane@example.com', role: 'Editor' },
+      { id: 3, name: 'Bob Johnson', email: 'bob@example.com', role: 'Author' },
+      { id: 4, name: 'Sarah Wilson', email: 'sarah@example.com', role: 'Author' },
+    ];
+    setTeamMembers(mockTeamMembers);
   }, []);
 
-  const fetchTeamMembers = async () => {
-    try {
-      setLoading(true);
-      const response = await fetch(`${API_URL}/auth/users`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const data = await response.json();
-      setTeamMembers(data.users || []);
-    } catch (err) {
-      console.error('Error fetching team members:', err);
-      setError('Failed to load team members');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const getRoleBadgeColor = (roles) => {
-    const role = roles && roles[0]?.toLowerCase();
+  const getRoleBadgeColor = (role) => {
     switch (role) {
-      case 'admin':
+      case 'Admin':
         return 'bg-red-100 text-red-800';
-      case 'editor':
-      case 'edior':
+      case 'Editor':
         return 'bg-blue-100 text-blue-800';
-      case 'author':
-      case 'auhor':
+      case 'Author':
         return 'bg-green-100 text-green-800';
       default:
         return 'bg-gray-100 text-gray-800';
     }
   };
-
-  if (loading) return (
-    <div className="flex justify-center items-center min-h-screen">
-      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-    </div>
-  );
-
-  if (error) return (
-    <div className="flex justify-center items-center min-h-screen text-red-600">
-      {error}
-    </div>
-  );
 
   return (
     <div className="flex justify-center min-h-screen bg-gray-50 pt-20 pb-6">
@@ -86,45 +49,24 @@ const TeamPage = () => {
                   <th className="text-left px-6 py-4 text-sm font-medium text-gray-500">Name</th>
                   <th className="text-left px-6 py-4 text-sm font-medium text-gray-500">Email</th>
                   <th className="text-left px-6 py-4 text-sm font-medium text-gray-500">Role</th>
-                  <th className="text-left px-6 py-4 text-sm font-medium text-gray-500">Created At</th>
-                  <th className="text-left px-6 py-4 text-sm font-medium text-gray-500">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
                 {teamMembers.map((member) => (
                   <tr 
-                    key={member._id} 
+                    key={member.id} 
                     className="hover:bg-gray-50 transition-colors duration-200"
                   >
                     <td className="px-6 py-4 text-sm text-gray-700 whitespace-nowrap">
-                      <div className="flex items-center">
-                        {member.name || 'N/A'}
-                      </div>
+                      {member.name}
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-700 whitespace-nowrap">
                       {member.email}
                     </td>
                     <td className="px-6 py-4 text-sm whitespace-nowrap">
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getRoleBadgeColor(member.roles)}`}>
-                        {member.roles?.[0] || 'User'}
+                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getRoleBadgeColor(member.role)}`}>
+                        {member.role}
                       </span>
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-700 whitespace-nowrap">
-                      {new Date(member.createdAt).toLocaleDateString()}
-                    </td>
-                    <td className="px-6 py-4 text-sm whitespace-nowrap">
-                      <button 
-                        className="text-blue-600 hover:text-blue-800 mr-3"
-                        onClick={() => {/* Handle edit */}}
-                      >
-                        Edit
-                      </button>
-                      <button 
-                        className="text-red-600 hover:text-red-800"
-                        onClick={() => {/* Handle delete */}}
-                      >
-                        Delete
-                      </button>
                     </td>
                   </tr>
                 ))}

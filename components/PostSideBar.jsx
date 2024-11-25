@@ -52,7 +52,7 @@ const statuses = [
 const PostSideBar = () => {
   return (
     <motion.div
-      className="w-full bg-zinc-100 h-screen px-3 pt-3 z-45"
+      className="w-full bg-zinc-100 h-screen px-3 pt-3"
       initial={{ x: '-100%' }} // Start position from left
       animate={{ x: 0 }} // Animate to the normal position
       transition={{ duration: 0.5, ease: 'easeOut' }} // Set the duration and easing

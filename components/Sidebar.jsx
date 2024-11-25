@@ -1,6 +1,4 @@
 "use client";
-import { useEffect } from "react";
-import { usePathname } from "next/navigation";
 import {
   MdKeyboardArrowLeft,
   MdKeyboardArrowRight,
@@ -16,14 +14,10 @@ import useSidebarStore from "@/store/useSidebarStore";
 
 const Sidebar = () => {
   const { collapsed, toggleSidebar} = useSidebarStore();
-  const [option, setOption] = useState("");
-  const pathname = usePathname();
 
-  useEffect(() => {
-    if (pathname.startsWith('/posts/')) {
-      toggleSidebar(true);
-    }
-  }, [pathname, toggleSidebar]);
+  const [option, setOption] = useState("");
+
+  
 
   const menuItems = [
     { name: "Home", icon: FaHome, link: "/#" },
@@ -37,7 +31,7 @@ const Sidebar = () => {
 
   return (
     <div
-      className={`flex flex-col z-40 justify-between h-[95vh] top-11 fixed bg-white border-r transition-all duration-300 ${
+      className={`flex flex-col z-50 justify-between h-[95vh] top-11 fixed bg-white border-r transition-all duration-300 ${
         collapsed ? "w-16" : "w-64"
       }`}
     >
