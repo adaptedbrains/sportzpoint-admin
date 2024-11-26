@@ -15,25 +15,35 @@ import { motion } from "framer-motion";
 import useSidebarStore from "@/store/useSidebarStore";
 
 const Sidebar = () => {
-  const { collapsed, toggleSidebar} = useSidebarStore();
+  const { collapsed, toggleSidebar, togglePostSidebar } = useSidebarStore();
   const [option, setOption] = useState("");
   const pathname = usePathname();
 
   useEffect(() => {
     if (pathname.startsWith('/posts/')) {
-      toggleSidebar(true);
+      togglePostSidebar(true);
+    } else {
+      togglePostSidebar(false);
     }
-  }, [pathname, toggleSidebar]);
+  }, [pathname, togglePostSidebar]);
+
+  const handlePostsClick = () => {
+    togglePostSidebar(true);
+    toggleSidebar(true);
+  };
 
   const menuItems = [
-    { name: "Home", icon: FaHome, link: "/#" },
-    { name: "Posts", icon: FaRegEdit, link: "/posts" },
-    { name: "Media Library", icon: MdOutlinePermMedia, link: "/media" },
-    { name: "Categories", icon: TbCategoryPlus, link: "/categories" },
-    { name: "Tags", icon: IoPricetagsOutline, link: "/tags" },
-    { name: "Configuration", icon: FaCog, link: "/configuration" },
-    { name: "Team", icon: FaUsers, link: "/team" },
-  ];
+    { name: "Home", icon: FaHome, link: "/#", onClick: () => togglePostSidebar(false) },
+    { name: "Posts", icon: FaRegEdit, link: "/posts", onClick: handlePostsClick },
+    { name: "Media Library", icon: MdOutlinePermMedia, link: "/media", onClick: () => togglePostSidebar(false) },
+    { name: "Categories", icon: TbCategoryPlus, link: "/categories", onClick: () => togglePostSidebar(false) },
+    { name: "Tags", icon: IoPricetagsOutline, link: "/tags", onClick: () => togglePostSidebar(false) },
+    { name: "Configuration", icon: FaCog, link: "/configuration", onClick: () => togglePostSidebar(false) },
+    { name: "Team", icon: FaUsers, link: "/team", onClick: () => togglePostSidebar(false) },
+  ].map(item => ({
+    ...item,
+    onClick: item.onClick || (() => togglePostSidebar(false))
+  }));
 
   return (
     <div
@@ -49,9 +59,8 @@ const Sidebar = () => {
             className="relative"
             onMouseEnter={() => setOption(item.name)}
             onMouseLeave={() => setOption("")}
-            onClick={()=>toggleSidebar(true)}
           >
-            <Link href={item.link}>
+            <Link href={item.link} onClick={item.onClick}>
               <div
                 className={`flex items-center gap-4 px-4 py-2 text-gray-700 rounded hover:bg-blue-100 hover:text-blue-600 ${
                   collapsed ? "justify-center" : "justify-start"

@@ -2,6 +2,23 @@
 import { FaRegEdit } from 'react-icons/fa';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
+import { AiOutlinePlus } from 'react-icons/ai';
+import Link from 'next/link';
+
+const EmptyDrafts = () => (
+  <div className="col-span-full flex flex-col items-center justify-center py-12 bg-white rounded-lg border border-gray-200">
+    <FaRegEdit className="w-12 h-12 text-gray-300 mb-4" />
+    <h3 className="text-lg font-medium text-gray-900 mb-1">No drafts yet</h3>
+    <p className="text-sm text-gray-500 mb-4">Get started by creating your first draft</p>
+    <Link 
+      href="/posts/article" 
+      className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 transition-colors"
+    >
+      <AiOutlinePlus className="w-4 h-4" />
+      Create New Post
+    </Link>
+  </div>
+);
 
 const HomePage = () => {
   const [drafts, setDrafts] = useState([]);
@@ -73,30 +90,34 @@ const HomePage = () => {
             </div>
           ) : (
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              {drafts.map((draft) => (
-                <div key={draft._id} className="bg-white p-3 rounded-lg border border-gray-200 hover:border-blue-500 transition-all duration-200">
-                  <div className="flex items-center gap-1 mb-1.5">
-                    <span className="text-xs font-medium text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded">
-                      {draft.category}
-                    </span>
-                  </div>
-                  <h3 className="text-sm font-medium text-gray-900 mb-1.5 line-clamp-2">
-                    {draft.title}
-                  </h3>
-                  <p className="text-xs text-gray-600 mb-2 line-clamp-2">
-                    {draft.excerpt}
-                  </p>
-                  <div className="flex items-center justify-between text-xs text-gray-500">
-                    <div className="flex items-center gap-1">
-                      <FaRegEdit className="text-gray-400 w-3 h-3" />
-                      {draft.lastEdited}
+              {drafts.length > 0 ? (
+                drafts.map((draft) => (
+                  <div key={draft._id} className="bg-white p-3 rounded-lg border border-gray-200 hover:border-blue-500 transition-all duration-200">
+                    <div className="flex items-center gap-1 mb-1.5">
+                      <span className="text-xs font-medium text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded">
+                        {draft.category}
+                      </span>
                     </div>
-                    <button className="text-blue-600 hover:text-blue-700 font-medium">
-                      Edit
-                    </button>
+                    <h3 className="text-sm font-medium text-gray-900 mb-1.5 line-clamp-2">
+                      {draft.title}
+                    </h3>
+                    <p className="text-xs text-gray-600 mb-2 line-clamp-2">
+                      {draft.excerpt}
+                    </p>
+                    <div className="flex items-center justify-between text-xs text-gray-500">
+                      <div className="flex items-center gap-1">
+                        <FaRegEdit className="text-gray-400 w-3 h-3" />
+                        {draft.lastEdited}
+                      </div>
+                      <button className="text-blue-600 hover:text-blue-700 font-medium">
+                        Edit
+                      </button>
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))
+              ) : (
+                <EmptyDrafts />
+              )}
             </div>
           )}
         </div>
