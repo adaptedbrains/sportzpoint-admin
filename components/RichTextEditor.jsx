@@ -2,13 +2,8 @@
 import React, { useRef } from 'react';
 import { Editor } from '@tinymce/tinymce-react';
 
-const RichTextEditor = ({ content,htmlContentGrab }) => {
+const RichTextEditor = ({ content, htmlContentGrab }) => {
   const editorRef = useRef(null);
-
-  // Function to log the content
-  const logContent = (newContent) => {
-    console.log("Updated Content:", newContent);
-  };
 
   return (
     <div className="bg-white rounded-lg shadow-lg">
@@ -19,9 +14,9 @@ const RichTextEditor = ({ content,htmlContentGrab }) => {
       <Editor
         apiKey="qagffr3pkuv17a8on1afax661irst1hbr4e6tbv888sz91jc"
         onInit={(evt, editor) => editorRef.current = editor}
-        value={content}  // The initial content to display
+        value={content}
         onEditorChange={(newContent) => {
-          logContent(newContent);  // Log the content every time it's changed
+          htmlContentGrab(newContent);
         }}
         init={{
           height: 500,
@@ -56,7 +51,6 @@ const RichTextEditor = ({ content,htmlContentGrab }) => {
             { title: 'Heading 4', format: 'h4' }
           ],
           setup: (editor) => {
-            // Add custom "More" button that opens all other options
             editor.ui.registry.addMenuButton('more', {
               text: '...',
               fetch: (callback) => {
@@ -99,19 +93,6 @@ const RichTextEditor = ({ content,htmlContentGrab }) => {
           },
         }}
       />
-
-      <div className="flex justify-end p-4 border-t border-gray-200">
-        <button
-          onClick={() => {
-            if (editorRef.current) {
-              console.log("Final Content:", editorRef.current.getContent());
-            }
-          }}
-          className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors"
-        >
-          Save Content
-        </button>
-      </div>
     </div>
   );
 };

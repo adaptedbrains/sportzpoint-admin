@@ -80,21 +80,53 @@ function ManagePostProperties() {
     }
   }, [pathname, allArticlePost]);
 
-  // Pass formData and setFormData to the child component
-  return (
-    <div className="flex flex-col gap-2">
-      <ArticlePostEditComponent
-        handleArticleFromData={handleArticleFromData}
-        formDataPostEdit={formDataPostEdit}
-      />
-      <RichTextEditor content={htmlContent && htmlContent} htmlContentGrab={htmlContentGrab} />
-      <RestOfPostEdit
-        formData={formData}
-        setFormData={setFormData} // Pass setter function to child
-      />
-      <button className="bg-black p-9 text-white"  onClick={()=> console.log("almmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm",formData)}  >Save Data</button>
+  // ... rest of the imports and code remains same ...
+
+return (
+  <div className="flex flex-col gap-2">
+    <ArticlePostEditComponent
+      handleArticleFromData={handleArticleFromData}
+      formDataPostEdit={formDataPostEdit}
+    />
+    <RichTextEditor content={htmlContent && htmlContent} htmlContentGrab={htmlContentGrab} />
+    <RestOfPostEdit
+      formData={formData}
+      setFormData={setFormData}
+    />
+    {/* New Action Buttons Section */}
+    <div className="flex justify-end gap-4 mt-6 bg-white p-4 rounded-lg shadow">
+      <button 
+        className="px-6 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors duration-200 flex items-center gap-2"
+        onClick={() => console.log("Saving as draft...", formData)}
+      >
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+        </svg>
+        Save as Draft
+      </button>
+
+      <button 
+        className="px-6 py-2 bg-blue-100 text-blue-700 rounded-md hover:bg-blue-200 transition-colors duration-200 flex items-center gap-2"
+        onClick={() => console.log("Sending for approval...", formData)}
+      >
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        Send for Approval
+      </button>
+
+      <button 
+        className="px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors duration-200 flex items-center gap-2"
+        onClick={() => console.log("Publishing...", formData)}
+      >
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+        </svg>
+        Publish
+      </button>
     </div>
-  );
+  </div>
+);
 }
 
 export default ManagePostProperties;
