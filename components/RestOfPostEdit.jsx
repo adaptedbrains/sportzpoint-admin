@@ -1,72 +1,41 @@
 'use client';
-import { useState, useEffect, useMemo } from 'react';
+import useDropDownDataStore from '@/store/dropDownDataStore';
+import { useState, useEffect } from 'react';
+import Select from 'react-select';
 
-function RestOfPostEdit() {
-  const [primaryCategory, setPrimaryCategory] = useState('');
-  const [additionalCategory, setAdditionalCategory] = useState('');
-  const [tags, setTags] = useState([]);
-  const [credits, setCredits] = useState('');
-  const [focusKeyphrase, setFocusKeyphrase] = useState('');
-  const [categoriesList, setCategoriesList] = useState([]);
-  const [categoryInput, setCategoryInput] = useState('');
-  const [filteredCategories, setFilteredCategories] = useState([]);
-  const [categoryOption, setCategoryOption] = useState('');
+function RestOfPostEdit({ formData, setFormData }) {
+  const { allTags, allCategory, allRoleBaseUser, fetchDropDownData } = useDropDownDataStore();
 
-  // Use useMemo to memoize the categories array
-  const categories = useMemo(() => [
-    'Autos & Vehicles',
-    'Comedy',
-    'Education',
-    'Entertainment',
-    'Film and Animation',
-    'Gaming',
-    'Howto & Style',
-    'Music',
-    'News & Politics',
-    'Nonprofits & Activism',
-    'People & Blogs',
-    'Pets & Animals',
-    'Science & Technology',
-    'Sports',
-    'Travel & Events',
-  ], []); // Empty dependency array ensures the categories are not recalculated on every render
-
-  const handlePrimaryCategoryChange = (e) => {
-    setPrimaryCategory(e.target.value);
-  };
-
-  const handleTagsChange = (e) => {
-    const selectedOptions = Array.from(e.target.selectedOptions).map((option) => option.value);
-    setTags(selectedOptions); // Update state with selected values
-  };
-
-  const handleCreditsChange = (e) => {
-    setCredits(e.target.value);
-  };
-
-  const handleFocusKeyphraseChange = (e) => {
-    setFocusKeyphrase(e.target.value);
-  };
-
-  // Update filtered categories based on input
   useEffect(() => {
-    if (categoryOption === 'categories') {
-      setFilteredCategories(
-        categoryInput
-          ? categories.filter((category) =>
-              category.toLowerCase().includes(categoryInput.toLowerCase())
-            )
-          : categories
-      );
-    }
-  }, [categoryInput, categoryOption, categories]);
+    // Fetch the dropdown data for categories, tags, and credits
+    fetchDropDownData(`${process.env.NEXT_PUBLIC_API_URL}/category`, 'category');
+    fetchDropDownData(`${process.env.NEXT_PUBLIC_API_URL}/tag`, 'tag');
+    fetchDropDownData(`${process.env.NEXT_PUBLIC_API_URL}/user`, 'roleBaseUser');
+  }, []);
 
-  const handleCategoryClick = (item) => {
-    setCategoriesList((prev) =>
-      prev.includes(item) ? prev.filter((category) => category !== item) : [...prev, item]
-    );
-    setCategoryInput(''); // Clear the input after selection
-    setCategoryOption(''); // Close the dropdown
+  // Options for dropdowns
+  const categoryOptions = allCategory.map((cat) => ({
+    value: cat._id,
+    label: cat.name,
+  }));
+
+  const tagOptions = allTags.map((tag) => ({
+    value: tag._id,
+    label: tag.name,
+  }));
+
+  const creditOptions = allRoleBaseUser.map((role) => ({
+    value: role._id,
+    label: role.name,
+  }));
+
+  // Handle changes for all form fields
+  const handleChange = (value, field) => {
+    const updatedFormData = { ...formData, [field]: value };
+    setFormData(updatedFormData); // Update parent state
+
+    // Log the entire form data on every change
+    console.log('Form Data Updated:', updatedFormData);
   };
 
   return (
@@ -74,117 +43,75 @@ function RestOfPostEdit() {
       <h2 className="text-xl font-bold mb-4">Manage Post Properties</h2>
 
       <div className="mb-4">
-        <label htmlFor="primaryCategory" className="block text-sm font-medium text-gray-700">
+        <label className="block text-sm font-medium text-gray-700 mb-1">
           Primary Category *
         </label>
-        <select
-          id="primaryCategory"
-          value={primaryCategory}
-          onChange={handlePrimaryCategoryChange}
-          className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-200 focus:border-indigo-500 sm:text-sm"
-        >
-          <option value="">Select Primary Category</option>
-          <option value="cricket">Cricket</option>
-          <option value="football">Football</option>
-        </select>
+        <Select
+          value={formData.primaryCategory}
+          onChange={(value) => handleChange(value, 'primaryCategory')}
+          options={categoryOptions}
+          className="basic-single"
+          classNamePrefix="select"
+          isClearable
+          placeholder="Select Primary Category"
+        />
       </div>
 
       <div className="mb-4">
-        {categoriesList.length !== 0 && (
-          <ul className="flex flex-wrap gap-1 mb-1 pr-1 min-w-auto w-3/4 justify-end">
-            {categoriesList.map((item, i) => (
-              <li
-                className="hover:bg-red-400 bg-red-100 hover:border-red-400 hover:text-white rounded inline-block text-sm text-zinc-800 px-2 border"
-                key={i}
-              >
-                <button
-                  type="button"
-                  className="py-1 inline"
-                  onClick={() =>
-                    setCategoriesList((prev) =>
-                      prev.filter((category) => category !== item)
-                    )
-                  }
-                >
-                  {item}
-                </button>
-              </li>
-            ))}
-          </ul>
-        )}
-        <div className="flex w-full items-center relative flex-col">
-          <label className="w-full text-start text-zinc-700">Additional Category </label>
-          <input
-            type="text"
-            className="border focus:outline-none px-4 py-1 rounded w-2/3 text-zinc-800"
-            placeholder={
-              categoriesList.length !== 0
-                ? categoriesList[categoriesList.length - 1]
-                : 'Search'
-            }
-            value={categoryInput}
-            onChange={(e) => setCategoryInput(e.target.value)}
-            onFocus={() => setCategoryOption('categories')}
-          />
-          {categoryOption === 'categories' && filteredCategories.length > 0 && (
-            <ul className="absolute top-12 left-28 bg-white border rounded shadow-lg z-10 w-2/3 max-h-40 overflow-y-auto">
-              {filteredCategories.map((category, index) => (
-                <li
-                  key={index}
-                  className="px-4 py-2 hover:bg-indigo-100 cursor-pointer"
-                  onClick={() => handleCategoryClick(category)}
-                >
-                  {category}
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          Additional Categories
+        </label>
+        <Select
+          isMulti
+          value={formData.additionalCategories}
+          onChange={(value) => handleChange(value, 'additionalCategories')}
+          options={categoryOptions}
+          className="basic-multi-select"
+          classNamePrefix="select"
+          placeholder="Select Additional Categories"
+        />
       </div>
 
       <div className="mb-4">
-        <label htmlFor="tags" className="block text-sm font-medium text-gray-700">
+        <label className="block text-sm font-medium text-gray-700 mb-1">
           Tags
         </label>
-        <select
-          id="tags"
-          multiple
-          value={tags}
-          onChange={handleTagsChange}
-          className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-200 focus:border-indigo-500 sm:text-sm"
-        >
-          <option value="cricket">Cricket</option>
-          <option value="football">Football</option>
-          <option value="basketball">Basketball</option>
-        </select>
+        <Select
+          isMulti
+          value={formData.tags}
+          onChange={(value) => handleChange(value, 'tags')}
+          options={tagOptions}
+          className="basic-multi-select"
+          classNamePrefix="select"
+          placeholder="Select Tags"
+        />
       </div>
 
       <div className="mb-4">
-        <label htmlFor="credits" className="block text-sm font-medium text-gray-700">
+        <label className="block text-sm font-medium text-gray-700 mb-1">
           Credits *
         </label>
-        <select
-          id="credits"
-          value={credits}
-          onChange={handleCreditsChange}
-          className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-200 focus:border-indigo-500 sm:text-sm"
-        >
-          <option value="">Please select Author</option>
-          <option value="author1">Author 1</option>
-          <option value="author2">Author 2</option>
-        </select>
+        <Select
+          isMulti
+          value={formData.credits}
+          onChange={(value) => handleChange(value, 'credits')}
+          options={creditOptions}
+          className="basic-multi-select"
+          classNamePrefix="select"
+          placeholder="Select Credits"
+        />
       </div>
 
       <div className="mb-4">
-        <label htmlFor="focusKeyphrase" className="block text-sm font-medium text-gray-700">
+        <label className="block text-sm font-medium text-gray-700 mb-1">
           Focus Keyphrase
         </label>
         <input
           type="text"
-          id="focusKeyphrase"
-          value={focusKeyphrase}
-          onChange={handleFocusKeyphraseChange}
+          value={formData.focusKeyphrase}
+          onChange={(e) => handleChange(e.target.value, 'focusKeyphrase')}
           className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-200 focus:border-indigo-500 sm:text-sm"
+          placeholder="Enter focus keyphrase"
         />
       </div>
     </div>
