@@ -1,9 +1,9 @@
 'use client';
 import Image from 'next/image';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FaPlusCircle } from 'react-icons/fa';
 
-const ArticlePostEditComponent = () => {
+const ArticlePostEditComponent = ({ onTitleChange, onMetaDescriptionChange, onSummaryChange }) => {
   const [title, setTitle] = useState('');
   const [englishTitle, setEnglishTitle] = useState('');
   const [summary, setSummary] = useState('');
@@ -11,20 +11,46 @@ const ArticlePostEditComponent = () => {
   const [featuredImage, setFeaturedImage] = useState(null);
   const [dragOver, setDragOver] = useState(false);
 
+  // Auto-generate English title from title
+  useEffect(() => {
+    const generateEnglishTitle = (text) => {
+      return text
+        .toLowerCase()
+        .replace(/[^a-z0-9\s-]/g, '') // Remove special characters
+        .trim()
+        .replace(/\s+/g, '-'); // Replace spaces with hyphens
+    };
+
+    if (title) {
+      setEnglishTitle(generateEnglishTitle(title));
+    }
+  }, [title]);
+
   const handleTitleChange = (e) => {
-    setTitle(e.target.value);
+    const newTitle = e.target.value;
+    setTitle(newTitle);
+    onTitleChange?.(newTitle);
   };
 
   const handleEnglishTitleChange = (e) => {
-    setEnglishTitle(e.target.value);
+    const newEnglishTitle = e.target.value
+      .toLowerCase()
+      .replace(/[^a-z0-9\s-]/g, '')
+      .trim()
+      .replace(/\s+/g, '-');
+    setEnglishTitle(newEnglishTitle);
   };
 
   const handleSummaryChange = (e) => {
-    setSummary(e.target.value.slice(0, 250)); // Enforce 250-character limit
+    const newSummary = e.target.value.slice(0, 250);
+    setSummary(newSummary);
+    onSummaryChange?.(newSummary);
   };
 
   const handleMetaDescriptionChange = (e) => {
-    setMetaDescription(e.target.value.slice(0, 160)); // Enforce 160-character limit
+    const newMetaDesc = e.target.value.slice(0, 160);
+    setMetaDescription(newMetaDesc);
+    onMetaDescriptionChange?.(newMetaDesc);
   };
 
   const handleFeaturedImageChange = (e) => {
@@ -70,6 +96,7 @@ const ArticlePostEditComponent = () => {
           id="title"
           value={title}
           onChange={handleTitleChange}
+          placeholder="Enter post title"
           className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-200 focus:border-indigo-500 sm:text-sm"
         />
       </div>
@@ -79,13 +106,19 @@ const ArticlePostEditComponent = () => {
         <label htmlFor="englishTitle" className="block text-sm font-medium text-gray-700">
           English Title (Permalink)
         </label>
-        <input
-          type="text"
-          id="englishTitle"
-          value={englishTitle}
-          onChange={handleEnglishTitleChange}
-          className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-200 focus:border-indigo-500 sm:text-sm"
-        />
+        <div className="mt-1 flex rounded-md shadow-sm">
+          <span className="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500 sm:text-sm">
+            /article/
+          </span>
+          <input
+            type="text"
+            id="englishTitle"
+            value={englishTitle}
+            onChange={handleEnglishTitleChange}
+            className="flex-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-none rounded-r-md focus:outline-none focus:ring-indigo-200 focus:border-indigo-500 sm:text-sm"
+            placeholder="auto-generated-url-slug"
+          />
+        </div>
       </div>
 
       {/* Summary */}
@@ -97,10 +130,15 @@ const ArticlePostEditComponent = () => {
           id="summary"
           value={summary}
           onChange={handleSummaryChange}
+          rows={3}
+          placeholder="Brief summary of the article"
           className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-200 focus:border-indigo-500 sm:text-sm"
         />
-        <div className="text-sm text-gray-500 mt-1">
-          {summary.length} / 250
+        <div className="text-sm text-gray-500 mt-1 flex justify-between">
+          <span>{summary.length} / 250 characters</span>
+          {summary.length > 200 && (
+            <span className="text-yellow-600">Approaching limit</span>
+          )}
         </div>
       </div>
 
@@ -113,10 +151,15 @@ const ArticlePostEditComponent = () => {
           id="metaDescription"
           value={metaDescription}
           onChange={handleMetaDescriptionChange}
+          rows={2}
+          placeholder="SEO meta description"
           className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-200 focus:border-indigo-500 sm:text-sm"
         />
-        <div className="text-sm text-gray-500 mt-1">
-          {metaDescription.length} / 160
+        <div className="text-sm text-gray-500 mt-1 flex justify-between">
+          <span>{metaDescription.length} / 160 characters</span>
+          {metaDescription.length > 140 && (
+            <span className="text-yellow-600">Approaching limit</span>
+          )}
         </div>
       </div>
 
@@ -126,8 +169,8 @@ const ArticlePostEditComponent = () => {
           Featured Image
         </label>
         <div
-          className={`flex items-center justify-center w-full h-40 mt-1 border rounded-md cursor-pointer ${
-            dragOver ? 'border-blue-500 bg-blue-100' : 'border-dashed border-gray-300 bg-gray-200'
+          className={`flex items-center justify-center w-full h-40 mt-1 border rounded-md cursor-pointer transition-all duration-200 ${
+            dragOver ? 'border-blue-500 bg-blue-50' : 'border-dashed border-gray-300 bg-gray-50 hover:bg-gray-100'
           }`}
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
@@ -137,6 +180,7 @@ const ArticlePostEditComponent = () => {
             type="file"
             id="featuredImage"
             onChange={handleFeaturedImageChange}
+            accept="image/*"
             className="hidden"
           />
           <label
@@ -144,23 +188,22 @@ const ArticlePostEditComponent = () => {
             className="flex items-center justify-center w-full h-full"
           >
             {featuredImage ? (
-             <Image
-             src={featuredImage}
-             alt="Featured"
-             
-             width={500}          
-             height={100}      
-             className="object-cover w-full h-full rounded-md"
-           />
+              <Image
+                src={featuredImage}
+                alt="Featured"
+                width={500}
+                height={100}
+                className="object-cover w-full h-full rounded-md"
+              />
             ) : (
-              <>
-                
-                <p className="mt-2 text-sm text-gray-500 text-center">
+              <div className="text-center">
+                <FaPlusCircle className="mx-auto h-8 w-8 text-gray-400" />
+                <p className="mt-2 text-sm text-gray-500">
                   Add Featured Image
                   <br />
-                  Recommended Size: 1280x720
+                  <span className="text-xs">Recommended Size: 1280x720</span>
                 </p>
-              </>
+              </div>
             )}
           </label>
         </div>
