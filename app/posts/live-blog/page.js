@@ -9,7 +9,7 @@ const page = () => {
 
   
     useEffect(()=>{
-      fetchAllPostedData(`${process.env.NEXT_PUBLIC_API_URL}/articles/type/Web Story?limit=15&page=1`,"Web Story")
+      fetchAllPostedData(`${process.env.NEXT_PUBLIC_API_URL}/articles/type/LiveBlog?limit=15&page=1`,"LiveBlog")
     },[currentPage])
 
 
@@ -33,7 +33,7 @@ const page = () => {
 
   return (
     <div className='p-1 pt-2'>
-      <Table posts={allPosts} type={"Web Story"}  totalPage={totalPage}
+      <Table posts={allPosts} type={"LiveBlog"}  totalPage={totalPage}
         currentPage={currentPage}
         onNextPage={handleNextPage}
         onPreviousPage={handlePreviousPage}

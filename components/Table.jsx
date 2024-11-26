@@ -8,7 +8,15 @@ import { useRouter } from "next/navigation";
 import CalendarModal from "./CalendarModal";
 import { formatDate } from "@/util/timeFormat";
 
-export default function Table({ posts }) {
+export default function Table({
+  posts,
+  type,
+  currentPage,
+  onNextPage,
+  onPreviousPage,
+  totalPage,
+  loading,
+}) {
   const router = useRouter();
 
   const articles = [
@@ -75,7 +83,7 @@ export default function Table({ posts }) {
       <div className="bg-white p-4 rounded-lg mb-1">
         <div className="flex justify-between items-center">
           <div className="flex items-center">
-            <h2 className="text-lg font-semibold">Article</h2>
+            <h2 className="text-lg font-semibold"> {type} </h2>
             <button className="ml-2 bg-blue-500 hover:bg-blue-700 text-white font-bold px-2 rounded">
               +
             </button>
@@ -131,6 +139,40 @@ export default function Table({ posts }) {
 
       <div className="p-3 bg-white rounded shadow">
         <h2 className="text-lg font-semibold mb-4">Published Posts</h2>
+        <div className=" float-end">
+          <div className="flex items-center mb-2 border border-green-700">
+            {/* Previous Button */}
+            <button
+              type="button"
+              disabled={currentPage === 1 || loading}
+              onClick={onPreviousPage}
+              className={`px-2 py-1 border-green-700 text-green-500 bg-white rounded ${
+                currentPage === 1 || loading
+                  ? "opacity-50 cursor-not-allowed"
+                  : "hover:bg-green-100"
+              }`}
+            >
+              {"Pre"}
+            </button>
+
+            {/* Current Page Indicator */}
+            <p className="bg-green-700 text-white px-5 py-1">{currentPage}</p>
+
+            {/* Next Button */}
+            <button
+              type="button"
+              disabled={currentPage === totalPage || loading}
+              onClick={onNextPage}
+              className={`px-2 py-1 border-green-400 text-green-700 bg-white rounded ${
+                currentPage === totalPage || loading
+                  ? "opacity-50 cursor-not-allowed"
+                  : "hover:bg-green-100"
+              }`}
+            >
+              {"Next"}
+            </button>
+          </div>
+        </div>
         <table className="w-full border-collapse border border-gray-300">
           <thead>
             <tr className="bg-gray-100">
@@ -194,9 +236,7 @@ export default function Table({ posts }) {
                   </span>
                 </td>
                 <td className="px-4 py-2 border border-gray-300 text-sm">
-
                   {formatDate(article.updated_at_datetime)}
-
                 </td>
                 <td className="px-4 py-2 text-center border border-gray-300 relative">
                   <div className="flex justify-center space-x-2">
@@ -205,7 +245,7 @@ export default function Table({ posts }) {
                       onClick={() => {
                         const type = article?.type ?? "defaultType"; // Provide a default if undefined
                         const views = article?.views ?? "0"; // Provide a default if undefined
-                        router.push(`/posts/${article.type}/${article._id}`);
+                        router.push(`/posts/${type}/${article._id}`);
                       }}
                     />
                     <FaEye className="text-blue-500 cursor-pointer" />

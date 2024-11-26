@@ -5,14 +5,15 @@ import React, { useEffect } from 'react'
 
 const page = () => {
 
-  const {fetchAllPostedData,allPosts , totalPage, currentPage,loading}=useAllPostDataStore()
+  const {fetchAllPostedData,allPosts, totalPage, currentPage,loading}=useAllPostDataStore()
 
   
     useEffect(()=>{
-      fetchAllPostedData(`${process.env.NEXT_PUBLIC_API_URL}/articles/type/Web Story?limit=15&page=1`,"Web Story")
+      fetchAllPostedData(`${process.env.NEXT_PUBLIC_API_URL}/articles/type/CustomPage?limit=15&page=1`,"CustomPage")
     },[currentPage])
 
 
+    
   // Function to go to the next page
   const handleNextPage = () => {
     if (currentPage < totalPage) {
@@ -31,9 +32,10 @@ const page = () => {
     }
   };
 
+
   return (
     <div className='p-1 pt-2'>
-      <Table posts={allPosts} type={"Web Story"}  totalPage={totalPage}
+      <Table posts={allPosts} type={"CustomPage"}  totalPage={totalPage}
         currentPage={currentPage}
         onNextPage={handleNextPage}
         onPreviousPage={handlePreviousPage}
