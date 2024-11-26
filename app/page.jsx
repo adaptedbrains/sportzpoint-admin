@@ -1,20 +1,23 @@
 "use client";
+import DraftPosts from '@/components/DraftPosts';
+import PostTypeDropdown from '@/components/PostTypeDropdown';
 
-const HomePage = () => {
+const DashboardPage = () => {
   return (
-    <div className="flex justify-center min-h-screen bg-gray-50 pt-20 pb-6">
-      <div className="w-full max-w-6xl px-4 sm:px-6 lg:px-8">
-        <div className="mb-8 text-center">
-          <h1 className="text-3xl font-semibold text-gray-900 mb-4">
-            Welcome to Sportzpoint Dashboard 👋
-          </h1>
-          <p className="text-lg text-gray-600">
-            Your central hub for sports content management
-          </p>
+    <div className="min-h-screen bg-white">
+      <div className="p-6">
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h1 className="text-2xl font-semibold text-gray-800">Dashboard</h1>
+            <p className="text-gray-500 text-sm mt-1">Manage your content and drafts</p>
+          </div>
+          <PostTypeDropdown />
         </div>
+        
+        <DraftPosts />
       </div>
     </div>
   );
 };
 
-export default HomePage; 
+export default DashboardPage; 
