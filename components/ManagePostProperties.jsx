@@ -80,7 +80,7 @@ function ManagePostProperties() {
 
   const submitData = (status) => {
     const transformedData = {
-      // Extract just the '_id' value for primaryCategory
+      
       primary_category:formData.primaryCategory ? [formData.primaryCategory.value] : [],
       title:formDataPostEdit.title,
       summary:formDataPostEdit.summary,
