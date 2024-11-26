@@ -70,123 +70,122 @@ function RestOfPostEdit() {
   };
 
   return (
-    <div className="bg-white p-4 rounded-lg shadow-md">
-      <h2 className="text-lg font-semibold mb-3">Manage Post Properties</h2>
+    <div className="bg-white p-6 rounded-lg shadow-md">
+      <h2 className="text-xl font-bold mb-4">Manage Post Properties</h2>
 
-      <div className="space-y-3">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Primary Category *
-          </label>
-          <select
-            value={primaryCategory}
-            onChange={handlePrimaryCategoryChange}
-            className="w-full px-2 py-1.5 border rounded"
-          >
-            <option value="">Select Primary Category</option>
-            <option value="cricket">Cricket</option>
-            <option value="football">Football</option>
-          </select>
-        </div>
+      <div className="mb-4">
+        <label htmlFor="primaryCategory" className="block text-sm font-medium text-gray-700">
+          Primary Category *
+        </label>
+        <select
+          id="primaryCategory"
+          value={primaryCategory}
+          onChange={handlePrimaryCategoryChange}
+          className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-200 focus:border-indigo-500 sm:text-sm"
+        >
+          <option value="">Select Primary Category</option>
+          <option value="cricket">Cricket</option>
+          <option value="football">Football</option>
+        </select>
+      </div>
 
-        <div>
-          {categoriesList.length !== 0 && (
-            <ul className="flex flex-wrap gap-1 mb-1 pr-1 min-w-auto w-3/4 justify-end">
-              {categoriesList.map((item, i) => (
-                <li
-                  className="hover:bg-red-400 bg-red-100 hover:border-red-400 hover:text-white rounded inline-block text-sm text-zinc-800 px-2 border"
-                  key={i}
+      <div className="mb-4">
+        {categoriesList.length !== 0 && (
+          <ul className="flex flex-wrap gap-1 mb-1 pr-1 min-w-auto w-3/4 justify-end">
+            {categoriesList.map((item, i) => (
+              <li
+                className="hover:bg-red-400 bg-red-100 hover:border-red-400 hover:text-white rounded inline-block text-sm text-zinc-800 px-2 border"
+                key={i}
+              >
+                <button
+                  type="button"
+                  className="py-1 inline"
+                  onClick={() =>
+                    setCategoriesList((prev) =>
+                      prev.filter((category) => category !== item)
+                    )
+                  }
                 >
-                  <button
-                    type="button"
-                    className="py-1 inline"
-                    onClick={() =>
-                      setCategoriesList((prev) =>
-                        prev.filter((category) => category !== item)
-                      )
-                    }
-                  >
-                    {item}
-                  </button>
+                  {item}
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
+        <div className="flex w-full items-center relative flex-col">
+          <label className="w-full text-start text-zinc-700">Additional Category </label>
+          <input
+            type="text"
+            className="border focus:outline-none px-4 py-1 rounded w-2/3 text-zinc-800"
+            placeholder={
+              categoriesList.length !== 0
+                ? categoriesList[categoriesList.length - 1]
+                : 'Search'
+            }
+            value={categoryInput}
+            onChange={(e) => setCategoryInput(e.target.value)}
+            onFocus={() => setCategoryOption('categories')}
+          />
+          {categoryOption === 'categories' && filteredCategories.length > 0 && (
+            <ul className="absolute top-12 left-28 bg-white border rounded shadow-lg z-10 w-2/3 max-h-40 overflow-y-auto">
+              {filteredCategories.map((category, index) => (
+                <li
+                  key={index}
+                  className="px-4 py-2 hover:bg-indigo-100 cursor-pointer"
+                  onClick={() => handleCategoryClick(category)}
+                >
+                  {category}
                 </li>
               ))}
             </ul>
           )}
-          <div className="flex w-full items-center relative flex-col">
-            <label className="w-full text-start text-zinc-700">Additional Category </label>
-            <input
-              type="text"
-              className="border focus:outline-none px-4 py-1 rounded w-2/3 text-zinc-800"
-              placeholder={
-                categoriesList.length !== 0
-                  ? categoriesList[categoriesList.length - 1]
-                  : 'Search'
-              }
-              value={categoryInput}
-              onChange={(e) => setCategoryInput(e.target.value)}
-              onFocus={() => setCategoryOption('categories')}
-            />
-            {categoryOption === 'categories' && filteredCategories.length > 0 && (
-              <ul className="absolute top-12 left-28 bg-white border rounded shadow-lg z-10 w-2/3 max-h-40 overflow-y-auto">
-                {filteredCategories.map((category, index) => (
-                  <li
-                    key={index}
-                    className="px-4 py-2 hover:bg-indigo-100 cursor-pointer"
-                    onClick={() => handleCategoryClick(category)}
-                  >
-                    {category}
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
         </div>
+      </div>
 
-        <div>
-          <label htmlFor="tags" className="block text-sm font-medium text-gray-700">
-            Tags
-          </label>
-          <select
-            id="tags"
-            multiple
-            value={tags}
-            onChange={handleTagsChange}
-            className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-200 focus:border-indigo-500 sm:text-sm"
-          >
-            <option value="cricket">Cricket</option>
-            <option value="football">Football</option>
-            <option value="basketball">Basketball</option>
-          </select>
-        </div>
+      <div className="mb-4">
+        <label htmlFor="tags" className="block text-sm font-medium text-gray-700">
+          Tags
+        </label>
+        <select
+          id="tags"
+          multiple
+          value={tags}
+          onChange={handleTagsChange}
+          className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-200 focus:border-indigo-500 sm:text-sm"
+        >
+          <option value="cricket">Cricket</option>
+          <option value="football">Football</option>
+          <option value="basketball">Basketball</option>
+        </select>
+      </div>
 
-        <div>
-          <label htmlFor="credits" className="block text-sm font-medium text-gray-700">
-            Credits *
-          </label>
-          <select
-            id="credits"
-            value={credits}
-            onChange={handleCreditsChange}
-            className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-200 focus:border-indigo-500 sm:text-sm"
-          >
-            <option value="">Please select Author</option>
-            <option value="author1">Author 1</option>
-            <option value="author2">Author 2</option>
-          </select>
-        </div>
+      <div className="mb-4">
+        <label htmlFor="credits" className="block text-sm font-medium text-gray-700">
+          Credits *
+        </label>
+        <select
+          id="credits"
+          value={credits}
+          onChange={handleCreditsChange}
+          className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-200 focus:border-indigo-500 sm:text-sm"
+        >
+          <option value="">Please select Author</option>
+          <option value="author1">Author 1</option>
+          <option value="author2">Author 2</option>
+        </select>
+      </div>
 
-        <div>
-          <label htmlFor="focusKeyphrase" className="block text-sm font-medium text-gray-700">
-            Focus Keyphrase
-          </label>
-          <input
-            type="text"
-            id="focusKeyphrase"
-            value={focusKeyphrase}
-            onChange={handleFocusKeyphraseChange}
-            className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-200 focus:border-indigo-500 sm:text-sm"
-          />
-        </div>
+      <div className="mb-4">
+        <label htmlFor="focusKeyphrase" className="block text-sm font-medium text-gray-700">
+          Focus Keyphrase
+        </label>
+        <input
+          type="text"
+          id="focusKeyphrase"
+          value={focusKeyphrase}
+          onChange={handleFocusKeyphraseChange}
+          className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-200 focus:border-indigo-500 sm:text-sm"
+        />
       </div>
     </div>
   );

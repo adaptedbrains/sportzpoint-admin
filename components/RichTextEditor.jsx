@@ -2,26 +2,31 @@
 import React, { useRef } from 'react';
 import { Editor } from '@tinymce/tinymce-react';
 
-const RichTextEditor = ({ onChange }) => {
+const RichTextEditor = () => {
   const editorRef = useRef(null);
-
-  const handleEditorChange = (content, editor) => {
-    onChange?.(content);
-  };
 
   return (
     <div className="bg-white rounded-lg shadow-lg">
-      <div className="border-b border-gray-200 p-3">
-        <h2 className="text-lg font-semibold text-gray-800">Content</h2>
+      <div className="border-b border-gray-200 p-4">
+        <h2 className="text-xl font-semibold text-gray-800">Content</h2>
       </div>
       
       <Editor
         apiKey="qagffr3pkuv17a8on1afax661irst1hbr4e6tbv888sz91jc"
         onInit={(evt, editor) => editorRef.current = editor}
-        onEditorChange={handleEditorChange}
         init={{
-          height: 400,
+          height: 500,
           menubar: true,
+          menu: {
+            file: { title: 'File', items: 'newdocument restoredraft | preview | export print | deleteallconversations' },
+            edit: { title: 'Edit', items: 'undo redo | cut copy paste pastetext | selectall | searchreplace' },
+            view: { title: 'View', items: 'code | visualaid visualchars visualblocks | spellchecker | preview fullscreen | showcomments' },
+            insert: { title: 'Insert', items: 'image link media addcomment pageembed template codesample inserttable | charmap emoticons hr | pagebreak nonbreaking anchor tableofcontents | insertdatetime' },
+            format: { title: 'Format', items: 'bold italic underline strikethrough superscript subscript codeformat | styles blocks fontfamily fontsize align lineheight | forecolor backcolor | language | removeformat' },
+            tools: { title: 'Tools', items: 'spellchecker spellcheckerlanguage | code wordcount' },
+            table: { title: 'Table', items: 'inserttable | cell row column | advtablesort | tableprops deletetable' },
+            help: { title: 'Help', items: 'help' }
+          },
           plugins: [
             'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
             'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
@@ -42,6 +47,7 @@ const RichTextEditor = ({ onChange }) => {
             { title: 'Heading 4', format: 'h4' }
           ],
           setup: (editor) => {
+            // Add custom "More" button that opens all other options
             editor.ui.registry.addMenuButton('more', {
               text: '...',
               fetch: (callback) => {
@@ -92,6 +98,19 @@ const RichTextEditor = ({ onChange }) => {
           }
         }}
       />
+      
+      <div className="flex justify-end p-4 border-t border-gray-200">
+        <button
+          onClick={() => {
+            if (editorRef.current) {
+              console.log(editorRef.current.getContent());
+            }
+          }}
+          className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors"
+        >
+          Save Content
+        </button>
+      </div>
     </div>
   );
 };

@@ -52,12 +52,12 @@ const statuses = [
 const PostSideBar = () => {
   return (
     <motion.div
-      className="w-full bg-white h-screen px-3 pt-3"
+      className="w-full bg-zinc-100 h-screen px-3 pt-3"
       initial={{ x: '-100%' }} // Start position from left
       animate={{ x: 0 }} // Animate to the normal position
       transition={{ duration: 0.5, ease: 'easeOut' }} // Set the duration and easing
     >
-      <button className='border-b py-2 px-4 flex items-center gap-2 hover:text-blue-600 hover:bg-blue-50 group w-full'>
+      <button className='border-b py-2 px-4 flex items-center gap-2 hover:text-blue-600 hover:bg-blue-100 group w-full'>
       <VscListFlat  />
       <li className=" text-gray-700 py-1 list-none   group-hover:text-blue-600 transition-all duration-100 "> 
       All Posts</li>
@@ -68,7 +68,7 @@ const PostSideBar = () => {
         <h3 className="text-gray-500 mb-2">Private View</h3>
         <Link
           href="/created-by-me"
-          className="flex items-center gap-2 p-2  transition-all duration-100 rounded-lg text-zinc-700 text-sm hover:bg-blue-50 hover:text-blue-600  "
+          className="flex items-center gap-2 p-2  transition-all duration-100 rounded-lg text-zinc-700 text-sm hover:bg-blue-100 hover:text-blue-600  "
         >
           <BiBookBookmark  />
           Created By Me
@@ -82,7 +82,7 @@ const PostSideBar = () => {
           <Link
             key={contentType.name}
             href={contentType.href}
-            className="flex items-center gap-2 p-2 group  transition-all duration-100 rounded-lg text-zinc-700 text-sm hover:bg-blue-50 hover:text-blue-600 justify-between"
+            className="flex items-center gap-2 p-2 group  transition-all duration-100 rounded-lg text-zinc-700 text-sm hover:bg-blue-100 hover:text-blue-600 justify-between"
           >
             <div className="flex items-center gap-2">
               {contentType.icon}
@@ -100,7 +100,7 @@ const PostSideBar = () => {
           <Link
             key={status.name}
             href={status.href}
-           className="flex items-center gap-2 p-2 group  transition-all duration-100 rounded-lg text-zinc-700 text-sm hover:bg-blue-50 hover:text-blue-600 "
+           className="flex items-center gap-2 p-2 group  transition-all duration-100 rounded-lg text-zinc-700 text-sm hover:bg-blue-100 hover:text-blue-600 "
           >
             <BsFillFileTextFill className='text-gray-600 group-hover:text-blue-600'  />
             <span>{status.name}</span>
