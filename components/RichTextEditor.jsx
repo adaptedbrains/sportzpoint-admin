@@ -1,9 +1,13 @@
 'use client';
-import React, { useRef } from 'react';
+import React, { useRef, useEffect } from 'react';
 import { Editor } from '@tinymce/tinymce-react';
 
-const RichTextEditor = () => {
+const RichTextEditor = ({ onChange }) => {
   const editorRef = useRef(null);
+
+  const handleEditorChange = (content, editor) => {
+    onChange?.(content);
+  };
 
   return (
     <div className="bg-white rounded-lg shadow-lg">
@@ -14,6 +18,7 @@ const RichTextEditor = () => {
       <Editor
         apiKey="qagffr3pkuv17a8on1afax661irst1hbr4e6tbv888sz91jc"
         onInit={(evt, editor) => editorRef.current = editor}
+        onEditorChange={handleEditorChange}
         init={{
           height: 500,
           menubar: true,
@@ -103,7 +108,9 @@ const RichTextEditor = () => {
         <button
           onClick={() => {
             if (editorRef.current) {
-              console.log(editorRef.current.getContent());
+              const content = editorRef.current.getContent();
+              onChange?.(content);
+              console.log(content);
             }
           }}
           className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors"
