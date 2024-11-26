@@ -1,10 +1,8 @@
 "use client";
 import { useState, useEffect } from 'react';
 import RichTextEditor from '../../../components/RichTextEditor';
-import useLivePost from '@/store/liveBlogStore';
 
 const LiveBlogPage = () => {
-  const {fetchLiveBlogData}=useLivePost()
   const [ongoingBlogs, setOngoingBlogs] = useState([]);
   const [allBlogs, setAllBlogs] = useState([]);
   const [activeStatus, setActiveStatus] = useState('all');
@@ -18,7 +16,6 @@ const LiveBlogPage = () => {
 
 
 
-    fetchLiveBlogData
 
 
 

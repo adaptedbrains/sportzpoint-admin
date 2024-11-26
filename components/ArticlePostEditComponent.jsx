@@ -1,15 +1,35 @@
 'use client';
 import Image from 'next/image';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { FaPlusCircle } from 'react-icons/fa';
+import { usePathname } from 'next/navigation';
+import useAllPostDataStore from '@/store/useAllPostDataStore';
 
 const ArticlePostEditComponent = () => {
-  const [title, setTitle] = useState('');
-  const [englishTitle, setEnglishTitle] = useState('');
-  const [summary, setSummary] = useState('');
-  const [metaDescription, setMetaDescription] = useState('');
-  const [featuredImage, setFeaturedImage] = useState(null);
+  const {allArticlePost}=useAllPostDataStore()
+  
+  const pathname = usePathname();
+  const parts = pathname.split('/');
+  const id = parts[3];
+  const [title, setTitle] = useState();
+  const [englishTitle, setEnglishTitle] = useState("");
+  const [summary, setSummary] = useState("");
+  const [metaDescription, setMetaDescription] = useState("");
+  const [featuredImage, setFeaturedImage] = useState("");
   const [dragOver, setDragOver] = useState(false);
+  useEffect(()=>{
+      const requiredData=allArticlePost.find((a)=>a._id===id)
+        console.log("requiredData",requiredData);
+        if(requiredData){
+          setTitle(requiredData.title)
+          setEnglishTitle(requiredData.legacy_url)
+          setSummary(requiredData.summary)
+          setMetaDescription(requiredData.seo_desc)
+          setFeaturedImage(`https://sportzpoint-media.s3.ap-south-1.amazonaws.com/${requiredData.banner_image}`)
+        }
+        
+    
+  },[id])
 
   const handleTitleChange = (e) => {
     setTitle(e.target.value);
@@ -146,10 +166,11 @@ const ArticlePostEditComponent = () => {
             {featuredImage ? (
              <Image
              src={featuredImage}
+            //  https://sportzpoint-media.s3.ap-south-1.amazonaws.com
              alt="Featured"
              
              width={500}          
-             height={100}      
+             height={400}      
              className="object-cover w-full h-full rounded-md"
            />
             ) : (

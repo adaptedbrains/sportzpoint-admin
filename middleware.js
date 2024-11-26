@@ -1,18 +1,23 @@
-// middleware.js
 import { NextResponse } from 'next/server';
 
 export function middleware(request) {
-  const token = request.cookies.get('token'); // Retrieve token from cookie
+  const token = request.cookies.get('token'); // Retrieve token from cookies
+  const pathname = request.nextUrl.pathname; // Get the current path
 
-  // If token is not found, redirect to /login
+  // Allow requests to the /login route or static files to proceed without checking the token
+  if (pathname === '/login' || pathname.startsWith('/_next')) {
+    return NextResponse.next();
+  }
+
+  // Redirect to /login if the token is missing
   if (!token) {
     return NextResponse.redirect(new URL('/login', request.url));
   }
 
-  // If token exists, allow the request to proceed
+  // Allow the request to proceed if the token exists
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ['/', '/dashboard', '/profile','/'], // Specify the routes where this middleware should run
+  matcher: '/:path*', // Match all routes
 };

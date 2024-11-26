@@ -1,37 +1,51 @@
-'use client'
-import React, { useState } from 'react';
+"use client";
+import React, { useEffect, useState } from "react";
+import Cookies from "js-cookie"; // Import js-cookie library
+import useDropDownDataStore from "../../store/dropDownDataStore";
 
 const Page = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const {fetchDropDownData}=useDropDownDataStore()
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState(null);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Login successful',  email, password, rememberMe);
-    // Example API endpoint, replace with your actual API endpoint
-    const res = await fetch('/api/login', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ email, password, rememberMe }),
-    });
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/user/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
 
-    const data = await res.json();
+      const data = await res.json();
 
-    if (res.ok) {
-      // Handle successful login, e.g., store token in localStorage/cookies
-      console.log('Login successful', data);
-    } else {
-      // Handle errors (wrong credentials, etc.)
-      setError(data.message || 'Login failed');
+      if (res.ok) {
+        // Save token to cookies
+        Cookies.set("token", data.token, {
+          expires: rememberMe ? 7 : undefined, // Set expiration if 'Remember me' is checked
+          secure: true,
+          sameSite: "Strict",
+        });
+        console.log("Login successful, token saved");
+        // Redirect to a secure route, e.g., /dashboard
+        window.location.href = "/";
+      } else {
+        // Handle errors (wrong credentials, etc.)
+        setError(data.message || "Login failed");
+      }
+    } catch (err) {
+      setError("An error occurred. Please try again later.");
     }
   };
 
+ 
+
   return (
-    <div className="bg-black text-white h-screen fixed top-0 start-0 z-40 w-full flex justify-center items-center ">
+    <div className="bg-black text-white h-screen fixed top-0 start-0 z-40 w-full flex justify-center items-center">
       <div className="w-1/3 h-[500px] bg-gray-800 p-8 rounded-lg shadow-lg">
         <h2 className="text-3xl font-bold text-center mb-6">Login</h2>
         {error && <p className="text-red-500 text-center mb-4">{error}</p>}
@@ -52,7 +66,10 @@ const Page = () => {
           </div>
 
           <div>
-            <label htmlFor="password" className="block text-sm font-semibold mb-1">
+            <label
+              htmlFor="password"
+              className="block text-sm font-semibold mb-1"
+            >
               Password
             </label>
             <input
@@ -78,7 +95,10 @@ const Page = () => {
                 Remember me
               </label>
             </div>
-            <a href="/forgot-password" className="text-sm text-blue-400 hover:underline">
+            <a
+              href="/forgot-password"
+              className="text-sm text-blue-400 hover:underline"
+            >
               Forgot password?
             </a>
           </div>
