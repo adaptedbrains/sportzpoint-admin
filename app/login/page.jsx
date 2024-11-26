@@ -30,7 +30,7 @@ const Page = () => {
           secure: true,
           sameSite: "Strict",
         });
-        console.log("Login successful, token saved");
+        localStorage.setItem('role',JSON.stringify(data.role))
         // Redirect to a secure route, e.g., /dashboard
         window.location.href = "/";
       } else {
@@ -104,12 +104,12 @@ const Page = () => {
           </div>
 
           <div className="mt-6">
-            <button
+            {!localStorage.getItem(JSON.parse('role').includes('Admin')) &&  <button
               type="submit"
               className="w-full py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition duration-200"
             >
               Login
-            </button>
+            </button>}
           </div>
         </form>
       </div>

@@ -23,7 +23,7 @@ const ArticlePostEditComponent = ({handleArticleFromData,formDataPostEdit}) => {
         console.log("requiredData",requiredData);
         if(requiredData){
           handleArticleFromData('title',requiredData.title)
-          handleArticleFromData('englishTitle',requiredData.legacy_url)
+          handleArticleFromData('englishTitle',requiredData.slug)
           handleArticleFromData('summary',requiredData.summary)
           handleArticleFromData('metaDescription',requiredData.seo_desc)
           
@@ -31,9 +31,9 @@ const ArticlePostEditComponent = ({handleArticleFromData,formDataPostEdit}) => {
           // setEnglishTitle(requiredData.legacy_url)
           // setSummary(requiredData.summary)
           // setMetaDescription(requiredData.seo_desc)
-          setFeaturedImage(`https://sportzpoint-media.s3.ap-south-1.amazonaws.com/${requiredData.banner_image}`)
+          setFeaturedImage(`https://img-cdn.thepublive.com/fit-in/1280x960/filters:format(webp)/sportzpoint/media/${requiredData.banner_image}`)
         }
-        
+      
     
   },[id])
 
@@ -111,6 +111,7 @@ const ArticlePostEditComponent = ({handleArticleFromData,formDataPostEdit}) => {
         </label>
         <input
           type="text"
+          disabled
           id="englishTitle"
           value={formDataPostEdit.englishTitle}
           onChange={handleEnglishTitleChange}
@@ -177,7 +178,7 @@ const ArticlePostEditComponent = ({handleArticleFromData,formDataPostEdit}) => {
              <Image
              src={featuredImage}
             //  https://sportzpoint-media.s3.ap-south-1.amazonaws.com
-             alt="Featured"
+             alt={featuredImage}
              
              width={500}          
              height={400}      

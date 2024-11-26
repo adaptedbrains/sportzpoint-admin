@@ -24,16 +24,14 @@ function ManagePostProperties() {
     summary: "",
     metaDescription: "",
     featuredImage: "",
+    banner_desc:""
   });
 
-  const [htmlContent, setHtmlContent] = useState('');
-  
+  const [htmlContent, setHtmlContent] = useState("");
 
-  const htmlContentGrab=(data)=>{
-    setHtmlContent(data)
-  }
- 
-  
+  const htmlContentGrab = (data) => {
+    setHtmlContent(data);
+  };
 
   const handleArticleFromData = (name, value) => {
     setFormDataPostEdit((prev) => ({
@@ -49,7 +47,7 @@ function ManagePostProperties() {
       const id = parts[3];
       const requiredData = allArticlePost.find((a) => a._id === id);
       setPost(requiredData);
-      setHtmlContent(requiredData.content)
+      setHtmlContent(requiredData.content);
       // Initialize formData with the fetched post data
       if (requiredData) {
         setFormData({
@@ -80,53 +78,90 @@ function ManagePostProperties() {
     }
   }, [pathname, allArticlePost]);
 
-  // ... rest of the imports and code remains same ...
+  const submitData = (status) => {
+    const transformedData = {
+      // Extract just the '_id' value for primaryCategory
+      primary_category:formData.primaryCategory ? [formData.primaryCategory.value] : [],
+      title:formDataPostEdit.title,
+      summary:formDataPostEdit.summary,
+      legacy_url:post.slug,
+      tags: formData.tags.map((tag) => tag.value),
+      categories:formData.additionalCategories.map((cat) => cat.value),
+      banner_desc:formDataPostEdit.banner_desc,
+      credits: formData.credits.map((credit) => credit.value),
+      focusKeyphrase: formData.focusKeyphrase,
+      content: htmlContent, 
+      status:status,
+      type:pathname.split("/")[2],
+      seo_desc:formDataPostEdit.metaDescription
+    };
+  
+    // Convert the object to a JSON string
+    const jsonData = JSON.stringify(transformedData, null, 2);
+  
+    // Create a blob with the JSON data and a URL for download
+    const blob = new Blob([jsonData], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+  
+    // Create a temporary link element to trigger the download
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "postData.json"; // File name
+    document.body.appendChild(link);
+    link.click();
+  
+    // Clean up by revoking the URL and removing the link
+    URL.revokeObjectURL(url);
+    document.body.removeChild(link);
+   
+    console.log("Data saved as JSON file:", transformedData);
+  };
+  
+  
 
-return (
-  <div className="flex flex-col gap-2">
-    <ArticlePostEditComponent
-      handleArticleFromData={handleArticleFromData}
-      formDataPostEdit={formDataPostEdit}
-    />
-    <RichTextEditor content={htmlContent && htmlContent} htmlContentGrab={htmlContentGrab} />
-    <RestOfPostEdit
-      formData={formData}
-      setFormData={setFormData}
-    />
-    {/* New Action Buttons Section */}
-    <div className="flex justify-end gap-4 mt-6 bg-white p-4 rounded-lg shadow">
-      <button 
-        className="px-6 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors duration-200 flex items-center gap-2"
-        onClick={() => console.log("Saving as draft...", formData)}
-      >
-        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
-        </svg>
-        Save as Draft
-      </button>
+  return (
+    <div className="flex flex-col gap-2">
+      <ArticlePostEditComponent
+        handleArticleFromData={handleArticleFromData}
+        formDataPostEdit={formDataPostEdit}
+      />
+      <RichTextEditor
+        content={htmlContent && htmlContent}
+        htmlContentGrab={htmlContentGrab}
+      />
+      <RestOfPostEdit formData={formData} setFormData={setFormData} />
+      {/* New Action Buttons Section */}
+      <div className="flex justify-end gap-4 mt-6 bg-white p-4 rounded-lg shadow">
+        <button
+          className="px-6 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors duration-200 flex items-center gap-2"
+          onClick={() => {
+            submitData('draft');
+          }}
+        >
+          Save as Draft
+        </button>
 
-      <button 
-        className="px-6 py-2 bg-blue-100 text-blue-700 rounded-md hover:bg-blue-200 transition-colors duration-200 flex items-center gap-2"
-        onClick={() => console.log("Sending for approval...", formData)}
-      >
-        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-        Send for Approval
-      </button>
+        <button
+          className="px-6 py-2 bg-blue-100 text-blue-700 rounded-md hover:bg-blue-200 transition-colors duration-200 flex items-center gap-2"
+          onClick={() => {
+            submitData('pending_approval');
+          }}
+        >
+          Send for Approval
+        </button>
 
-      <button 
-        className="px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors duration-200 flex items-center gap-2"
-        onClick={() => console.log("Publishing...", formData)}
-      >
-        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-        </svg>
-        Publish
-      </button>
+        <button
+          className="px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors duration-200 flex items-center gap-2"
+          onClick={() => {
+            
+            submitData('published');
+          }}
+        >
+          Publish
+        </button>
+      </div>
     </div>
-  </div>
-);
+  );
 }
 
 export default ManagePostProperties;
