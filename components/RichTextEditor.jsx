@@ -2,7 +2,7 @@
 import React, { useRef } from 'react';
 import { Editor } from '@tinymce/tinymce-react';
 
-const RichTextEditor = () => {
+const RichTextEditor = ({ content, htmlContentGrab }) => {
   const editorRef = useRef(null);
 
   return (
@@ -10,10 +10,14 @@ const RichTextEditor = () => {
       <div className="border-b border-gray-200 p-4">
         <h2 className="text-xl font-semibold text-gray-800">Content</h2>
       </div>
-      
+
       <Editor
         apiKey="qagffr3pkuv17a8on1afax661irst1hbr4e6tbv888sz91jc"
         onInit={(evt, editor) => editorRef.current = editor}
+        value={content}
+        onEditorChange={(newContent) => {
+          htmlContentGrab(newContent);
+        }}
         init={{
           height: 500,
           menubar: true,
@@ -47,7 +51,6 @@ const RichTextEditor = () => {
             { title: 'Heading 4', format: 'h4' }
           ],
           setup: (editor) => {
-            // Add custom "More" button that opens all other options
             editor.ui.registry.addMenuButton('more', {
               text: '...',
               fetch: (callback) => {
@@ -81,36 +84,15 @@ const RichTextEditor = () => {
               }
             });
           },
-          content_style: `
-            body {
-              font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-              font-size: 14px;
-              line-height: 1.6;
-              color: #333;
-              margin: 1rem;
-            }
-          `,
+          content_style: `body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif; font-size: 14px; line-height: 1.6; color: #333; margin: 1rem; }`,
           formats: {
             alignleft: { selector: 'p,h1,h2,h3,h4,h5,h6,td,th,div,ul,ol,li,table,img', classes: 'text-left' },
             aligncenter: { selector: 'p,h1,h2,h3,h4,h5,h6,td,th,div,ul,ol,li,table,img', classes: 'text-center' },
             alignright: { selector: 'p,h1,h2,h3,h4,h5,h6,td,th,div,ul,ol,li,table,img', classes: 'text-right' },
             alignjustify: { selector: 'p,h1,h2,h3,h4,h5,h6,td,th,div,ul,ol,li,table,img', classes: 'text-justify' }
-          }
+          },
         }}
       />
-      
-      <div className="flex justify-end p-4 border-t border-gray-200">
-        <button
-          onClick={() => {
-            if (editorRef.current) {
-              console.log(editorRef.current.getContent());
-            }
-          }}
-          className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors"
-        >
-          Save Content
-        </button>
-      </div>
     </div>
   );
 };

@@ -1,5 +1,4 @@
-'use client';  // This tells Next.js that this component should only run in the browser
-
+'use client';
 import useAllPostDataStore from '@/store/useAllPostDataStore';
 import Table from '../../../components/Table';
 import TableHeader from '../../../components/TableHeader';
@@ -13,19 +12,17 @@ const Page = () => {
 
   // Function to update data when status or page changes
   const fetchData = () => {
-    const url = `${process.env.NEXT_PUBLIC_API_URL}/posts/${status}?type=Article&limit=${limit}&page=${currentPage}`;
-    fetchAllPostedData(url, 'Article');
+    const url = `${process.env.NEXT_PUBLIC_API_URL}/posts/${status}?type=Video&limit=${limit}&page=${currentPage}`;
+    fetchAllPostedData(url, 'Video');
   };
 
-  // useEffect hook ensures fetchData runs only on the client
   useEffect(() => {
     fetchData();
   }, [currentPage, status]);
 
-  // Only execute scroll logic on the client
   const handlePageChange = (newPage) => {
     setCurrentPage(newPage);
-    if (typeof window !== 'undefined') {  // Check if window is defined (client-side only)
+    if (typeof window !== 'undefined') {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
@@ -40,7 +37,7 @@ const Page = () => {
       <div className='max-w-7xl mx-auto p-4'>
         <div className='bg-white rounded-lg shadow'>
           <TableHeader
-            type="Article"
+            type="Video"
             currentPage={currentPage}
             loading={loading}
             totalPages={totalPages}
@@ -63,3 +60,9 @@ const Page = () => {
 };
 
 export default Page;
+
+
+
+
+
+

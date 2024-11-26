@@ -6,7 +6,7 @@ export default function PostDetailsPage({ params }) {
     return (
       <div className="pt-2 p-1">
        
-        <ManagePostProperties/>
+        <ManagePostProperties type={type} id={id}   />
       </div>
     );
   }
