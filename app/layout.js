@@ -2,11 +2,14 @@
 
 import localFont from "next/font/local";
 import "./globals.css";
+
+import { useState } from "react";
+import Navbar from "../components/Navbar";
 import Sidebar from "../components/Sidebar";
 import useSidebarStore from "../store/useSidebarStore";
+
 import 'quill/dist/quill.snow.css';
 import 'quill-better-table/dist/quill-better-table.css';
-import { Toaster } from 'react-hot-toast';
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -29,7 +32,7 @@ export default function RootLayout({ children }) {
       <body
         className={`bg-gray-300  ${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <Toaster position="top-right" />
+        <Navbar />
         <Sidebar />
         <div   className={`${collapsed ? 'ml-16' : 'ml-64'} p-0 transition-all duration-300`}
         >

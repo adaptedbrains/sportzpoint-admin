@@ -8,15 +8,16 @@ import { IoPricetagsOutline } from "react-icons/io5";
 import { TbCategoryPlus } from "react-icons/tb";
 import React, { useState } from "react";
 import Link from "next/link";
-import { FaHome, FaRegEdit, FaUsers, FaCog, FaRegUser } from "react-icons/fa";
+import { FaHome, FaRegEdit, FaUsers, FaCog } from "react-icons/fa";
 import { motion } from "framer-motion";
 import useSidebarStore from "@/store/useSidebarStore";
-import ProfileModal from "./ProfileModal";
 
 const Sidebar = () => {
-  const { collapsed, toggleSidebar } = useSidebarStore();
+  const { collapsed, toggleSidebar} = useSidebarStore();
+
   const [option, setOption] = useState("");
-  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+
+  
 
   const menuItems = [
     { name: "Home", icon: FaHome, link: "/#" },
@@ -29,110 +30,68 @@ const Sidebar = () => {
   ];
 
   return (
-    <>
-      <div
-        className={`flex flex-col z-50 justify-between h-screen fixed bg-white border-r transition-all duration-300 ${
-          collapsed ? "w-16" : "w-64"
-        }`}
-      >
-        {/* Profile Section */}
-        <div>
-          <div
-            className={`flex items-center gap-4 p-4 text-gray-700 hover:bg-blue-50 hover:text-blue-600 cursor-pointer border-b ${
-              collapsed ? "justify-center" : "justify-start"
-            }`}
-            onClick={() => setIsProfileModalOpen(true)}
-            onMouseEnter={() => setOption("Profile")}
+    <div
+      className={`flex flex-col z-50 justify-between h-[95vh] top-11 fixed bg-white border-r transition-all duration-300 ${
+        collapsed ? "w-16" : "w-64"
+      }`}
+    >
+      {/* Menu Items */}
+      <ul className={`mt-4 space-y-2 px-2`}>
+        {menuItems.map((item, index) => (
+          <li
+            key={index}
+            className="relative"
+            onMouseEnter={() => setOption(item.name)}
             onMouseLeave={() => setOption("")}
+            onClick={()=>toggleSidebar(true)}
           >
-            <div className="text-xl">
-              <FaRegUser size={16} />
-            </div>
-            <span
-              className={`transition-opacity duration-300 ${
-                collapsed ? "hidden w-0 overflow-hidden" : "opacity-100"
-              }`}
-            >
-              Profile
-            </span>
-            {/* Tooltip for collapsed state */}
-            {collapsed && option === "Profile" && (
-              <motion.div
-                initial={{ x: "-100%" }}
-                animate={{ x: "0%" }}
-                exit={{ x: "-100%" }}
-                className="absolute left-16 px-2 tracking-wider bg-black text-white font-thin text-xs p-1 rounded shadow-md"
+            <Link href={item.link}>
+              <div
+                className={`flex items-center gap-4 px-4 py-2 text-gray-700 rounded hover:bg-blue-100 hover:text-blue-600 ${
+                  collapsed ? "justify-center" : "justify-start"
+                }`}
               >
-                Profile
-              </motion.div>
-            )}
-          </div>
-        </div>
-
-        {/* Menu Items */}
-        <ul className="flex-1">
-          {menuItems.map((item, index) => (
-            <li
-              key={index}
-              className="relative"
-              onMouseEnter={() => setOption(item.name)}
-              onMouseLeave={() => setOption("")}
-              onClick={() => toggleSidebar(true)}
-            >
-              <Link href={item.link}>
-                <div
-                  className={`flex items-center gap-4 px-4 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600 ${
-                    collapsed ? "justify-center" : "justify-start"
+                <div className="text-xl hover:text-blue-600">
+                  <item.icon size={16} />
+                </div>
+                <span
+                  className={`transition-opacity duration-300 ${
+                    collapsed ? "hidden w-0 overflow-hidden" : "opacity-100"
                   }`}
                 >
-                  <div className="text-xl">
-                    <item.icon size={16} />
-                  </div>
-                  <span
-                    className={`transition-opacity duration-300 ${
-                      collapsed ? "hidden w-0 overflow-hidden" : "opacity-100"
-                    }`}
-                  >
-                    {item.name}
-                  </span>
-                </div>
-                {/* Tooltip */}
-                {collapsed && option === item.name && (
-                  <motion.div
-                    initial={{ x: "-100%" }}
-                    animate={{ x: "0%" }}
-                    exit={{ x: "-100%" }}
-                    className="absolute left-16 px-2 tracking-wider bg-black text-white font-thin text-xs p-1 rounded shadow-md"
-                  >
-                    {option}
-                  </motion.div>
-                )}
-              </Link>
-            </li>
-          ))}
-        </ul>
-
-        {/* Sidebar Toggle Button */}
-        <button
-          onClick={() => toggleSidebar(!collapsed)}
-          className="p-4 text-gray-500 hover:text-gray-700"
-          aria-label="Toggle Sidebar"
-        >
-          {collapsed ? (
-            <MdKeyboardArrowRight size={26} />
-          ) : (
-            <div className="flex justify-center gap-1">
-              <MdKeyboardArrowLeft size={25} /> Collapse
-            </div>
-          )}
-        </button>
-      </div>
-
-      <ProfileModal 
-        isOpen={isProfileModalOpen} 
-        onClose={() => setIsProfileModalOpen(false)} 
-      />
-    </>
+                  {item.name}
+                </span>
+              </div>
+              {/* Tooltip with animation */}
+              {collapsed && option === item.name && (
+                <motion.div
+                  initial={{ x: "-100%" }}
+                  animate={{ x: "0%" }}
+                  exit={{ x: "-100%" }}
+                  className="absolute bottom-0 start-16 px-2 tracking-wider bg-black text-white font-thin text-xs p-1 rounded shadow-md"
+                >
+                  {option}
+                </motion.div>
+              )}
+            </Link>
+          </li>
+        ))}
+      </ul>
+      {/* Sidebar Toggle Button */}
+      <button
+        onClick={()=>toggleSidebar(!collapsed )}
+        className="p-4 text-gray-500 hover:text-gray-700"
+        aria-label="Toggle Sidebar"
+      >
+        {collapsed ? (
+          <MdKeyboardArrowRight size={26} color="black" />
+        ) : (
+          <div className="flex justify-center gap-1">
+            <MdKeyboardArrowLeft size={25} color="black" /> Collapse
+          </div>
+        )}
+      </button>
+    </div>
   );
 };
 
