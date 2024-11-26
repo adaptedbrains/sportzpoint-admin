@@ -1,7 +1,7 @@
 import React from 'react'
 import { FaChevronLeft, FaChevronRight } from 'react-icons/fa'
 
-const Pagination = ({ currentPage, totalPages, onPageChange, compact = true }) => {
+const Pagination = ({ currentPage, totalPages, onPageChange, compact = true, loading }) => {
   const pageNumbers = []
   const maxVisiblePages = compact ? 3 : 5 // Show fewer pages in compact mode
 
@@ -23,9 +23,9 @@ const Pagination = ({ currentPage, totalPages, onPageChange, compact = true }) =
       {/* Previous Button */}
       <button
         onClick={() => onPageChange(currentPage - 1)}
-        disabled={currentPage === 1}
+        disabled={loading || currentPage === 1}
         className={`flex items-center p-1 rounded ${
-          currentPage === 1
+          loading || currentPage === 1
             ? 'text-gray-300 cursor-not-allowed'
             : 'text-gray-600 hover:bg-gray-100'
         }`}
@@ -39,9 +39,12 @@ const Pagination = ({ currentPage, totalPages, onPageChange, compact = true }) =
         <>
           <button
             onClick={() => onPageChange(1)}
+            disabled={loading}
             className={`w-8 h-8 rounded flex items-center justify-center ${
-              currentPage === 1 
-                ? 'bg-blue-500 text-white' 
+              currentPage === 1
+                ? 'bg-blue-500 text-white'
+                : loading
+                ? 'text-gray-300 cursor-not-allowed'
                 : 'text-gray-600 hover:bg-gray-100'
             }`}
           >
@@ -56,9 +59,12 @@ const Pagination = ({ currentPage, totalPages, onPageChange, compact = true }) =
         <button
           key={number}
           onClick={() => onPageChange(number)}
+          disabled={loading}
           className={`w-8 h-8 rounded flex items-center justify-center ${
             currentPage === number
               ? 'bg-blue-500 text-white'
+              : loading
+              ? 'text-gray-300 cursor-not-allowed'
               : 'text-gray-600 hover:bg-gray-100'
           }`}
         >
@@ -72,9 +78,12 @@ const Pagination = ({ currentPage, totalPages, onPageChange, compact = true }) =
           {endPage < totalPages - 1 && <span className="text-gray-400">...</span>}
           <button
             onClick={() => onPageChange(totalPages)}
+            disabled={loading}
             className={`w-8 h-8 rounded flex items-center justify-center ${
               currentPage === totalPages
                 ? 'bg-blue-500 text-white'
+                : loading
+                ? 'text-gray-300 cursor-not-allowed'
                 : 'text-gray-600 hover:bg-gray-100'
             }`}
           >
@@ -86,9 +95,9 @@ const Pagination = ({ currentPage, totalPages, onPageChange, compact = true }) =
       {/* Next Button */}
       <button
         onClick={() => onPageChange(currentPage + 1)}
-        disabled={currentPage === totalPages}
+        disabled={loading || currentPage === totalPages}
         className={`flex items-center p-1 rounded ${
-          currentPage === totalPages
+          loading || currentPage === totalPages
             ? 'text-gray-300 cursor-not-allowed'
             : 'text-gray-600 hover:bg-gray-100'
         }`}
@@ -100,4 +109,4 @@ const Pagination = ({ currentPage, totalPages, onPageChange, compact = true }) =
   )
 }
 
-export default Pagination 
+export default Pagination

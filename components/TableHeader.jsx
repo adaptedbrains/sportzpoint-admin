@@ -1,14 +1,14 @@
 import React from 'react'
 import Pagination from './Pagination'
 
-const TableHeader = ({ totalPages, currentPage, onPageChange, totalItems, type }) => {
+const TableHeader = ({ totalPages, currentPage, onPageChange, totalItems, type,loading }) => {
   return (
     <div className="bg-white p-4 rounded-t-lg border-b">
       <div className="flex justify-between items-center">
         <div className="text-gray-600">
           <h2 className="text-lg font-semibold">{type} Posts</h2>
           <p className="text-sm">
-            Total: {totalItems} {type} posts
+            Total: {Number(totalItems) + Number(totalPages)} {type} posts
           </p>
         </div>
         
@@ -20,6 +20,7 @@ const TableHeader = ({ totalPages, currentPage, onPageChange, totalItems, type }
             currentPage={currentPage}
             totalPages={totalPages}
             onPageChange={onPageChange}
+            loading={loading}
           />
         </div>
       </div>

@@ -11,7 +11,7 @@ function RestOfPostEdit({ formData, setFormData }) {
     fetchDropDownData(`${process.env.NEXT_PUBLIC_API_URL}/category`, 'category');
     fetchDropDownData(`${process.env.NEXT_PUBLIC_API_URL}/tag`, 'tag');
     fetchDropDownData(`${process.env.NEXT_PUBLIC_API_URL}/user`, 'roleBaseUser');
-  }, []);
+  }, [fetchDropDownData]);
 
   // Options for dropdowns
   const categoryOptions = allCategory.map((cat) => ({

@@ -12,14 +12,13 @@ const Page = () => {
 
   // Function to update data when status or page changes
   const fetchData = () => {
-    const url = `${process.env.NEXT_PUBLIC_API_URL}/posts/${status}?type=CustomPage&limit=${limit}&page=${currentPage}`;
-    fetchAllPostedData(url, 'CustomPage');
+    const url = `${process.env.NEXT_PUBLIC_API_URL}/posts/${status}?type=Newsletter&limit=${limit}&page=${currentPage}`;
+    fetchAllPostedData(url, 'Newsletter');
   };
 
   useEffect(() => {
     fetchData();
-  }, [currentPage, status]);
-
+  }, [currentPage, status,fetchData]);
   const handlePageChange = (newPage) => {
     setCurrentPage(newPage);
     if (typeof window !== 'undefined') {
@@ -37,7 +36,7 @@ const Page = () => {
       <div className='max-w-7xl mx-auto p-4'>
         <div className='bg-white rounded-lg shadow'>
           <TableHeader
-            type="CustomPage"
+            type="Newsletter"
             currentPage={currentPage}
             loading={loading}
             totalPages={totalPages}
@@ -60,10 +59,6 @@ const Page = () => {
 };
 
 export default Page;
-
-
-
-
 
 
 

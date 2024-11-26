@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { FaUpload, FaSearch, FaEllipsisH } from 'react-icons/fa';
 import { BsGrid, BsList } from 'react-icons/bs';
+import Image from 'next/image';
 
 const MediaLibrary = () => {
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
@@ -132,10 +133,12 @@ const MediaLibrary = () => {
                 className="group relative bg-white rounded-lg overflow-hidden border border-gray-200 hover:border-blue-500 transition-all duration-200"
               >
                 <div className="aspect-square relative">
-                  <img
+                  <Image
                     src={item.url}
                     alt={item.title}
-                    className="w-full h-full object-cover"
+                    width={300}
+                    height={200}
+                    className="object-cover"
                   />
                   <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-30 transition-opacity duration-200" />
                   <button className="absolute top-2 right-2 p-1.5 bg-white rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-200">

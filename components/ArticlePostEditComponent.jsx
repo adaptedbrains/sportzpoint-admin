@@ -6,7 +6,7 @@ import { usePathname } from 'next/navigation';
 import useAllPostDataStore from '@/store/useAllPostDataStore';
 
 const ArticlePostEditComponent = ({handleArticleFromData,formDataPostEdit}) => {
-  const {allArticlePost}=useAllPostDataStore()
+  const {allPosts}=useAllPostDataStore()
   
   const pathname = usePathname();
   const parts = pathname.split('/');
@@ -19,7 +19,7 @@ const ArticlePostEditComponent = ({handleArticleFromData,formDataPostEdit}) => {
   const [dragOver, setDragOver] = useState(false);
 
   useEffect(()=>{
-      const requiredData=allArticlePost.find((a)=>a._id===id)
+      const requiredData=allPosts.find((a)=>a._id===id)
         console.log("requiredData",requiredData);
         if(requiredData){
           handleArticleFromData('title',requiredData.title)
@@ -35,7 +35,7 @@ const ArticlePostEditComponent = ({handleArticleFromData,formDataPostEdit}) => {
         }
       
     
-  },[id])
+  },[id,allPosts])
 
   const handleTitleChange = (e) => {
    

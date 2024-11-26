@@ -4,19 +4,21 @@ import { useState } from "react";
 import { FaEdit, FaEye, FaEllipsisV } from "react-icons/fa";
 import { GoLink } from "react-icons/go";
 import ActionMenu from "./ActionMenu";
-import { useRouter } from "next/navigation";
+import { useRouter,usePathname } from "next/navigation";
 import CalendarModal from "./CalendarModal";
 import { formatDate } from "@/util/timeFormat";
 
 export default function Table({
   posts,
   type,
+  onStatusChange,
   currentPage,
   onNextPage,
   onPreviousPage,
   totalPage,
   loading,
 }) {
+
   const router = useRouter();
 
   const articles = [
@@ -56,7 +58,7 @@ export default function Table({
   const [Action, setAction] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
-
+  const pathname=usePathname()
   const handleFilterChange = (event) => {
     setFilter(event.target.value);
   };
@@ -100,7 +102,7 @@ export default function Table({
                 ? "border-b-2 border-blue-600 text-blue-600"
                 : "border-b-2 border-transparent text-black"
             } transition-all linear duration-300 pb-2`}
-            onClick={() => setFilter("Published")}
+            onClick={() => {setFilter("Published"),onStatusChange('published')}}
           >
             Published
           </button>
@@ -110,7 +112,7 @@ export default function Table({
                 ? "border-b-2 border-blue-600 text-blue-600"
                 : "border-b-2 border-transparent text-black"
             } transition-all linear duration-300 pb-2`}
-            onClick={() => setFilter("Draft")}
+            onClick={() =>{ setFilter("Draft");onStatusChange('draft')}}
           >
             Draft
           </button>
@@ -120,7 +122,7 @@ export default function Table({
                 ? "border-b-2 border-blue-600 text-blue-600"
                 : "border-b-2 border-transparent text-black"
             } transition-all linear duration-300 pb-2`}
-            onClick={() => setFilter("PendingApproval")}
+            onClick={() => {setFilter("PendingApproval");onStatusChange('pending-approval')}}
           >
             Pending Approval
           </button>
@@ -130,7 +132,7 @@ export default function Table({
                 ? "border-b-2 border-blue-600 text-blue-600"
                 : "border-b-2 border-transparent text-black"
             } transition-all linear duration-300 pb-2`}
-            onClick={() => setFilter("Scheduled")}
+            onClick={() =>{ setFilter("Scheduled");onStatusChange('scheduled')}}
           >
             Scheduled
           </button>
@@ -140,38 +142,7 @@ export default function Table({
       <div className="p-3 bg-white rounded shadow">
         <h2 className="text-lg font-semibold mb-4">Published Posts</h2>
         <div className=" float-end">
-          <div className="flex items-center mb-2 border border-green-700">
-            {/* Previous Button */}
-            <button
-              type="button"
-              disabled={currentPage === 1 || loading}
-              onClick={onPreviousPage}
-              className={`px-2 py-1 border-green-700 text-green-500 bg-white rounded ${
-                currentPage === 1 || loading
-                  ? "opacity-50 cursor-not-allowed"
-                  : "hover:bg-green-100"
-              }`}
-            >
-              {"Pre"}
-            </button>
-
-            {/* Current Page Indicator */}
-            <p className="bg-green-700 text-white px-5 py-1">{currentPage}</p>
-
-            {/* Next Button */}
-            <button
-              type="button"
-              disabled={currentPage === totalPage || loading}
-              onClick={onNextPage}
-              className={`px-2 py-1 border-green-400 text-green-700 bg-white rounded ${
-                currentPage === totalPage || loading
-                  ? "opacity-50 cursor-not-allowed"
-                  : "hover:bg-green-100"
-              }`}
-            >
-              {"Next"}
-            </button>
-          </div>
+         
         </div>
         <table className="w-full border-collapse border border-gray-300">
           <thead>
@@ -222,7 +193,7 @@ export default function Table({
                 </td>
 
                 <td className="px-4 py-2 text-center border border-gray-300 text-sm">
-                  {article.content.split(" ").length}
+                  {article && article.content && article.content.split(" ").length}
                 </td>
                 <td className="px-4 py-2 text-center border border-gray-300 text-sm">
                   <span

@@ -8,7 +8,7 @@ import { useEffect, useState } from "react";
 import useAllPostDataStore from "@/store/useAllPostDataStore";
 
 function ManagePostProperties() {
-  const { allArticlePost } = useAllPostDataStore();
+  const { allPosts } = useAllPostDataStore();
   const pathname = usePathname();
   const [post, setPost] = useState(null);
   const [formData, setFormData] = useState({
@@ -45,7 +45,7 @@ function ManagePostProperties() {
       const parts = pathname.split("/");
       const type = parts[2];
       const id = parts[3];
-      const requiredData = allArticlePost.find((a) => a._id === id);
+      const requiredData = allPosts.find((a) => a._id === id);
       setPost(requiredData);
       setHtmlContent(requiredData.content);
       // Initialize formData with the fetched post data
@@ -76,7 +76,7 @@ function ManagePostProperties() {
         });
       }
     }
-  }, [pathname, allArticlePost]);
+  }, [pathname, allPosts]);
 
   const submitData = (status) => {
     const transformedData = {

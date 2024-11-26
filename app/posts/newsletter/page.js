@@ -14,12 +14,14 @@ const Page = () => {
       `${process.env.NEXT_PUBLIC_API_URL}/articles/type/Newsletter?limit=${limit}&page=${currentPage}`,
       'Newsletter'
     )
-  }, [currentPage])
+  }, [])
 
   const handlePageChange = (newPage) => {
-    setCurrentPage(newPage)
-    window.scrollTo({ top: 0, behavior: 'smooth' })
-  }
+    setCurrentPage(newPage);
+    if (typeof window !== 'undefined') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
 
   return (
     <div className='bg-gray-50 min-h-screen'>

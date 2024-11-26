@@ -1,25 +1,36 @@
-'use client'
-import useAllPostDataStore from '@/store/useAllPostDataStore'
-import Table from '../../../components/Table'
-import TableHeader from '../../../components/TableHeader'
-import React, { useEffect, useState } from 'react'
+'use client';
+import useAllPostDataStore from '@/store/useAllPostDataStore';
+import Table from '../../../components/Table';
+import TableHeader from '../../../components/TableHeader';
+import React, { useEffect, useState } from 'react';
 
 const Page = () => {
-  const { fetchAllPostedData, allPosts, totalPages, loading } = useAllPostDataStore()
-  const [currentPage, setCurrentPage] = useState(1)
-  const limit = 15
+  const { fetchAllPostedData, allPosts, totalPages, loading } = useAllPostDataStore();
+  const [currentPage, setCurrentPage] = useState(1);
+  const [status, setStatus] = useState('published'); // Default status
+  const limit = 15;
+
+  // Function to update data when status or page changes
+  const fetchData = () => {
+    const url = `${process.env.NEXT_PUBLIC_API_URL}/posts/${status}?type=Web Story&limit=${limit}&page=${currentPage}`;
+    fetchAllPostedData(url, 'Web Story');
+  };
 
   useEffect(() => {
-    fetchAllPostedData(
-      `${process.env.NEXT_PUBLIC_API_URL}/articles/type/WebStory?limit=${limit}&page=${currentPage}`,
-      'Web Story'
-    )
-  }, [currentPage])
+    fetchData();
+  }, [currentPage, status]);
 
   const handlePageChange = (newPage) => {
-    setCurrentPage(newPage)
-    window.scrollTo({ top: 0, behavior: 'smooth' })
-  }
+    setCurrentPage(newPage);
+    if (typeof window !== 'undefined') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
+  const handleStatusChange = (newStatus) => {
+    setStatus(newStatus);
+    setCurrentPage(1); // Reset to the first page when status changes
+  };
 
   return (
     <div className='bg-gray-50 min-h-screen'>
@@ -28,15 +39,28 @@ const Page = () => {
           <TableHeader
             type="Web Story"
             currentPage={currentPage}
+            loading={loading}
             totalPages={totalPages}
             onPageChange={handlePageChange}
+            onStatusChange={handleStatusChange} 
             totalItems={allPosts.length}
+            status={status} // Pass current status
           />
-          <Table posts={allPosts} loading={loading} />
+          <div className="overflow-x-auto">
+            <Table 
+              posts={allPosts} 
+              loading={loading} 
+              onStatusChange={handleStatusChange} // Optionally pass this to Table for status-specific actions
+            />
+          </div>
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default Page
+export default Page;
+
+
+
+
