@@ -11,8 +11,8 @@ const Page = () => {
 
   useEffect(() => {
     fetchAllPostedData(
-      `${process.env.NEXT_PUBLIC_API_URL}/articles/type/Video?limit=${limit}&page=${currentPage}`,
-      'Video'
+      `${process.env.NEXT_PUBLIC_API_URL}/articles/type/Newsletter?limit=${limit}&page=${currentPage}`,
+      'Newsletter'
     )
   }, [currentPage])
 
@@ -26,7 +26,7 @@ const Page = () => {
       <div className='max-w-7xl mx-auto p-4'>
         <div className='bg-white rounded-lg shadow'>
           <TableHeader
-            type="Video"
+            type="Newsletter"
             currentPage={currentPage}
             totalPages={totalPages}
             onPageChange={handlePageChange}
@@ -39,4 +39,4 @@ const Page = () => {
   )
 }
 
-export default Page
+export default Page 

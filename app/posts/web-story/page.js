@@ -1,46 +1,42 @@
 'use client'
 import useAllPostDataStore from '@/store/useAllPostDataStore'
 import Table from '../../../components/Table'
-import React, { useEffect } from 'react'
+import TableHeader from '../../../components/TableHeader'
+import React, { useEffect, useState } from 'react'
 
-const page = () => {
+const Page = () => {
+  const { fetchAllPostedData, allPosts, totalPages, loading } = useAllPostDataStore()
+  const [currentPage, setCurrentPage] = useState(1)
+  const limit = 15
 
-  const {fetchAllPostedData,allPosts , totalPage, currentPage,loading}=useAllPostDataStore()
+  useEffect(() => {
+    fetchAllPostedData(
+      `${process.env.NEXT_PUBLIC_API_URL}/articles/type/WebStory?limit=${limit}&page=${currentPage}`,
+      'Web Story'
+    )
+  }, [currentPage])
 
-  
-    useEffect(()=>{
-      fetchAllPostedData(`${process.env.NEXT_PUBLIC_API_URL}/articles/type/Web Story?limit=15&page=1`,"Web Story")
-    },[currentPage])
-
-
-  // Function to go to the next page
-  const handleNextPage = () => {
-    if (currentPage < totalPage) {
-      useAllPostDataStore.setState((state) => ({
-        currentPage: state.currentPage + 1,
-      }));
-    }
-  };
-
-  // Function to go to the previous page
-  const handlePreviousPage = () => {
-    if (currentPage > 1) {
-      useAllPostDataStore.setState((state) => ({
-        currentPage: state.currentPage - 1,
-      }));
-    }
-  };
+  const handlePageChange = (newPage) => {
+    setCurrentPage(newPage)
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
 
   return (
-    <div className='p-1 pt-2'>
-      <Table posts={allPosts} type={"Web Story"}  totalPage={totalPage}
-        currentPage={currentPage}
-        onNextPage={handleNextPage}
-        onPreviousPage={handlePreviousPage}
-        loading={loading}
-      />
+    <div className='bg-gray-50 min-h-screen'>
+      <div className='max-w-7xl mx-auto p-4'>
+        <div className='bg-white rounded-lg shadow'>
+          <TableHeader
+            type="Web Story"
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={handlePageChange}
+            totalItems={allPosts.length}
+          />
+          <Table posts={allPosts} loading={loading} />
+        </div>
+      </div>
     </div>
   )
 }
 
-export default page
+export default Page
