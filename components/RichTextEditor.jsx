@@ -2,7 +2,7 @@
 import React, { useRef } from 'react';
 import { Editor } from '@tinymce/tinymce-react';
 
-const RichTextEditor = ({ content }) => {
+const RichTextEditor = ({ content,htmlContentGrab }) => {
   const editorRef = useRef(null);
 
   // Function to log the content

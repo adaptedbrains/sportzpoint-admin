@@ -1,42 +1,39 @@
 'use client';
+import useDropDownDataStore from '@/store/dropDownDataStore';
 import { useState, useEffect } from 'react';
 import Select from 'react-select';
 
-function RestOfPostEdit() {
-  const [formData, setFormData] = useState({
-    primaryCategory: null,
-    additionalCategories: [],
-    tags: [],
-    credits: [],
-    focusKeyphrase: '',
-  });
+function RestOfPostEdit({ formData, setFormData }) {
+  const { allTags, allCategory, allRoleBaseUser, fetchDropDownData } = useDropDownDataStore();
+
+  useEffect(() => {
+    // Fetch the dropdown data for categories, tags, and credits
+    fetchDropDownData(`${process.env.NEXT_PUBLIC_API_URL}/category`, 'category');
+    fetchDropDownData(`${process.env.NEXT_PUBLIC_API_URL}/tag`, 'tag');
+    fetchDropDownData(`${process.env.NEXT_PUBLIC_API_URL}/user`, 'roleBaseUser');
+  }, []);
 
   // Options for dropdowns
-  const categoryOptions = [
-    { value: 'cricket', label: 'Cricket' },
-    { value: 'football', label: 'Football' },
-    { value: 'basketball', label: 'Basketball' },
-    { value: 'tennis', label: 'Tennis' },
-  ];
+  const categoryOptions = allCategory.map((cat) => ({
+    value: cat._id,
+    label: cat.name,
+  }));
 
-  const tagOptions = [
-    { value: 'ipl', label: 'IPL' },
-    { value: 'worldcup', label: 'World Cup' },
-    { value: 'premier-league', label: 'Premier League' },
-    { value: 'nba', label: 'NBA' },
-  ];
+  const tagOptions = allTags.map((tag) => ({
+    value: tag._id,
+    label: tag.name,
+  }));
 
-  const creditOptions = [
-    { value: 'author1', label: 'Author 1' },
-    { value: 'author2', label: 'Author 2' },
-    { value: 'author3', label: 'Author 3' },
-  ];
+  const creditOptions = allRoleBaseUser.map((role) => ({
+    value: role._id,
+    label: role.name,
+  }));
 
   // Handle changes for all form fields
   const handleChange = (value, field) => {
     const updatedFormData = { ...formData, [field]: value };
-    setFormData(updatedFormData);
-    
+    setFormData(updatedFormData); // Update parent state
+
     // Log the entire form data on every change
     console.log('Form Data Updated:', updatedFormData);
   };
