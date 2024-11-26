@@ -30,11 +30,11 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body
-        className={`bg-gray-300  ${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`bg-white ${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <Navbar />
         <Sidebar />
-        <div   className={`${collapsed ? 'ml-16' : 'ml-64'} p-0 transition-all duration-300`}
+        <div   className={`${collapsed ? 'ml-16' : 'ml-64'} p-0 transition-all duration-300 bg-white`}
         >
 
         {children}

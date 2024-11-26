@@ -3,7 +3,7 @@ import RichTextEditor from './RichTextEditor'
 import RestOfPostEdit from './RestOfPostEdit'
 import ArticlePostEditComponent from './ArticlePostEditComponent'
 import SeoAnalysisSidebar from './SeoAnalysisSidebar'
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 
 function ManagePostProperties() {
   const [content, setContent] = useState('')
@@ -11,41 +11,10 @@ function ManagePostProperties() {
   const [metaDescription, setMetaDescription] = useState('')
   const [seoData, setSeoData] = useState(null)
 
-  // Debounced SEO analysis
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      if (content || title || metaDescription) {
-        analyzeSEO();
-      }
-    }, 1000);
-
-    return () => clearTimeout(timer);
-  }, [content, title, metaDescription]);
-
-  const analyzeSEO = async () => {
-    try {
-      const response = await fetch('/api/analyze-seo', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          content: content,
-          title: title,
-          metaDescription: metaDescription,
-        }),
-      });
-
-      const data = await response.json();
-      setSeoData(data);
-    } catch (error) {
-      console.error('Error analyzing SEO:', error);
-    }
-  };
-
   return (
-    <div className='flex gap-4'>
-      <div className='flex-1 flex flex-col gap-2'>
+    <div className='flex gap-4 max-w-[1600px] mx-auto px-4'>
+      {/* Main content area - made narrower */}
+      <div className='flex-1 flex flex-col gap-2 max-w-[calc(100%-340px)]'>
         <ArticlePostEditComponent
           onTitleChange={setTitle}
           onMetaDescriptionChange={setMetaDescription}
@@ -56,6 +25,7 @@ function ManagePostProperties() {
         <RestOfPostEdit />
       </div>
       
+      {/* SEO Sidebar */}
       <SeoAnalysisSidebar
         content={content}
         title={title}

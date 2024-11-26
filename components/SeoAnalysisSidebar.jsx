@@ -1,6 +1,6 @@
 'use client'
-import React, { useEffect, useState } from 'react'
-import { FaCheckCircle, FaTimesCircle } from 'react-icons/fa'
+import React, { useState } from 'react'
+import { FaCheckCircle, FaTimesCircle, FaSearch } from 'react-icons/fa'
 import { AiOutlineLoading3Quarters } from 'react-icons/ai'
 
 const SeoAnalysisSidebar = ({ content, title, metaDescription }) => {
@@ -12,6 +12,11 @@ const SeoAnalysisSidebar = ({ content, title, metaDescription }) => {
   const [keyphraseResults, setKeyphraseResults] = useState(null)
 
   const analyzeSEO = async () => {
+    if (!content || !title || !metaDescription) {
+      alert('Please fill in the content, title, and meta description before analyzing')
+      return
+    }
+
     setIsAnalyzing(true)
     try {
       const response = await fetch('/api/analyze-seo', {
@@ -38,15 +43,6 @@ const SeoAnalysisSidebar = ({ content, title, metaDescription }) => {
       setIsAnalyzing(false)
     }
   }
-
-  useEffect(() => {
-    if (content && title && metaDescription && focusKeyphrase) {
-      const debounce = setTimeout(() => {
-        analyzeSEO()
-      }, 1000)
-      return () => clearTimeout(debounce)
-    }
-  }, [content, title, metaDescription, focusKeyphrase])
 
   return (
     <div className="w-80 bg-white shadow-lg rounded-lg p-4 fixed right-4 top-20 h-[calc(100vh-6rem)] overflow-y-auto">
