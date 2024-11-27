@@ -1,14 +1,44 @@
 'use client';
 import { FaPlus, FaUserCircle } from "react-icons/fa";
+import { CiVideoOn } from "react-icons/ci";
+import { RiArticleLine } from "react-icons/ri";
+import { BsBook, BsImages, BsBroadcastPin } from "react-icons/bs";
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from 'next/navigation';
 import ProfileModal from "./ProfileModal";
 
+const contentTypes = [
+  {
+    name: 'Article',
+    href: '/posts/article',
+    icon: <RiArticleLine className="w-4 h-4" />,
+  },
+  {
+    name: 'Video',
+    href: '/posts/video',
+    icon: <CiVideoOn className="w-4 h-4" />,
+  },
+  {
+    name: 'Web Story',
+    href: '/posts/web-story',
+    icon: <BsBook className="w-4 h-4" />,
+  },
+  {
+    name: 'Photo Gallery',
+    href: '/posts/photo-gallery',
+    icon: <BsImages className="w-4 h-4" />,
+  },
+  {
+    name: 'Live Blog',
+    href: '/posts/live-blog',
+    icon: <BsBroadcastPin className="w-4 h-4" />,
+  }
+];
+
 const Navbar = () => {
   const router = useRouter();
-  const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [userData, setUserData] = useState(null);
   
@@ -75,15 +105,31 @@ const Navbar = () => {
           <h1>Sportz</h1>
         </div>
         <div className="leftSide flex items-center gap-5">
-          <Link 
-            href="/posts/article"
-            className="plus p-2 rounded-lg cursor-pointer hover:bg-blue-100 hover:text-blue-600 text-gray-700 transition duration-200"
-          >
-            <FaPlus size={15} />
-          </Link>
-          <div className="relative">
+          {/* Content Type Dropdown */}
+          <div className="relative group">
             <button 
-              onClick={() => setShowProfileMenu(!showProfileMenu)}
+              className="p-2 rounded-lg cursor-pointer hover:bg-blue-100 hover:text-blue-600 text-gray-700 transition duration-200"
+            >
+              <FaPlus size={15} />
+            </button>
+            
+            <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 border border-gray-200 hidden group-hover:block z-50">
+              {contentTypes.map((type) => (
+                <Link
+                  key={type.name}
+                  href={type.href}
+                  className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-blue-100 hover:text-blue-600"
+                >
+                  {type.icon}
+                  <span>{type.name}</span>
+                </Link>
+              ))}
+            </div>
+          </div>
+
+          {/* Profile Dropdown */}
+          <div className="relative group">
+            <button 
               className="p-2 rounded-lg cursor-pointer hover:bg-blue-100 hover:text-blue-600 text-gray-700 transition duration-200"
             >
               {userData?.avatar ? (
@@ -99,25 +145,20 @@ const Navbar = () => {
               )}
             </button>
             
-            {showProfileMenu && (
-              <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 border border-gray-200">
-                <button
-                  onClick={() => {
-                    setShowProfileModal(true);
-                    setShowProfileMenu(false);
-                  }}
-                  className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-blue-100 hover:text-blue-600"
-                >
-                  Edit Profile
-                </button>
-                <button
-                  onClick={handleLogout}
-                  className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-blue-100 hover:text-blue-600"
-                >
-                  Sign Out
-                </button>
-              </div>
-            )}
+            <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 border border-gray-200 hidden group-hover:block z-50">
+              <button
+                onClick={() => setShowProfileModal(true)}
+                className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-blue-100 hover:text-blue-600"
+              >
+                Edit Profile
+              </button>
+              <button
+                onClick={handleLogout}
+                className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-blue-100 hover:text-blue-600"
+              >
+                Sign Out
+              </button>
+            </div>
           </div>
         </div>
       </nav>
