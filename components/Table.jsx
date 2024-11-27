@@ -21,39 +21,7 @@ export default function Table({
 
   const router = useRouter();
 
-  const articles = [
-    {
-      title:
-        "'You challenged me in ways no one else could': Roger Federer's special message on Rafael Nadal's retirement",
-      category: "Tennis",
-      author: "Payal Debnath",
-      views: 11,
-      wordCount: 591,
-      seoScore: 93,
-      publishedAt: "19 Nov 2024 16:07",
-      type: "articles",
-    },
-    {
-      title: "Clippers dominate second quarter to defeat the in-form Warriors.",
-      category: "Basketball",
-      author: "Muojindu Francis",
-      views: 9,
-      wordCount: 326,
-      seoScore: 93,
-      publishedAt: "19 Nov 2024 15:29",
-      type: "articles",
-    },
-    {
-      title: "The most Valuable U21 Football Players in 2024",
-      category: "Football",
-      author: "Muojindu Francis",
-      views: 20,
-      wordCount: 637,
-      seoScore: 100,
-      publishedAt: "18 Nov 2024 22:11",
-      type: "articles",
-    },
-  ];
+  
   const [filter, setFilter] = useState("Published");
   const [action, setAction] = useState("");
   const [startDate, setStartDate] = useState("");

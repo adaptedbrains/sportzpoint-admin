@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+
 import { useRouter } from "next/navigation";
 import Cookies from 'js-cookie';
 
@@ -11,13 +12,14 @@ import {
   FaBan,
   FaTrash,
 } from "react-icons/fa";
+import useAllPostDataStore from "@/store/useAllPostDataStore";
 
 function ActionMenu({ actionText, id, type }) {
-  const token = Cookies.get('token');
+  const {fetchAllPostedData}=useAllPostDataStore()
+  
  const router=useRouter()
   const menuRef = useRef(null);
 
-  // Close the menu when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (menuRef.current && !menuRef.current.contains(event.target)) {
@@ -30,6 +32,34 @@ function ActionMenu({ actionText, id, type }) {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [actionText]);
+
+
+  const handleDelete = async () => {
+    try {
+      const token = Cookies.get("token"); // Get token from cookies
+  
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/article/${id}`, {
+        method: "DELETE", // Use DELETE HTTP method
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`, // Include token in headers
+        },
+      });
+  
+      if (!response.ok) {
+        alert("error")
+        throw new Error("Failed to delete the image");
+      }
+      const result = await response.json();
+      alert("Delete SuccessFully")
+      fetchAllPostedData(`${process.env.NEXT_PUBLIC_API_URL}/posts/published?type=${type}&limit=15&page=1`, 'Article');
+      
+  
+      // Optionally: Update state or refetch data after delete
+    } catch (error) {
+      console.error("Error during delete:", error.message);
+    }
+  };
 
   return (
     <div className="relative inline-block" ref={menuRef}>
@@ -79,44 +109,8 @@ function ActionMenu({ actionText, id, type }) {
             <button
               type="button"
               className="flex group items-center"
-              // onClick={async () => {
-              //   try {
-                  
-              //     if (!token) {
-              //       throw new Error("No token found in cookies");
-              //     }
-
-              //     // Assuming post._id is the ID of the article you're deleting
-                 
-
-              //     // API URL for the delete request
-              //     const apiUrl = `${process.env.NEXT_PUBLIC_API_URL}/article/delete/${id}`;
-
-              //     // Make DELETE request
-              //     const response = await fetch(apiUrl, {
-              //       method: "DELETE",
-              //       headers: {
-              //         "Content-Type": "application/json",
-              //         Authorization: `Bearer ${token}`,
-              //       },
-              //     });
-
-              //     if (!response.ok) {
-              //       throw new Error("Failed to delete article");
-              //     }
-
-              //     const data = await response.json();
-              //     alert("Article deleted successfully");
-
-                 
-              //     router.push(`${process.env.NEXT_PUBLIC_API_URL}/posts/article`)
-
-              //   } catch (error) {
-              //     console.log(error);
-                  
-              //     alert("Error deleting article: " + error.message);
-              //   }
-              // }}
+              onClick={handleDelete}
+              
             >
               <FaTrash className="w-3 h-3 transition-all duration-100 mr-2" />
               Delete

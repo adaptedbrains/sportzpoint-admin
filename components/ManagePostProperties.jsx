@@ -174,11 +174,27 @@ function ManagePostProperties() {
           }`
         );
       }
-      alert("Successdjfhbadufvbhjkk")
-  
+      
+      alert('Post Successfully')
       const data = await response.json();
-      console.log(`Article ${isCreate ? 'created' : 'updated'} successfully:`, data);
-      return data;
+       // Clear all form fields
+    setFormData({
+      primaryCategory: null,
+      tags: [],
+      additionalCategories: [],
+      credits: [],
+      focusKeyphrase: '',
+    });
+    formDataPostEdit.title = '';
+    formDataPostEdit.summary = '';
+    formDataPostEdit.banner_desc = '';
+    formDataPostEdit.seo_desc = '';
+
+    // Navigate to the post/article route
+
+      window.location.href("/posts/article")
+
+    return data;
     } catch (error) {
       console.error('Error:', error.message);
       throw error; // Re-throw error to handle it in the calling code if necessary
