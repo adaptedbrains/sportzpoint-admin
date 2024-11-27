@@ -45,7 +45,7 @@ const Page = () => {
             loading={loading}
             totalPages={totalPages}
             onPageChange={handlePageChange}
-            onStatusChange={handleStatusChange} 
+            onStatusChange={handleStatusChange}
             totalItems={allPosts.length}
             status={status} // Pass current status
           />
@@ -53,6 +53,7 @@ const Page = () => {
             <Table 
               posts={allPosts} 
               loading={loading} 
+              type={'Article'}
               onStatusChange={handleStatusChange} // Optionally pass this to Table for status-specific actions
             />
           </div>

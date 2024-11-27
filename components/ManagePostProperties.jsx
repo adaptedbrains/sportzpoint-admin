@@ -20,9 +20,9 @@ function ManagePostProperties() {
   });
   const [formDataPostEdit, setFormDataPostEdit] = useState({
     title: "",
-    englishTitle: "",
+    slug: "",
     summary: "",
-    metaDescription: "",
+    seo_desc: "",
     featuredImage: "",
     banner_desc:""
   });
@@ -45,57 +45,91 @@ function ManagePostProperties() {
       const parts = pathname.split("/");
       const type = parts[2];
       const id = parts[3];
-      const requiredData = allPosts.find((a) => a._id === id);
-      setPost(requiredData);
-      setHtmlContent(requiredData.content);
-      // Initialize formData with the fetched post data
-      if (requiredData) {
+  
+      if (id === "new-post") {
+        // Fresh initialization for a new post
+        setPost(null);
+        setHtmlContent("");
         setFormData({
-          primaryCategory: requiredData.primary_category
-            ? {
-                value: requiredData.primary_category[0]._id,
-                label: requiredData.primary_category[0].name,
-              }
-            : null,
-          additionalCategories: requiredData.categories
-            ? requiredData.categories.map((cat) => ({
-                value: cat._id,
-                label: cat.name,
-              }))
-            : [],
-          tags: requiredData.tags
-            ? requiredData.tags.map((t) => ({ value: t._id, label: t.name }))
-            : [],
-          credits: requiredData.credits
-            ? requiredData.credits.map((credit) => ({
-                value: credit._id,
-                label: credit.name,
-              }))
-            : [],
+          primaryCategory: null,
+          additionalCategories: [],
+          tags: [],
+          credits: [],
           focusKeyphrase: "",
         });
+        setFormDataPostEdit({
+          title: "",
+          slug: "",
+          summary: "",
+          seo_desc: "",
+          featuredImage: "",
+          banner_desc: "",
+        });
+      } else {
+        // Fetch and initialize data for an existing post
+        const requiredData = allPosts.find((a) => a._id === id);
+        setPost(requiredData);
+        setHtmlContent(requiredData?.content || "");
+        if (requiredData) {
+          setFormData({
+            primaryCategory: requiredData.primary_category
+              ? {
+                  value: requiredData.primary_category[0]._id,
+                  label: requiredData.primary_category[0].name,
+                }
+              : null,
+            additionalCategories: requiredData.categories
+              ? requiredData.categories.map((cat) => ({
+                  value: cat._id,
+                  label: cat.name,
+                }))
+              : [],
+            tags: requiredData.tags
+              ? requiredData.tags.map((t) => ({ value: t._id, label: t.name }))
+              : [],
+            credits: requiredData.credits
+              ? requiredData.credits.map((credit) => ({
+                  value: credit._id,
+                  label: credit.name,
+                }))
+              : [],
+            focusKeyphrase: "",
+          });
+          setFormDataPostEdit({
+            title: requiredData.title || "",
+            englishTitle: requiredData.englishTitle || "",
+            summary: requiredData.summary || "",
+            metaDescription: requiredData.metaDescription || "",
+            featuredImage: requiredData.featuredImage || "",
+            banner_desc: requiredData.banner_desc || "",
+          });
+        }
       }
     }
   }, [pathname, allPosts]);
+  
 
   const submitData = (status) => {
     const transformedData = {
-      
-      primary_category:formData.primaryCategory ? [formData.primaryCategory.value] : [],
-      title:formDataPostEdit.title,
-      summary:formDataPostEdit.summary,
-      legacy_url:post.slug,
+      primary_category: formData.primaryCategory ? [formData.primaryCategory.value] : [],
+      title: formDataPostEdit.title,
+      summary: formDataPostEdit.summary,
+      legacy_url: id === 'new-post' ? formDataPostEdit.title.split(" ").join("-") : post.slug,
       tags: formData.tags.map((tag) => tag.value),
-      categories:formData.additionalCategories.map((cat) => cat.value),
-      banner_desc:formDataPostEdit.banner_desc,
+      categories: formData.additionalCategories.map((cat) => cat.value),
+      banner_desc: formDataPostEdit.banner_desc,
       credits: formData.credits.map((credit) => credit.value),
       focusKeyphrase: formData.focusKeyphrase,
-      content: htmlContent, 
-      status:status,
-      type:pathname.split("/")[2],
-      seo_desc:formDataPostEdit.metaDescription
+      content: htmlContent,
+      banner_desc:formDataPostEdit.banner_desc,
+      status: status,
+      type: pathname.split("/")[2],
     };
   
+    // Conditionally add `seo_desc` if not a new post
+    if (id !== 'new-post') {
+      transformedData.seo_desc = formDataPostEdit.seo_desc;
+    }
     // Convert the object to a JSON string
     const jsonData = JSON.stringify(transformedData, null, 2);
   

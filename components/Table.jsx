@@ -86,7 +86,11 @@ export default function Table({
         <div className="flex justify-between items-center">
           <div className="flex items-center">
             <h2 className="text-lg font-semibold"> {type} </h2>
-            <button className="ml-2 bg-blue-500 hover:bg-blue-700 text-white font-bold px-2 rounded">
+            <button className="ml-2 bg-blue-500 hover:bg-blue-700 text-white font-bold px-2 rounded" onClick={()=>{
+
+                router.push(`/posts/${type}/new-post`);
+
+            }} >
               +
             </button>
           </div>

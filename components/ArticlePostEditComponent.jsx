@@ -25,7 +25,8 @@ const ArticlePostEditComponent = ({handleArticleFromData,formDataPostEdit}) => {
           handleArticleFromData('title',requiredData.title)
           handleArticleFromData('englishTitle',requiredData.slug)
           handleArticleFromData('summary',requiredData.summary)
-          handleArticleFromData('metaDescription',requiredData.seo_desc)
+          handleArticleFromData('seo_desc',requiredData.seo_desc)
+          handleArticleFromData('banner_desc',requiredData.banner_desc)
           
           // setTitle(requiredData.title)
           // setEnglishTitle(requiredData.legacy_url)
@@ -142,12 +143,12 @@ const ArticlePostEditComponent = ({handleArticleFromData,formDataPostEdit}) => {
         </label>
         <textarea
           id="metaDescription"
-          value={formDataPostEdit.metaDescription}
+          value={formDataPostEdit.seo_desc}
           onChange={handleMetaDescriptionChange}
           className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-200 focus:border-indigo-500 sm:text-sm"
         />
         <div className="text-sm text-gray-500 mt-1">
-          {formDataPostEdit.metaDescription.length} / 160
+          {formDataPostEdit.seo_desc && formDataPostEdit.seo_desc.split(" ").length} / 160
         </div>
       </div>
 
@@ -194,6 +195,8 @@ const ArticlePostEditComponent = ({handleArticleFromData,formDataPostEdit}) => {
                 </p>
               </>
             )}
+
+            <input type="text" value={formDataPostEdit.banner_image}  onChange={(e)=>handleArticleFromData(e.target.value)}   />
           </label>
         </div>
       </div>

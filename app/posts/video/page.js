@@ -29,7 +29,7 @@ const Page = () => {
 
   const handleStatusChange = (newStatus) => {
     setStatus(newStatus);
-    setCurrentPage(1); // Reset to the first page when status changes
+    setCurrentPage(1); 
   };
 
   return (
@@ -50,6 +50,7 @@ const Page = () => {
             <Table 
               posts={allPosts} 
               loading={loading} 
+              type={"Video"}
               onStatusChange={handleStatusChange} // Optionally pass this to Table for status-specific actions
             />
           </div>

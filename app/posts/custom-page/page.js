@@ -50,6 +50,7 @@ const Page = () => {
             <Table 
               posts={allPosts} 
               loading={loading} 
+              type={'CustomPage'}
               onStatusChange={handleStatusChange} // Optionally pass this to Table for status-specific actions
             />
           </div>

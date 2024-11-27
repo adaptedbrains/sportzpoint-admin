@@ -49,6 +49,7 @@ const Page = () => {
           <div className="overflow-x-auto">
             <Table 
               posts={allPosts} 
+              type={'Web Story'}
               loading={loading} 
               onStatusChange={handleStatusChange} // Optionally pass this to Table for status-specific actions
             />
