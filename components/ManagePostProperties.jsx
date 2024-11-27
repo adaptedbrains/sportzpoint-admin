@@ -1,5 +1,5 @@
 "use client";
-import Cookies from 'js-cookie';
+import Cookies from "js-cookie";
 
 import RichTextEditor from "./RichTextEditor";
 import RestOfPostEdit from "./RestOfPostEdit";
@@ -24,7 +24,7 @@ function ManagePostProperties() {
     summary: "",
     seo_desc: "",
     featuredImage: "",
-    banner_desc:""
+    banner_desc: "",
   });
 
   const [htmlContent, setHtmlContent] = useState("");
@@ -45,7 +45,7 @@ function ManagePostProperties() {
       const parts = pathname.split("/");
       const type = parts[2];
       const id = parts[3];
-      
+
       if (id === "new-post") {
         // Fresh initialization for a new post
         setPost(null);
@@ -107,15 +107,39 @@ function ManagePostProperties() {
       }
     }
   }, [pathname, allPosts]);
-  
 
   const submitData = async (status) => {
     try {
-      const token = Cookies.get('token');
+      const token = Cookies.get("token");
       if (!token) {
         throw new Error("No token found in cookies");
       }
-  
+
+      if (status === "send-for-approval") {
+        try {
+          const articleId = post._id; // Ensure you have `post` and `_id` available
+          const response = await fetch(
+            `${process.env.NEXT_PUBLIC_API_URL}/posts/send-for-approval?articleId=${articleId}`,
+            {
+              method: "GET",
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+
+          if (!response.ok) {
+            throw new Error(`Send for approval failed: ${response.statusText}`);
+            return;
+          }
+          alert("Success fully send for approval");
+          return;
+        } catch (error) {
+          return;
+          console.log(error);
+        }
+      }
+
       // Transform data
       const transformedData = {
         primary_category: formData.primaryCategory
@@ -124,7 +148,7 @@ function ManagePostProperties() {
         title: formDataPostEdit.title,
         summary: formDataPostEdit.summary,
         legacy_url:
-          pathname.split("/")[3] === 'new-post'
+          pathname.split("/")[3] === "new-post"
             ? formDataPostEdit.title.split(" ").join("-")
             : post.slug,
         tags: formData.tags.map((tag) => tag.value),
@@ -134,79 +158,98 @@ function ManagePostProperties() {
         focusKeyphrase: formData.focusKeyphrase,
         content: htmlContent,
         status: status,
-        author: JSON.parse(localStorage.getItem('id')),
+        author: JSON.parse(localStorage.getItem("id")),
         slug: formDataPostEdit.title.split(" ").join("-"),
         type: pathname.split("/")[2],
       };
-  
+
       // Add `published_at_datetime` for published status
       if (status === "published") {
         transformedData.published_at_datetime = new Date();
       }
-  
+
       // Add `seo_desc` if it's not a new post
-      if (pathname.split("/")[3] !== 'new-post') {
+      if (pathname.split("/")[3] !== "new-post") {
         transformedData.seo_desc = formDataPostEdit.seo_desc;
       }
-  
+
+      if (status === "draft") {
+        try {
+          const response = await fetch(
+            `${process.env.NEXT_PUBLIC_API_URL}/posts/draft`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+              },
+              body: JSON.stringify({ articleId }), // Send articleId in the body
+            }
+          );
+
+          if (!response.ok) {
+            throw new Error(`Send for approval failed: ${response.statusText}`);
+          }
+          alert("Successfully sent for approval");
+        } catch (error) {
+          console.log(error);
+        }
+      }
+
       // Determine if it's a POST or PUT request
-      const isCreate = pathname.split("/")[3] === 'new-post';
+      const isCreate = pathname.split("/")[3] === "new-post";
       const apiUrl = isCreate
         ? `${process.env.NEXT_PUBLIC_API_URL}/article/create`
         : `${process.env.NEXT_PUBLIC_API_URL}/article/update/${post._id}`;
-  
-      const method = isCreate ? 'POST' : 'PUT';
-  
+
+      const method = isCreate ? "POST" : "PUT";
+
       // Make API call
       const response = await fetch(apiUrl, {
         method: method,
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(transformedData),
       });
-  
+
       if (!response.ok) {
         throw new Error(
-          `${isCreate ? 'Creating' : 'Updating'} article failed: ${
+          `${isCreate ? "Creating" : "Updating"} article failed: ${
             response.statusText
           }`
         );
       }
-      
-      alert('Post Successfully')
+
+      alert("Post Successfully");
       const data = await response.json();
-       // Clear all form fields
-    setFormData({
-      primaryCategory: null,
-      tags: [],
-      additionalCategories: [],
-      credits: [],
-      focusKeyphrase: '',
-    });
-    formDataPostEdit.title = '';
-    formDataPostEdit.summary = '';
-    formDataPostEdit.banner_desc = '';
-    formDataPostEdit.seo_desc = '';
+      // Clear all form fields
+      setFormData({
+        primaryCategory: null,
+        tags: [],
+        additionalCategories: [],
+        credits: [],
+        focusKeyphrase: "",
+      });
+      formDataPostEdit.title = "";
+      formDataPostEdit.summary = "";
+      formDataPostEdit.banner_desc = "";
+      formDataPostEdit.seo_desc = "";
 
-    // Navigate to the post/article route
+      // Navigate to the post/article route
 
-      window.location.href("/posts/article")
+      window.location.href("/posts/article");
 
-    return data;
+      return data;
     } catch (error) {
-      console.error('Error:', error.message);
+      console.error("Error:", error.message);
       throw error; // Re-throw error to handle it in the calling code if necessary
     }
   };
-  
-  
 
   return (
     <div className="flex flex-col gap-2">
-
-      
       <ArticlePostEditComponent
         handleArticleFromData={handleArticleFromData}
         formDataPostEdit={formDataPostEdit}
@@ -218,10 +261,10 @@ function ManagePostProperties() {
       <RestOfPostEdit formData={formData} setFormData={setFormData} />
       {/* New Action Buttons Section */}
       <div className="flex justify-end gap-4 mt-6 bg-white p-4 rounded-lg shadow">
-        <button 
+        <button
           className="px-6 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors duration-200 flex items-center gap-2"
           onClick={() => {
-            submitData('draft');
+            submitData("draft");
           }}
         >
           Save as Draft
@@ -230,7 +273,7 @@ function ManagePostProperties() {
         <button
           className="px-6 py-2 bg-blue-100 text-blue-700 rounded-md hover:bg-blue-200 transition-colors duration-200 flex items-center gap-2"
           onClick={() => {
-            submitData('pending_approval');
+            submitData("send-for-approval");
           }}
         >
           Send for Approval
@@ -239,8 +282,7 @@ function ManagePostProperties() {
         <button
           className="px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors duration-200 flex items-center gap-2"
           onClick={() => {
-            
-            submitData('published');
+            submitData("published");
           }}
         >
           Publish
