@@ -21,7 +21,7 @@ const ArticlePostEditComponent = ({
 
   const [gallery, setGallery] = useState(false);
   const toggleGalleyButton = () => {
-    alert("Hii")
+    
     setGallery((pre) => !pre);
   };
 

@@ -7,7 +7,7 @@ import ArticlePostEditComponent from "./ArticlePostEditComponent";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import useAllPostDataStore from "../store/useAllPostDataStore";
-
+import LiveBlogUpdate from './LiveBlogUpdate'
 function ManagePostProperties() {
   const router = useRouter();
   const { allPosts } = useAllPostDataStore();
@@ -117,7 +117,7 @@ function ManagePostProperties() {
   const renderView = () => {
     if (view === "updates") {
       return <div>   
-        
+        <LiveBlogUpdate postId={post._id} />
          
             </div>;
     }
