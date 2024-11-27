@@ -12,7 +12,9 @@ import {
   FaBan,
   FaTrash,
 } from "react-icons/fa";
-import useAllPostDataStore from "@/store/useAllPostDataStore";
+
+import useAllPostDataStore from "../store/useAllPostDataStore";
+
 
 function ActionMenu({ actionText, id, type }) {
   const {fetchAllPostedData}=useAllPostDataStore()

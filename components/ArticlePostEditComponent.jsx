@@ -3,8 +3,9 @@ import Image from "next/image";
 import React, { useEffect, useState } from "react";
 import { FaPlusCircle } from "react-icons/fa";
 import { usePathname } from "next/navigation";
-import useAllPostDataStore from "@/store/useAllPostDataStore";
+import useAllPostDataStore from "../store/useAllPostDataStore";
 import ImageGalleryPopup from "./ImageGalleryPopup";
+
 
 const ArticlePostEditComponent = ({
   handleArticleFromData,
@@ -20,6 +21,7 @@ const ArticlePostEditComponent = ({
 
   const [gallery, setGallery] = useState(false);
   const toggleGalleyButton = () => {
+    alert("Hii")
     setGallery((pre) => !pre);
   };
 
@@ -59,39 +61,43 @@ const ArticlePostEditComponent = ({
     // setMetaDescription(e.target.value.slice(0, 160));
     handleArticleFromData("metaDescription", e.target.value);
   };
-
-  const handleFeaturedImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file && file.type.startsWith("image/")) {
-      setFeaturedImage(URL.createObjectURL(file));
-    } else {
-      alert("Please upload a valid image file!");
-    }
+  const handleBanner_descDescriptionChange = (e) => {
+    // setMetaDescription(e.target.value.slice(0, 160));
+    handleArticleFromData("banner_desc", e.target.value);
   };
 
-  const handleDragOver = (e) => {
-    e.preventDefault();
-    setDragOver(true);
-  };
+  
 
-  const handleDragLeave = () => {
-    setDragOver(false);
-  };
+  // const handleDragOver = (e) => {
+  //   e.preventDefault();
+  //   setDragOver(true);
+  // };
 
-  const handleDrop = (e) => {
-    e.preventDefault();
-    setDragOver(false);
-    const file = e.dataTransfer.files[0];
-    if (file && file.type.startsWith("image/")) {
-      setFeaturedImage(URL.createObjectURL(file));
-    } else {
-      alert("Please upload a valid image file!");
-    }
-  };
+  // const handleDragLeave = () => {
+  //   setDragOver(false);
+  // };
+
+  // const handleDrop = (e) => {
+  //   e.preventDefault();
+  //   setDragOver(false);
+  //   const file = e.dataTransfer.files[0];
+  //   if (file && file.type.startsWith("image/")) {
+  //     setFeaturedImage(URL.createObjectURL(file));
+  //   } else {
+  //     alert("Please upload a valid image file!");
+  //   }
+  // };
+
+
+  const selecttedImageForBanner=(filename)=>{
+    setFeaturedImage(`https://sportzpoint-media.s3.ap-south-1.amazonaws.com/${filename}`)
+    handleArticleFromData("banner_desc", filename);
+    handleArticleFromData("banner_image", filename);
+  }
 
   return (
     <div className="bg-white p-6 rounded-lg shadow-md">
-      {gallery && <ImageGalleryPopup onClose={toggleGalleyButton} />}
+      {gallery && <ImageGalleryPopup onClose={toggleGalleyButton}  onSelect={selecttedImageForBanner} />}
       <h2 className="text-xl font-bold mb-4">Manage Post Properties</h2>
 
       {/* Title */}
@@ -158,6 +164,7 @@ const ArticlePostEditComponent = ({
         </label>
         <textarea
           id="metaDescription"
+          disabled
           value={formDataPostEdit.seo_desc}
           onChange={handleMetaDescriptionChange}
           className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-200 focus:border-indigo-500 sm:text-sm"
@@ -214,6 +221,7 @@ const ArticlePostEditComponent = ({
             {/* <input type="text" value={formDataPostEdit.banner_image}  onChange={(e)=>handleArticleFromData(e.target.value)}   /> */}
           </label>
         </div>
+          <input type="text" onChange={handleBanner_descDescriptionChange} value={formDataPostEdit.banner_desc} placeholder="Banner Desc" className="mt-4 border border-dashed rounded outline-none focus:outline-none px-5 py-1 w-1/2 border-gray-100 bg-gray-100 mx-auto" />
       </div>
     </div>
   );

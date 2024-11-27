@@ -1,18 +1,49 @@
 "use client";
 import { useState, useEffect } from 'react';
+import Cookies from 'js-cookie';
 
 const TeamPage = () => {
   const [teamMembers, setTeamMembers] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    role: '',
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState(null);
 
   useEffect(() => {
-    const mockTeamMembers = [
-      { id: 1, name: 'John Doe', email: 'john@example.com', role: 'Admin' },
-      { id: 2, name: 'Jane Smith', email: 'jane@example.com', role: 'Editor' },
-      { id: 3, name: 'Bob Johnson', email: 'bob@example.com', role: 'Author' },
-      { id: 4, name: 'Sarah Wilson', email: 'sarah@example.com', role: 'Author' },
-    ];
-    setTeamMembers(mockTeamMembers);
+    const fetchTeamMembers = async () => {
+      try {
+        setLoading(true);
+        const token = Cookies.get('token');
+        
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/user`, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          credentials: 'include'
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch team members');
+        }
+
+        const data = await response.json();
+        setTeamMembers(data.users || []);
+      } catch (err) {
+        console.error('Error fetching team members:', err);
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTeamMembers();
   }, []);
 
   const getRoleBadgeColor = (role) => {
@@ -27,6 +58,64 @@ const TeamPage = () => {
         return 'bg-gray-100 text-gray-800';
     }
   };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setSubmitError(null);
+    setIsSubmitting(true);
+
+    try {
+      const token = Cookies.get('token');
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/team/team-members/create`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        credentials: 'include',
+        body: JSON.stringify(formData)
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to create team member');
+      }
+
+      // Refresh team members list
+      await fetchTeamMembers();
+      setIsModalOpen(false);
+      setFormData({ name: '', email: '', role: '' });
+    } catch (err) {
+      console.error('Error creating team member:', err);
+      setSubmitError(err.message);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center min-h-screen bg-gray-50">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex justify-center items-center min-h-screen bg-gray-50">
+        <div className="text-red-500">Error: {error}</div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex justify-center min-h-screen bg-gray-50 pt-20 pb-6">
@@ -75,70 +164,74 @@ const TeamPage = () => {
           </div>
         </div>
 
-        {/* Add Member Modal */}
+        {/* Updated Add Member Modal */}
         {isModalOpen && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
             <div className="bg-white rounded-lg p-6 w-full max-w-md">
               <div className="flex justify-between items-center mb-4">
                 <h2 className="text-xl font-semibold">Add Team Member</h2>
                 <button 
-                  onClick={() => setIsModalOpen(false)}
+                  onClick={() => {
+                    setIsModalOpen(false);
+                    setFormData({ name: '', email: '', role: '' });
+                    setSubmitError(null);
+                  }}
                   className="text-gray-500 hover:text-gray-700"
                 >
                   ×
                 </button>
               </div>
 
-              <form className="space-y-4">
-                {/* Photo Upload */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Photo
-                  </label>
-                  <div className="flex items-center justify-center w-full">
-                    <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100">
-                      <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                        <svg className="w-8 h-8 mb-4 text-gray-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16">
-                          <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"/>
-                        </svg>
-                        <p className="mb-2 text-sm text-gray-500">Click to upload</p>
-                      </div>
-                      <input type="file" className="hidden" accept="image/*" />
-                    </label>
+              <form onSubmit={handleSubmit} className="space-y-4">
+                {submitError && (
+                  <div className="p-3 bg-red-100 border border-red-400 text-red-700 rounded-md text-sm">
+                    {submitError}
                   </div>
-                </div>
+                )}
 
                 {/* Name Input */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Name
+                    Name *
                   </label>
                   <input
                     type="text"
+                    name="name"
+                    value={formData.name}
+                    onChange={handleInputChange}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     placeholder="Enter name"
+                    required
                   />
                 </div>
 
                 {/* Email Input */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Email
+                    Email *
                   </label>
                   <input
                     type="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleInputChange}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     placeholder="Enter email"
+                    required
                   />
                 </div>
 
                 {/* Role Select */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Role
+                    Role *
                   </label>
                   <select
+                    name="role"
+                    value={formData.role}
+                    onChange={handleInputChange}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    required
                   >
                     <option value="">Select role</option>
                     <option value="Admin">Admin</option>
@@ -147,20 +240,26 @@ const TeamPage = () => {
                   </select>
                 </div>
 
-                {/* Submit Button */}
+                {/* Submit Buttons */}
                 <div className="flex justify-end gap-3 mt-6">
                   <button
                     type="button"
-                    onClick={() => setIsModalOpen(false)}
+                    onClick={() => {
+                      setIsModalOpen(false);
+                      setFormData({ name: '', email: '', role: '' });
+                      setSubmitError(null);
+                    }}
                     className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md transition-colors duration-200"
+                    disabled={isSubmitting}
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    className="px-4 py-2 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700 transition-colors duration-200"
+                    className="px-4 py-2 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700 transition-colors duration-200 disabled:bg-blue-400"
+                    disabled={isSubmitting}
                   >
-                    Add Member
+                    {isSubmitting ? 'Adding...' : 'Add Member'}
                   </button>
                 </div>
               </form>

@@ -4,10 +4,12 @@ import Cookies from "js-cookie";
 import RichTextEditor from "./RichTextEditor";
 import RestOfPostEdit from "./RestOfPostEdit";
 import ArticlePostEditComponent from "./ArticlePostEditComponent";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import useAllPostDataStore from "@/store/useAllPostDataStore";
+import useAllPostDataStore from "../store/useAllPostDataStore";
+
 function ManagePostProperties() {
+  const router = useRouter();
   const { allPosts } = useAllPostDataStore();
   const pathname = usePathname();
   const [post, setPost] = useState(null);
@@ -18,16 +20,18 @@ function ManagePostProperties() {
     credits: [],
     focusKeyphrase: "",
   });
+
   const [formDataPostEdit, setFormDataPostEdit] = useState({
     title: "",
     slug: "",
     summary: "",
     seo_desc: "",
-    featuredImage: "",
+    banner_image: "",
     banner_desc: "",
   });
 
   const [htmlContent, setHtmlContent] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const htmlContentGrab = (data) => {
     setHtmlContent(data);
@@ -62,7 +66,7 @@ function ManagePostProperties() {
           slug: "",
           summary: "",
           seo_desc: "",
-          featuredImage: "",
+          banner_image: "",
           banner_desc: "",
         });
       } else {
@@ -72,7 +76,7 @@ function ManagePostProperties() {
         setHtmlContent(requiredData?.content || "");
         if (requiredData) {
           setFormData({
-            primaryCategory: requiredData.primary_category
+            primaryCategory: requiredData.primary_category?.[0]
               ? {
                   value: requiredData.primary_category[0]._id,
                   label: requiredData.primary_category[0].name,
@@ -93,26 +97,26 @@ function ManagePostProperties() {
                   label: credit.name,
                 }))
               : [],
-            focusKeyphrase: "",
+            focusKeyphrase: requiredData.focusKeyphrase || "",
           });
           setFormDataPostEdit({
             title: requiredData.title || "",
             englishTitle: requiredData.slug || "",
             summary: requiredData.summary || "",
             seo_desc: requiredData.seo_desc || "",
-            featuredImage: requiredData.featuredImage || "",
+            banner_image: requiredData.banner_image || "",
             banner_desc: requiredData.banner_desc || "",
           });
         }
       }
     }
   }, [pathname, allPosts]);
-
+  
   const submitData = async (status) => {
     try {
       const token = Cookies.get("token");
       if (!token) {
-        throw new Error("No token found in cookies");
+        throw new Error("No token found. Please login again.");
       }
 
       if (status === "send-for-approval") {
@@ -154,18 +158,20 @@ function ManagePostProperties() {
         tags: formData.tags.map((tag) => tag.value),
         categories: formData.additionalCategories.map((cat) => cat.value),
         banner_desc: formDataPostEdit.banner_desc,
+        banner_image:formDataPostEdit.banner_image,
         credits: formData.credits.map((credit) => credit.value),
-        focusKeyphrase: formData.focusKeyphrase,
-        content: htmlContent,
+        focusKeyphrase: formData.focusKeyphrase.trim(),
+        content: htmlContent.trim(),
         status: status,
         author: JSON.parse(localStorage.getItem("id")),
         slug: formDataPostEdit.title.split(" ").join("-"),
         type: pathname.split("/")[2],
+        seo_desc: formDataPostEdit.seo_desc.trim(),
       };
 
       // Add `published_at_datetime` for published status
       if (status === "published") {
-        transformedData.published_at_datetime = new Date();
+        transformedData.published_at_datetime = new Date().toISOString();
       }
 
       // Add `seo_desc` if it's not a new post
@@ -206,7 +212,7 @@ function ManagePostProperties() {
 
       // Make API call
       const response = await fetch(apiUrl, {
-        method: method,
+        method: isCreate ? "POST" : "PUT",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
@@ -254,12 +260,9 @@ function ManagePostProperties() {
         handleArticleFromData={handleArticleFromData}
         formDataPostEdit={formDataPostEdit}
       />
-      <RichTextEditor
-        content={htmlContent && htmlContent}
-        htmlContentGrab={htmlContentGrab}
-      />
+      <RichTextEditor content={htmlContent} htmlContentGrab={htmlContentGrab} />
       <RestOfPostEdit formData={formData} setFormData={setFormData} />
-      {/* New Action Buttons Section */}
+
       <div className="flex justify-end gap-4 mt-6 bg-white p-4 rounded-lg shadow">
         <button
           className="px-6 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors duration-200 flex items-center gap-2"
@@ -267,7 +270,7 @@ function ManagePostProperties() {
             submitData("draft");
           }}
         >
-          Save as Draft
+          {isSubmitting ? "Saving..." : "Save as Draft"}
         </button>
 
         <button
@@ -276,7 +279,7 @@ function ManagePostProperties() {
             submitData("send-for-approval");
           }}
         >
-          Send for Approval
+          {isSubmitting ? "Sending..." : "Send for Approval"}
         </button>
 
         <button
@@ -285,7 +288,7 @@ function ManagePostProperties() {
             submitData("published");
           }}
         >
-          Publish
+          {isSubmitting ? "Publishing..." : "Publish"}
         </button>
       </div>
     </div>

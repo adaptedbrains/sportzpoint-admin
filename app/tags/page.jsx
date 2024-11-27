@@ -1,16 +1,60 @@
 "use client";
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { FaEdit, FaTrash } from 'react-icons/fa';
+import Cookies from 'js-cookie';
 
 const TagsPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [tags, setTags] = useState([
-    { id: 1, name: 'Cricket', slug: 'cricket' },
-    { id: 2, name: 'Football', slug: 'football' },
-    { id: 3, name: 'Tennis', slug: 'tennis' },
-    { id: 4, name: 'Basketball', slug: 'basketball' },
-    { id: 5, name: 'Formula 1', slug: 'formula-1' },
-  ]);
+  const [tags, setTags] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchTags = async () => {
+      try {
+        setLoading(true);
+        const token = Cookies.get('token');
+        
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/tag`, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          credentials: 'include'
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch tags');
+        }
+
+        const data = await response.json();
+        setTags(data.tags || []);
+      } catch (err) {
+        console.error('Error fetching tags:', err);
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTags();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center min-h-screen bg-gray-50">
+        <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-500"></div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex justify-center items-center min-h-screen bg-gray-50">
+        <p className="text-red-500">{error}</p>
+      </div>
+    );
+  }
 
   return (
     <div className="flex justify-center min-h-screen bg-gray-50 pt-20 pb-6">

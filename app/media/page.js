@@ -1,60 +1,104 @@
 "use client";
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { FaUpload, FaSearch, FaEllipsisH } from 'react-icons/fa';
 import { BsGrid, BsList } from 'react-icons/bs';
 import Image from 'next/image';
+import Cookies from 'js-cookie';
 
 const MediaLibrary = () => {
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
   const [activeFilter, setActiveFilter] = useState('all');
-  const [viewType, setViewType] = useState('grid'); // 'grid' or 'list'
+  const [viewType, setViewType] = useState('grid');
+  const [mediaItems, setMediaItems] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [uploadFiles, setUploadFiles] = useState([]);
+  const [uploading, setUploading] = useState(false);
 
-  // Using placeholder images from picsum.photos with sports-related images
-  const mediaItems = [
-    {
-      id: 1,
-      type: 'image',
-      url: 'https://picsum.photos/seed/sports1/400/400',
-      title: 'Match Highlight 1',
-      date: '2024-02-20',
-      size: '2.4 MB'
-    },
-    {
-      id: 2,
-      url: 'https://picsum.photos/seed/sports2/400/400',
-      title: 'Player Portrait',
-      date: '2024-02-19',
-      size: '1.8 MB'
-    },
-    {
-      id: 3,
-      url: 'https://picsum.photos/seed/sports3/400/400',
-      title: 'Stadium Aerial',
-      date: '2024-02-18',
-      size: '3.2 MB'
-    },
-    {
-      id: 4,
-      url: 'https://picsum.photos/seed/sports4/400/400',
-      title: 'Team Celebration',
-      date: '2024-02-17',
-      size: '2.1 MB'
-    },
-    {
-      id: 5,
-      url: 'https://picsum.photos/seed/sports5/400/400',
-      title: 'Press Conference',
-      date: '2024-02-16',
-      size: '1.9 MB'
-    },
-    {
-      id: 6,
-      url: 'https://picsum.photos/seed/sports6/400/400',
-      title: 'Training Session',
-      date: '2024-02-15',
-      size: '2.7 MB'
-    },
-  ];
+  useEffect(() => {
+    fetchMediaFiles();
+  }, []);
+
+  const fetchMediaFiles = async () => {
+    try {
+      setLoading(true);
+      const token = Cookies.get('token');
+      
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/media`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        credentials: 'include'
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch media files');
+      }
+
+      const data = await response.json();
+      setMediaItems(data.media || []);
+    } catch (err) {
+      console.error('Error fetching media:', err);
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleFileUpload = async (e) => {
+    e.preventDefault();
+    if (!uploadFiles.length) return;
+
+    try {
+      setUploading(true);
+      const token = Cookies.get('token');
+      const formData = new FormData();
+      
+      uploadFiles.forEach(file => {
+        formData.append('files', file);
+      });
+
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/media/upload`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+        body: formData,
+        credentials: 'include'
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to upload media');
+      }
+
+      // Refresh media files list
+      await fetchMediaFiles();
+      setIsUploadModalOpen(false);
+      setUploadFiles([]);
+    } catch (err) {
+      console.error('Error uploading media:', err);
+      setError(err.message);
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center min-h-screen bg-gray-50">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex justify-center items-center min-h-screen bg-gray-50">
+        <div className="text-red-500">Error: {error}</div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex justify-center min-h-screen bg-gray-50 pt-20 pb-6">
@@ -125,51 +169,58 @@ const MediaLibrary = () => {
         <div className={`${viewType === 'grid' 
           ? 'grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4' 
           : 'space-y-2'}`}>
-          {mediaItems.map((item) => (
-            viewType === 'grid' ? (
-              // Grid View
-              <div 
-                key={item.id} 
-                className="group relative bg-white rounded-lg overflow-hidden border border-gray-200 hover:border-blue-500 transition-all duration-200"
-              >
-                <div className="aspect-square relative">
-                  <Image
-                    src={item.url}
-                    alt={item.title}
-                    width={300}
-                    height={200}
-                    className="object-cover"
-                  />
-                  <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-30 transition-opacity duration-200" />
-                  <button className="absolute top-2 right-2 p-1.5 bg-white rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                    <FaEllipsisH className="text-gray-600" size={14} />
-                  </button>
+          {mediaItems.length === 0 ? (
+            <div className="col-span-full text-center py-8 text-gray-500">
+              No media files found
+            </div>
+          ) : (
+            mediaItems.map((item) => (
+              viewType === 'grid' ? (
+                // Grid View
+                <div 
+                  key={item._id} 
+                  className="group relative bg-white rounded-lg overflow-hidden border border-gray-200 hover:border-blue-500 transition-all duration-200"
+                >
+                  <div className="aspect-square relative">
+                    <Image
+                      src={item.url}
+                      alt={item.title || 'Media item'}
+                      width={300}
+                      height={200}
+                      className="object-cover"
+                    />
+                    <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-30 transition-opacity duration-200" />
+                    <button className="absolute top-2 right-2 p-1.5 bg-white rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                      <FaEllipsisH className="text-gray-600" size={14} />
+                    </button>
+                  </div>
+                  <div className="p-3">
+                    <h3 className="text-sm font-medium text-gray-800 truncate">{item.title || 'Untitled'}</h3>
+                    <p className="text-xs text-gray-500 mt-1">{item.size || 'Unknown size'}</p>
+                  </div>
                 </div>
-                <div className="p-3">
-                  <h3 className="text-sm font-medium text-gray-800 truncate">{item.title}</h3>
-                  <p className="text-xs text-gray-500 mt-1">{item.size}</p>
+              ) : (
+                // List View
+                <div 
+                  key={item._id}
+                  className="flex items-center space-x-4 p-3 bg-white rounded-lg border border-gray-200 hover:border-blue-500 transition-all duration-200"
+                >
+                  <div className="aspect-square w-16 h-16 relative">
+                    <Image
+                      src={item.url}
+                      alt={item.title || 'Media item'}
+                      fill
+                      className="object-cover"
+                    />
+                  </div>
+                  <div className="flex flex-col">
+                    <h3 className="text-sm font-medium text-gray-800 truncate">{item.title || 'Untitled'}</h3>
+                    <p className="text-xs text-gray-500 mt-1">{item.size || 'Unknown size'}</p>
+                  </div>
                 </div>
-              </div>
-            ) : (
-              // List View
-              <div 
-                key={item.id}
-                className="flex items-center space-x-4 p-3 bg-white rounded-lg border border-gray-200 hover:border-blue-500 transition-all duration-200"
-              >
-                <div className="aspect-square w-16 h-16">
-                  <img
-                    src={item.url}
-                    alt={item.title}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <div className="flex flex-col">
-                  <h3 className="text-sm font-medium text-gray-800 truncate">{item.title}</h3>
-                  <p className="text-xs text-gray-500 mt-1">{item.size}</p>
-                </div>
-              </div>
-            )
-          ))}
+              )
+            ))
+          )}
         </div>
 
         {/* Upload Modal */}
@@ -186,30 +237,55 @@ const MediaLibrary = () => {
                 </button>
               </div>
 
-              <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
-                <div className="flex flex-col items-center">
-                  <FaUpload className="text-gray-400 mb-3" size={24} />
-                  <p className="text-gray-600 mb-2">Drag and drop files here</p>
-                  <p className="text-gray-500 text-sm mb-4">or</p>
-                  <button className="px-4 py-2 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700 transition-colors duration-200">
-                    Browse Files
+              <form onSubmit={handleFileUpload}>
+                <div 
+                  className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center"
+                  onDragOver={(e) => e.preventDefault()}
+                  onDrop={(e) => {
+                    e.preventDefault();
+                    setUploadFiles(Array.from(e.dataTransfer.files));
+                  }}
+                >
+                  <div className="flex flex-col items-center">
+                    <FaUpload className="text-gray-400 mb-3" size={24} />
+                    <p className="text-gray-600 mb-2">
+                      {uploadFiles.length ? `${uploadFiles.length} files selected` : 'Drag and drop files here'}
+                    </p>
+                    <p className="text-gray-500 text-sm mb-4">or</p>
+                    <input
+                      type="file"
+                      multiple
+                      className="hidden"
+                      id="fileInput"
+                      onChange={(e) => setUploadFiles(Array.from(e.target.files))}
+                    />
+                    <label
+                      htmlFor="fileInput"
+                      className="px-4 py-2 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700 transition-colors duration-200 cursor-pointer"
+                    >
+                      Browse Files
+                    </label>
+                  </div>
+                </div>
+
+                <div className="flex justify-end gap-3 mt-6">
+                  <button
+                    type="button"
+                    onClick={() => setIsUploadModalOpen(false)}
+                    className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md transition-colors duration-200"
+                    disabled={uploading}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-4 py-2 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700 transition-colors duration-200 disabled:bg-blue-400"
+                    disabled={uploading || !uploadFiles.length}
+                  >
+                    {uploading ? 'Uploading...' : 'Upload'}
                   </button>
                 </div>
-              </div>
-
-              <div className="flex justify-end gap-3 mt-6">
-                <button
-                  onClick={() => setIsUploadModalOpen(false)}
-                  className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md transition-colors duration-200"
-                >
-                  Cancel
-                </button>
-                <button
-                  className="px-4 py-2 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700 transition-colors duration-200"
-                >
-                  Upload
-                </button>
-              </div>
+              </form>
             </div>
           </div>
         )}

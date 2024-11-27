@@ -1,5 +1,5 @@
 'use client';
-import useAllPostDataStore from '@/store/useAllPostDataStore';
+import useAllPostDataStore from '../../../store/useAllPostDataStore';
 import Table from '../../../components/Table';
 import TableHeader from '../../../components/TableHeader';
 import React, { useEffect, useState } from 'react';
@@ -15,7 +15,7 @@ const Page = () => {
     const url = `${process.env.NEXT_PUBLIC_API_URL}/posts/${status}?type=CustomPage&limit=${limit}&page=${currentPage}`;
     fetchAllPostedData(url, 'CustomPage');
   };
-
+  
   useEffect(() => {
     fetchData();
   }, [currentPage, status]);

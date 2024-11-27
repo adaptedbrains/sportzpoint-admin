@@ -1,46 +1,52 @@
 "use client";
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { FaEdit, FaTrash } from 'react-icons/fa';
+import Cookies from 'js-cookie';
 
 const CategoriesPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [categories, setCategories] = useState([
-    { 
-      id: 1, 
-      name: 'International Cricket', 
-      slug: 'international-cricket',
-      description: 'International cricket matches and tournaments',
-      postCount: 45
-    },
-    { 
-      id: 2, 
-      name: 'Premier League', 
-      slug: 'premier-league',
-      description: 'English Premier League football coverage',
-      postCount: 32
-    },
-    { 
-      id: 3, 
-      name: 'Grand Slam', 
-      slug: 'grand-slam',
-      description: 'Tennis Grand Slam tournaments',
-      postCount: 28
-    },
-    { 
-      id: 4, 
-      name: 'NBA', 
-      slug: 'nba',
-      description: 'National Basketball Association news',
-      postCount: 23
-    },
-    { 
-      id: 5, 
-      name: 'Formula 1', 
-      slug: 'formula-1',
-      description: 'Formula 1 racing championships',
-      postCount: 19
-    },
-  ]);
+  const [categories, setCategories] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        setLoading(true);
+        const token = Cookies.get('token');
+        
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/category`, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          credentials: 'include'
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch categories');
+        }
+
+        const data = await response.json();
+        setCategories(data.categories || []);
+      } catch (err) {
+        console.error('Error fetching categories:', err);
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCategories();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center min-h-screen bg-gray-50">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex justify-center min-h-screen bg-gray-50 pt-20 pb-6">
