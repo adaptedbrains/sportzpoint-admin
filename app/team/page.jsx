@@ -1,18 +1,42 @@
 "use client";
 import { useState, useEffect } from 'react';
+import Cookies from 'js-cookie';
 
 const TeamPage = () => {
   const [teamMembers, setTeamMembers] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    const mockTeamMembers = [
-      { id: 1, name: 'John Doe', email: 'john@example.com', role: 'Admin' },
-      { id: 2, name: 'Jane Smith', email: 'jane@example.com', role: 'Editor' },
-      { id: 3, name: 'Bob Johnson', email: 'bob@example.com', role: 'Author' },
-      { id: 4, name: 'Sarah Wilson', email: 'sarah@example.com', role: 'Author' },
-    ];
-    setTeamMembers(mockTeamMembers);
+    const fetchTeamMembers = async () => {
+      try {
+        setLoading(true);
+        const token = Cookies.get('token');
+        
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/user`, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          credentials: 'include'
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch team members');
+        }
+
+        const data = await response.json();
+        setTeamMembers(data.users || []);
+      } catch (err) {
+        console.error('Error fetching team members:', err);
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTeamMembers();
   }, []);
 
   const getRoleBadgeColor = (role) => {
@@ -27,6 +51,22 @@ const TeamPage = () => {
         return 'bg-gray-100 text-gray-800';
     }
   };
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center min-h-screen bg-gray-50">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex justify-center items-center min-h-screen bg-gray-50">
+        <div className="text-red-500">Error: {error}</div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex justify-center min-h-screen bg-gray-50 pt-20 pb-6">
