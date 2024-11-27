@@ -10,83 +10,40 @@ const Page = () => {
   const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState(null);
 
-  const submitData = async (status) => {
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     try {
-      const token = Cookies.get('token');
-      if (!token) {
-        throw new Error("No token found in cookies");
-      }
-  
-      // Transform data
-      const transformedData = {
-        primary_category: formData.primaryCategory
-          ? [formData.primaryCategory.value] // Ensure value is ObjectID
-          : [],
-        title: formDataPostEdit.title,
-        summary: formDataPostEdit.summary,
-        legacy_url:
-          pathname.split("/")[3] === 'new-post'
-            ? formDataPostEdit.title.split(" ").join("-")
-            : post.slug,
-        tags: formData.tags.map((tag) => tag.value), // Ensure values are ObjectIDs
-        categories: formData.additionalCategories.map((cat) => cat.value), // Ensure values are ObjectIDs
-        banner_desc: formDataPostEdit.banner_desc,
-        credits: formData.credits.map((credit) => credit.value), // Ensure values are ObjectIDs
-        focusKeyphrase: formData.focusKeyphrase,
-        content: htmlContent,
-        status: status,
-        author: JSON.parse(localStorage.getItem('id')), // Ensure this is a valid ObjectID
-        slug: formDataPostEdit.title.split(" ").join("-"),
-        type: pathname.split("/")[2],
-        updated_at_datetime: new Date(), // Add updated_at_datetime for updates
-      };
-  
-      // Add `published_at_datetime` for published status
-      if (status === "published") {
-        transformedData.published_at_datetime = new Date();
-      }
-  
-      // Add `seo_desc` if it's not a new post
-      if (pathname.split("/")[3] !== 'new-post') {
-        transformedData.seo_desc = formDataPostEdit.seo_desc;
-      }
-  
-      // Determine if it's a POST or PUT request
-      const isCreate = pathname.split("/")[3] === 'new-post';
-      const apiUrl = isCreate
-        ? `${process.env.NEXT_PUBLIC_API_URL}/article/create`
-        : `${process.env.NEXT_PUBLIC_API_URL}/article/update?${post._id}`;
-  
-      const method = isCreate ? 'POST' : 'PUT';
-  
-      // Make API call
-      const response = await fetch(apiUrl, {
-        method: method,
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/user/login`, {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify(transformedData),
+        body: JSON.stringify({ email, password }),
       });
-  
-      if (!response.ok) {
-        throw new Error(
-          `${isCreate ? 'Creating' : 'Updating'} article failed: ${
-            response.statusText
-          }`
-        );
+
+      const data = await res.json();
+
+      if (res.ok) {
+        // Save token to cookies
+        Cookies.set("token", data.token, {
+          expires: rememberMe ? 7 : undefined, // Set expiration if 'Remember me' is checked
+          secure: true,
+          sameSite: "Strict",
+        });
+        localStorage.setItem('role',JSON.stringify(data.user.roles))
+        localStorage.setItem('id',(data.user.id))
+
+        // Redirect to a secure route, e.g., /dashboard
+        window.location.href = "/";
+      } else {
+        // Handle errors (wrong credentials, etc.)
+        setError(data.message || "Login failed");
       }
-  
-      alert("Success");
-      const data = await response.json();
-      console.log(`Article ${isCreate ? 'created' : 'updated'} successfully:`, data);
-      return data;
-    } catch (error) {
-      console.error('Error:', error.message);
-      throw error; // Re-throw error to handle it in the calling code if necessary
+    } catch (err) {
+      setError("An error occurred. Please try again later.");
     }
   };
-  
+
  
 
   return (
