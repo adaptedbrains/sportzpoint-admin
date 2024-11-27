@@ -1,5 +1,6 @@
 "use client";
 
+import axios from "axios";
 import Cookies from "js-cookie";
 import React, { useState, useEffect } from "react";
 
@@ -8,13 +9,18 @@ const LiveBlogUpdates = ({ postId, onAddUpdate }) => {
   const [updates, setUpdates] = useState([]);
   const [editingUpdate, setEditingUpdate] = useState(null);
 
-  /* const fetchUpdates = async () => {
+  const fetchUpdates = async () => {
     try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/posts/${postId}/updates`,
+      const token = Cookies.get("token");
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_API_URL}/post/${postId}/live-blog/updates`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
       );
-      const data = await response.json();
-      setUpdates(data);
+      setUpdate(response.data.updates[0].content);
     } catch (error) {
       console.error("Error fetching updates:", error);
     }
@@ -22,7 +28,7 @@ const LiveBlogUpdates = ({ postId, onAddUpdate }) => {
 
   useEffect(() => {
     fetchUpdates();
-  }, [postId]); */
+  }, [postId]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -174,4 +180,3 @@ const LiveBlogUpdates = ({ postId, onAddUpdate }) => {
 };
 
 export default LiveBlogUpdates;
-
