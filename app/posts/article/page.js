@@ -1,6 +1,6 @@
 'use client';  // This tells Next.js that this component should only run in the browser
 
-import useAllPostDataStore from '@/store/useAllPostDataStore';
+import useAllPostDataStore from '../../../store/useAllPostDataStore';
 import Table from '../../../components/Table';
 import TableHeader from '../../../components/TableHeader';
 import React, { useEffect, useState } from 'react';

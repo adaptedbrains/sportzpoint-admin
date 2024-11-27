@@ -12,7 +12,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { FaHome, FaRegEdit, FaUsers, FaCog } from "react-icons/fa";
 import { motion } from "framer-motion";
-import useSidebarStore from "@/store/useSidebarStore";
+import useSidebarStore from "../store/useSidebarStore";
 
 const Sidebar = () => {
   const { collapsed, toggleSidebar, togglePostSidebar } = useSidebarStore();
