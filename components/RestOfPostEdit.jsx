@@ -1,4 +1,5 @@
 'use client';
+// import useDropDownDataStore from '@/store/dropDownDataStore';
 import useDropDownDataStore from '../store/dropDownDataStore';
 import { useState, useEffect } from 'react';
 import Select from 'react-select';
@@ -39,80 +40,84 @@ function RestOfPostEdit({ formData, setFormData }) {
   };
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-md">
-      <h2 className="text-xl font-bold mb-4">Manage Post Properties</h2>
-
-      <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700 mb-1">
-          Primary Category *
-        </label>
-        <Select
-          value={formData.primaryCategory}
-          onChange={(value) => handleChange(value, 'primaryCategory')}
-          options={categoryOptions}
-          className="basic-single"
-          classNamePrefix="select"
-          isClearable
-          placeholder="Select Primary Category"
-        />
+    <div className="rounded-lg border bg-white">
+      <div className="p-4 border-b">
+        <h2 className="text-lg font-medium">Manage Post Properties</h2>
       </div>
+      
+      <div className="p-4 space-y-4">
+        <div className="mb-4">
+          <label className="block text-sm font-medium text-gray-500 mb-1">
+            Primary Category *
+          </label>
+          <Select
+            value={formData.primaryCategory}
+            onChange={(value) => handleChange(value, 'primaryCategory')}
+            options={categoryOptions}
+            className="basic-single"
+            classNamePrefix="select"
+            isClearable
+            placeholder="Select Primary Category"
+          />
+        </div>
 
-      <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700 mb-1">
-          Additional Categories
-        </label>
-        <Select
-          isMulti
-          value={formData.additionalCategories}
-          onChange={(value) => handleChange(value, 'additionalCategories')}
-          options={categoryOptions}
-          className="basic-multi-select"
-          classNamePrefix="select"
-          placeholder="Select Additional Categories"
-        />
-      </div>
+        <div className="mb-4">
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Additional Categories
+          </label>
+          <Select
+            isMulti
+            value={formData.additionalCategories}
+            onChange={(value) => handleChange(value, 'additionalCategories')}
+            options={categoryOptions}
+            className="basic-multi-select"
+            classNamePrefix="select"
+            placeholder="Select Additional Categories"
+          />
+        </div>
 
-      <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700 mb-1">
-          Tags
-        </label>
-        <Select
-          isMulti
-          value={formData.tags}
-          onChange={(value) => handleChange(value, 'tags')}
-          options={tagOptions}
-          className="basic-multi-select"
-          classNamePrefix="select"
-          placeholder="Select Tags"
-        />
-      </div>
+        <div className="mb-4">
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Tags
+          </label>
+          <Select
+            isMulti
+            value={formData.tags}
+            onChange={(value) => handleChange(value, 'tags')}
+            options={tagOptions}
+            className="basic-multi-select"
+            classNamePrefix="select"
+            placeholder="Select Tags"
+          />
+        </div>
 
-      <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700 mb-1">
-          Credits *
-        </label>
-        <Select
-          isMulti
-          value={formData.credits}
-          onChange={(value) => handleChange(value, 'credits')}
-          options={creditOptions}
-          className="basic-multi-select"
-          classNamePrefix="select"
-          placeholder="Select Credits"
-        />
-      </div>
+        <div className="mb-4">
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Credits *
+          </label>
+          <Select
+            isMulti
+            value={formData.credits}
+            onChange={(value) => handleChange(value, 'credits')}
+            options={creditOptions}
+            className="basic-multi-select"
+            classNamePrefix="select"
+            placeholder="Select Credits"
+          />
+        </div>
 
-      <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700 mb-1">
-          Focus Keyphrase
-        </label>
-        <input
-          type="text"
-          value={formData.focusKeyphrase}
-          onChange={(e) => handleChange(e.target.value, 'focusKeyphrase')}
-          className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-200 focus:border-indigo-500 sm:text-sm"
-          placeholder="Enter focus keyphrase"
-        />
+        <div className="mb-4">
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Focus Keyphrase
+          </label>
+          <input
+            type="text"
+            value={formData.focusKeyphrase}
+            onChange={(e) => handleChange(e.target.value, 'focusKeyphrase')}
+            className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-200 focus:border-indigo-500 sm:text-sm"
+            placeholder="Enter focus keyphrase"
+          />
+        </div>
       </div>
     </div>
   );
