@@ -12,7 +12,6 @@ const Page = () => {
   const [status, setStatus] = useState('published'); // Default status
   const limit = 15;
   const [selectedPostId, setSelectedPostId] = useState(null);
-  const [ongoingPosts, setOngoingPosts] = useState([]);
 
   // Function to update data when status or page changes
   const fetchData = () => {
@@ -36,30 +35,13 @@ const Page = () => {
     setCurrentPage(1); // Reset to the first page when status changes
   };
 
-  // Add this function to fetch ongoing live blogs
-  const fetchOngoingLiveBlogs = async () => {
-    try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/posts/ongoing-live-blogs`);
-      const data = await response.json();
-      setOngoingPosts(Array.isArray(data) ? data : []);
-      console.log('Ongoing posts data:', data);
-    } catch (error) {
-      console.error('Error fetching ongoing live blogs:', error);
-      setOngoingPosts([]);
-    }
-  };
-
-  useEffect(() => {
-    fetchOngoingLiveBlogs();
-  }, []);
-
   const handleStopLive = async (postId) => {
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/posts/stop-live/${postId}`, {
         method: 'PUT',
       });
       if (response.ok) {
-        fetchOngoingLiveBlogs();
+        fetchData();
       }
     } catch (error) {
       console.error('Error stopping live blog:', error);
@@ -74,13 +56,11 @@ const Page = () => {
             postId={selectedPostId}
             onAddUpdate={() => {
               setSelectedPostId(null);
-              fetchOngoingLiveBlogs();
             }}
           />
         )}
         
         <OngoingLiveBlogs
-          posts={ongoingPosts}
           onStopLive={handleStopLive}
           onAddUpdate={(postId) => setSelectedPostId(postId)}
         />

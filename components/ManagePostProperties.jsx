@@ -1,13 +1,14 @@
 "use client";
 import Cookies from 'js-cookie';
-
 import RichTextEditor from "./RichTextEditor";
 import RestOfPostEdit from "./RestOfPostEdit";
 import ArticlePostEditComponent from "./ArticlePostEditComponent";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import useAllPostDataStore from "@/store/useAllPostDataStore";
+
 function ManagePostProperties() {
+  const router = useRouter();
   const { allPosts } = useAllPostDataStore();
   const pathname = usePathname();
   const [post, setPost] = useState(null);
@@ -18,16 +19,18 @@ function ManagePostProperties() {
     credits: [],
     focusKeyphrase: "",
   });
+  
   const [formDataPostEdit, setFormDataPostEdit] = useState({
     title: "",
     slug: "",
     summary: "",
     seo_desc: "",
     featuredImage: "",
-    banner_desc:""
+    banner_desc: ""
   });
 
   const [htmlContent, setHtmlContent] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const htmlContentGrab = (data) => {
     setHtmlContent(data);
@@ -72,7 +75,7 @@ function ManagePostProperties() {
         setHtmlContent(requiredData?.content || "");
         if (requiredData) {
           setFormData({
-            primaryCategory: requiredData.primary_category
+            primaryCategory: requiredData.primary_category?.[0] 
               ? {
                   value: requiredData.primary_category[0]._id,
                   label: requiredData.primary_category[0].name,
@@ -93,7 +96,7 @@ function ManagePostProperties() {
                   label: credit.name,
                 }))
               : [],
-            focusKeyphrase: "",
+            focusKeyphrase: requiredData.focusKeyphrase || "",
           });
           setFormDataPostEdit({
             title: requiredData.title || "",
@@ -107,85 +110,105 @@ function ManagePostProperties() {
       }
     }
   }, [pathname, allPosts]);
-  
+
+  const validateForm = () => {
+    if (!formDataPostEdit.title.trim()) {
+      throw new Error("Title is required");
+    }
+    if (!htmlContent.trim()) {
+      throw new Error("Content is required");
+    }
+    if (!formData.primaryCategory) {
+      throw new Error("Primary category is required");
+    }
+  };
 
   const submitData = async (status) => {
     try {
+      setIsSubmitting(true);
+      
+      // Validate form
+      validateForm();
+
       const token = Cookies.get('token');
       if (!token) {
-        throw new Error("No token found in cookies");
+        throw new Error("No token found. Please login again.");
       }
-  
+
+      // Safely get author ID
+      let authorId;
+      try {
+        const storedId = localStorage.getItem('id');
+        authorId = storedId ? storedId.replace(/^"(.*)"$/, '$1') : null;
+        
+        if (!authorId) {
+          throw new Error("No author ID found. Please login again.");
+        }
+      } catch (e) {
+        console.error('Error getting author ID:', e);
+        throw new Error("Authentication error. Please login again.");
+      }
+
       // Transform data
       const transformedData = {
         primary_category: formData.primaryCategory
           ? [formData.primaryCategory.value]
           : [],
-        title: formDataPostEdit.title,
-        summary: formDataPostEdit.summary,
-        legacy_url:
-          pathname.split("/")[3] === 'new-post'
-            ? formDataPostEdit.title.split(" ").join("-")
-            : post.slug,
+        title: formDataPostEdit.title.trim(),
+        summary: formDataPostEdit.summary.trim(),
+        legacy_url: pathname.split("/")[3] === 'new-post'
+          ? formDataPostEdit.title.trim().toLowerCase().split(" ").join("-")
+          : post.slug,
         tags: formData.tags.map((tag) => tag.value),
         categories: formData.additionalCategories.map((cat) => cat.value),
-        banner_desc: formDataPostEdit.banner_desc,
+        banner_desc: formDataPostEdit.banner_desc.trim(),
         credits: formData.credits.map((credit) => credit.value),
-        focusKeyphrase: formData.focusKeyphrase,
-        content: htmlContent,
+        focusKeyphrase: formData.focusKeyphrase.trim(),
+        content: htmlContent.trim(),
         status: status,
-        author: JSON.parse(localStorage.getItem('id')),
-        slug: formDataPostEdit.title.split(" ").join("-"),
+        author: authorId,
+        slug: formDataPostEdit.title.trim().toLowerCase().split(" ").join("-"),
         type: pathname.split("/")[2],
+        seo_desc: formDataPostEdit.seo_desc.trim(),
       };
-  
-      // Add `published_at_datetime` for published status
+
       if (status === "published") {
-        transformedData.published_at_datetime = new Date();
+        transformedData.published_at_datetime = new Date().toISOString();
       }
-  
-      // Add `seo_desc` if it's not a new post
-      if (pathname.split("/")[3] !== 'new-post') {
-        transformedData.seo_desc = formDataPostEdit.seo_desc;
-      }
-  
-      // Determine if it's a POST or PUT request
+
       const isCreate = pathname.split("/")[3] === 'new-post';
       const apiUrl = isCreate
         ? `${process.env.NEXT_PUBLIC_API_URL}/article/create`
         : `${process.env.NEXT_PUBLIC_API_URL}/article/update/${post._id}`;
-  
-      const method = isCreate ? 'POST' : 'PUT';
-  
-      // Make API call
+
       const response = await fetch(apiUrl, {
-        method: method,
+        method: isCreate ? 'POST' : 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
+          'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify(transformedData),
       });
-  
+
       if (!response.ok) {
-        throw new Error(
-          `${isCreate ? 'Creating' : 'Updating'} article failed: ${
-            response.statusText
-          }`
-        );
+        const errorData = await response.json();
+        throw new Error(errorData.message || `Failed to ${isCreate ? 'create' : 'update'} article`);
       }
-      alert("Successdjfhbadufvbhjkk")
-  
+
       const data = await response.json();
-      console.log(`Article ${isCreate ? 'created' : 'updated'} successfully:`, data);
+      alert(`Article ${isCreate ? 'created' : 'updated'} successfully!`);
+      
+      // Redirect to the articles list page
+      router.push('/posts/article');
+      
       return data;
     } catch (error) {
-      console.error('Error:', error.message);
-      throw error; // Re-throw error to handle it in the calling code if necessary
+      console.error('Error:', error);
+      alert(error.message || 'An unexpected error occurred');
+    } finally {
+      setIsSubmitting(false);
     }
   };
-  
-  
 
   return (
     <div className="flex flex-col gap-2">
@@ -194,38 +217,43 @@ function ManagePostProperties() {
         formDataPostEdit={formDataPostEdit}
       />
       <RichTextEditor
-        content={htmlContent && htmlContent}
+        content={htmlContent}
         htmlContentGrab={htmlContentGrab}
       />
-      <RestOfPostEdit formData={formData} setFormData={setFormData} />
-      {/* New Action Buttons Section */}
+      <RestOfPostEdit 
+        formData={formData} 
+        setFormData={setFormData} 
+      />
+      
       <div className="flex justify-end gap-4 mt-6 bg-white p-4 rounded-lg shadow">
         <button 
-          className="px-6 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors duration-200 flex items-center gap-2"
-          onClick={() => {
-            submitData('draft');
-          }}
+          className={`px-6 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors duration-200 flex items-center gap-2 ${
+            isSubmitting ? 'opacity-50 cursor-not-allowed' : ''
+          }`}
+          onClick={() => submitData('draft')}
+          disabled={isSubmitting}
         >
-          Save as Draft
+          {isSubmitting ? 'Saving...' : 'Save as Draft'}
         </button>
 
         <button
-          className="px-6 py-2 bg-blue-100 text-blue-700 rounded-md hover:bg-blue-200 transition-colors duration-200 flex items-center gap-2"
-          onClick={() => {
-            submitData('pending_approval');
-          }}
+          className={`px-6 py-2 bg-blue-100 text-blue-700 rounded-md hover:bg-blue-200 transition-colors duration-200 flex items-center gap-2 ${
+            isSubmitting ? 'opacity-50 cursor-not-allowed' : ''
+          }`}
+          onClick={() => submitData('pending_approval')}
+          disabled={isSubmitting}
         >
-          Send for Approval
+          {isSubmitting ? 'Sending...' : 'Send for Approval'}
         </button>
 
         <button
-          className="px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors duration-200 flex items-center gap-2"
-          onClick={() => {
-            
-            submitData('published');
-          }}
+          className={`px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors duration-200 flex items-center gap-2 ${
+            isSubmitting ? 'opacity-50 cursor-not-allowed' : ''
+          }`}
+          onClick={() => submitData('published')}
+          disabled={isSubmitting}
         >
-          Publish
+          {isSubmitting ? 'Publishing...' : 'Publish'}
         </button>
       </div>
     </div>
