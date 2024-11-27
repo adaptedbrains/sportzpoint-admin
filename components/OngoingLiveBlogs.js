@@ -1,4 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import axios from "axios";
+import Link from "next/link";
+import React, { useEffect, useState } from "react";
 
 const OngoingLiveBlogs = ({ onStopLive, onAddUpdate }) => {
   const [ongoingPosts, setOngoingPosts] = useState([]);
@@ -10,26 +12,15 @@ const OngoingLiveBlogs = ({ onStopLive, onAddUpdate }) => {
     try {
       setLoading(true);
       setError(null);
-      
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/liveblogs`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_API_URL}/liveblogs`,
+      );
 
-      const data = await response.json();
-      // Assuming the API returns an array of live blogs
-      const livePosts = Array.isArray(data) ? data : [];
-      setOngoingPosts(livePosts);
-      
+      setOngoingPosts(response.data.liveBlogs);
     } catch (error) {
-      console.error('Error fetching ongoing live blogs:', error);
-      setError('Failed to load ongoing live blogs');
+      console.error("Error fetching ongoing live blogs:", error);
+      setError("Failed to load ongoing live blogs");
       setOngoingPosts([]);
     } finally {
       setLoading(false);
@@ -44,36 +35,39 @@ const OngoingLiveBlogs = ({ onStopLive, onAddUpdate }) => {
   }, []);
 
   const handleStopLive = async (postId) => {
-    if (!window.confirm('Are you sure you want to stop this live blog?')) return;
-    
+    if (!window.confirm("Are you sure you want to stop this live blog?"))
+      return;
+
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/post/stop-live/${postId}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/admin/post/stop-live/${postId}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
         },
-      });
-      
+      );
+
       if (!response.ok) {
-        throw new Error('Failed to stop live blog');
+        throw new Error("Failed to stop live blog");
       }
-      
+
       // Refresh the list after stopping a live blog
       fetchOngoingLiveBlogs();
-      
     } catch (error) {
-      console.error('Error stopping live blog:', error);
-      alert('Failed to stop live blog. Please try again.');
+      console.error("Error stopping live blog:", error);
+      alert("Failed to stop live blog. Please try again.");
     }
   };
 
   return (
     <div className="container mx-auto p-4">
       <h2 className="text-2xl font-bold mb-4">Ongoing Live Blogs</h2>
-      
+
       {loading && <p>Loading...</p>}
       {error && <p className="text-red-500">{error}</p>}
-      
+
       {!loading && !error && (
         <div className="overflow-x-auto">
           <table className="min-w-full bg-white border border-gray-300">
@@ -91,7 +85,7 @@ const OngoingLiveBlogs = ({ onStopLive, onAddUpdate }) => {
                 <tr key={blog._id} className="hover:bg-gray-50">
                   <td className="px-4 py-2 border">{blog.title}</td>
                   <td className="px-4 py-2 border">
-                    {blog.primary_category?.[0]?.name || 'Uncategorized'}
+                    {blog.primary_category?.[0]?.name || "Uncategorized"}
                   </td>
                   <td className="px-4 py-2 border text-center">
                     {blog.live_blog_updates?.length || 0}
@@ -101,12 +95,14 @@ const OngoingLiveBlogs = ({ onStopLive, onAddUpdate }) => {
                   </td>
                   <td className="px-4 py-2 border">
                     <div className="flex gap-2 justify-center">
-                      <button
-                        onClick={() => onAddUpdate(blog._id)}
-                        className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
-                      >
-                        Add Update
-                      </button>
+                      <Link href={`/posts/live-blog/${blog._id}`}>
+                        <button
+                          onClick={() => onAddUpdate(blog._id)}
+                          className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
+                        >
+                          Add Update
+                        </button>
+                      </Link>
                       <button
                         onClick={() => onStopLive(blog._id)}
                         className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
@@ -129,4 +125,5 @@ const OngoingLiveBlogs = ({ onStopLive, onAddUpdate }) => {
   );
 };
 
-export default OngoingLiveBlogs; 
+export default OngoingLiveBlogs;
+

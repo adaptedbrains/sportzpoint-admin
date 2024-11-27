@@ -1,86 +1,101 @@
-import React, { useState, useEffect } from 'react';
+"use client";
+
+import Cookies from "js-cookie";
+import React, { useState, useEffect } from "react";
 
 const LiveBlogUpdates = ({ postId, onAddUpdate }) => {
-  const [update, setUpdate] = useState('');
+  const [update, setUpdate] = useState("");
   const [updates, setUpdates] = useState([]);
   const [editingUpdate, setEditingUpdate] = useState(null);
 
-  // Fetch existing updates
-  const fetchUpdates = async () => {
+  /* const fetchUpdates = async () => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/posts/${postId}/updates`);
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/posts/${postId}/updates`,
+      );
       const data = await response.json();
       setUpdates(data);
     } catch (error) {
-      console.error('Error fetching updates:', error);
+      console.error("Error fetching updates:", error);
     }
   };
 
   useEffect(() => {
     fetchUpdates();
-  }, [postId]);
+  }, [postId]); */
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!update.trim()) return;
-    
+
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/posts/${postId}/live-blog/update`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
+      const token = Cookies.get("token");
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/posts/${postId}/live-blog/update`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ content: update }),
         },
-        body: JSON.stringify({ content: update }),
-      });
-      
+      );
+
       if (response.ok) {
-        setUpdate('');
+        setUpdate("");
         fetchUpdates();
       }
     } catch (error) {
-      console.error('Error adding update:', error);
+      console.error("Error adding update:", error);
     }
   };
 
   const handleEdit = async (updateId, content) => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/live-blog/update/${updateId}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/live-blog/update/${updateId}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ content }),
         },
-        body: JSON.stringify({ content }),
-      });
-      
+      );
+
       if (response.ok) {
         setEditingUpdate(null);
         fetchUpdates();
       }
     } catch (error) {
-      console.error('Error editing update:', error);
+      console.error("Error editing update:", error);
     }
   };
 
   const handleDelete = async (updateId) => {
-    if (!window.confirm('Are you sure you want to delete this update?')) return;
-    
+    if (!window.confirm("Are you sure you want to delete this update?")) return;
+
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/live-blog/update/${updateId}`, {
-        method: 'DELETE',
-      });
-      
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/live-blog/update/${updateId}`,
+        {
+          method: "DELETE",
+        },
+      );
+
       if (response.ok) {
         fetchUpdates();
       }
     } catch (error) {
-      console.error('Error deleting update:', error);
+      console.error("Error deleting update:", error);
     }
   };
 
   return (
     <div className="p-4 bg-white rounded-lg shadow mb-6">
       <h2 className="text-xl font-bold mb-4">Live Blog Updates</h2>
-      
+
       {/* Add Update Form */}
       <form onSubmit={handleSubmit} className="mb-6">
         <textarea
@@ -108,8 +123,10 @@ const LiveBlogUpdates = ({ postId, onAddUpdate }) => {
                   className="w-full p-2 border rounded-lg"
                   value={item.content}
                   onChange={(e) => {
-                    const newUpdates = updates.map(u => 
-                      u._id === item._id ? { ...u, content: e.target.value } : u
+                    const newUpdates = updates.map((u) =>
+                      u._id === item._id
+                        ? { ...u, content: e.target.value }
+                        : u,
                     );
                     setUpdates(newUpdates);
                   }}
@@ -156,4 +173,5 @@ const LiveBlogUpdates = ({ postId, onAddUpdate }) => {
   );
 };
 
-export default LiveBlogUpdates; 
+export default LiveBlogUpdates;
+
