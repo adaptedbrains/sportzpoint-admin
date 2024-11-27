@@ -5,7 +5,8 @@ import RestOfPostEdit from "./RestOfPostEdit";
 import ArticlePostEditComponent from "./ArticlePostEditComponent";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import useAllPostDataStore from "@/store/useAllPostDataStore";
+// import useAllPostDataStore from "@/store/useAllPostDataStore";
+import useAllPostDataStore from "../store/useAllPostDataStore";
 
 function ManagePostProperties() {
   const router = useRouter();

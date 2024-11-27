@@ -6,7 +6,7 @@ import { GoLink } from "react-icons/go";
 import ActionMenu from "./ActionMenu";
 import { useRouter,usePathname } from "next/navigation";
 import CalendarModal from "./CalendarModal";
-import { formatDate } from "@/util/timeFormat";
+import { formatDate } from "../util/timeFormat";
 
 export default function Table({
   posts,

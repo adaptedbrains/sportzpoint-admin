@@ -3,7 +3,8 @@ import Image from 'next/image';
 import React, { useEffect, useState } from 'react';
 import { FaPlusCircle } from 'react-icons/fa';
 import { usePathname } from 'next/navigation';
-import useAllPostDataStore from '@/store/useAllPostDataStore';
+// import useAllPostDataStore from '@/store/useAllPostDataStore';
+import useAllPostDataStore from '../store/useAllPostDataStore';
 
 const ArticlePostEditComponent = ({handleArticleFromData,formDataPostEdit}) => {
   const {allPosts}=useAllPostDataStore()
