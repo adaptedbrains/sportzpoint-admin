@@ -1,17 +1,15 @@
-'use client';
+'use client';  // This tells Next.js that this component should only run in the browser
+
 import useAllPostDataStore from '../../../store/useAllPostDataStore';
 import Table from '../../../components/Table';
 import TableHeader from '../../../components/TableHeader';
 import React, { useEffect, useState } from 'react';
-import OngoingLiveBlogs from '../../../components/OngoingLiveBlogs';
-import LiveBlogUpdates from '../../../components/LiveBlogUpdates';
 
 const Page = () => {
   const { fetchAllPostedData, allPosts, totalPages, loading } = useAllPostDataStore();
   const [currentPage, setCurrentPage] = useState(1);
   const [status, setStatus] = useState('published'); // Default status
   const limit = 15;
-  const [selectedPostId, setSelectedPostId] = useState(null);
 
   // Function to update data when status or page changes
   const fetchData = () => {
@@ -19,13 +17,15 @@ const Page = () => {
     fetchAllPostedData(url, 'LiveBlog');
   };
 
+  // useEffect hook ensures fetchData runs only on the client
   useEffect(() => {
     fetchData();
   }, [currentPage, status]);
 
+  // Only execute scroll logic on the client
   const handlePageChange = (newPage) => {
     setCurrentPage(newPage);
-    if (typeof window !== 'undefined') {
+    if (typeof window !== 'undefined') {  // Check if window is defined (client-side only)
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
@@ -35,36 +35,9 @@ const Page = () => {
     setCurrentPage(1); // Reset to the first page when status changes
   };
 
-  const handleStopLive = async (postId) => {
-    try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/posts/stop-live/${postId}`, {
-        method: 'PUT',
-      });
-      if (response.ok) {
-        fetchData();
-      }
-    } catch (error) {
-      console.error('Error stopping live blog:', error);
-    }
-  };
-
   return (
     <div className='bg-gray-50 min-h-screen'>
       <div className='max-w-7xl mx-auto p-4'>
-        {selectedPostId && (
-          <LiveBlogUpdates
-            postId={selectedPostId}
-            onAddUpdate={() => {
-              setSelectedPostId(null);
-            }}
-          />
-        )}
-        
-        <OngoingLiveBlogs
-          onStopLive={handleStopLive}
-          onAddUpdate={(postId) => setSelectedPostId(postId)}
-        />
-
         <div className='bg-white rounded-lg shadow'>
           <TableHeader
             type="LiveBlog"
@@ -72,7 +45,7 @@ const Page = () => {
             loading={loading}
             totalPages={totalPages}
             onPageChange={handlePageChange}
-            onStatusChange={handleStatusChange} 
+            onStatusChange={handleStatusChange}
             totalItems={allPosts.length}
             status={status} // Pass current status
           />
@@ -91,6 +64,7 @@ const Page = () => {
 };
 
 export default Page;
+
 
 
 
