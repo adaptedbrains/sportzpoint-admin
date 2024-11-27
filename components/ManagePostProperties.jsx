@@ -189,6 +189,8 @@ function ManagePostProperties() {
 
   return (
     <div className="flex flex-col gap-2">
+
+      
       <ArticlePostEditComponent
         handleArticleFromData={handleArticleFromData}
         formDataPostEdit={formDataPostEdit}

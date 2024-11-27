@@ -196,7 +196,7 @@ const ArticlePostEditComponent = ({handleArticleFromData,formDataPostEdit}) => {
               </>
             )}
 
-            <input type="text" value={formDataPostEdit.banner_image}  onChange={(e)=>handleArticleFromData(e.target.value)}   />
+            {/* <input type="text" value={formDataPostEdit.banner_image}  onChange={(e)=>handleArticleFromData(e.target.value)}   /> */}
           </label>
         </div>
       </div>

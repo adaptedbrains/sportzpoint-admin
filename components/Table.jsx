@@ -55,7 +55,7 @@ export default function Table({
     },
   ];
   const [filter, setFilter] = useState("Published");
-  const [Action, setAction] = useState("");
+  const [action, setAction] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const pathname=usePathname()
@@ -228,12 +228,12 @@ export default function Table({
 
                     <FaEllipsisV
                       className="text-blue-500 cursor-pointer"
-                      // onClick={() => actionText(article.views)}
+                      onClick={() => actionText(article._id)}
                     />
                   </div>
-                  {Action === article.views && (
+                  {action === article._id && (
                     <div className=" absolute shadow-2xl z-10 bottom-8 end-0">
-                      {/* <ActionMenu actionText={actionText} /> */}
+                      <ActionMenu actionText={actionText} id={article._id} type={article.type} />
                     </div>
                   )}
                 </td>

@@ -1,4 +1,7 @@
 import { useState, useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
+import Cookies from 'js-cookie';
+
 import {
   FaEdit,
   FaLink,
@@ -9,7 +12,9 @@ import {
   FaTrash,
 } from "react-icons/fa";
 
-function ActionMenu({ actionText }) {
+function ActionMenu({ actionText, id, type }) {
+  const token = Cookies.get('token');
+ const router=useRouter()
   const menuRef = useRef(null);
 
   // Close the menu when clicking outside
@@ -71,10 +76,51 @@ function ActionMenu({ actionText }) {
             </a>
           </li>
           <li className="py-2 px-4 hover:bg-gray-100 hover:text-blue-700">
-            <a href="#" className="flex group items-center">
+            <button
+              type="button"
+              className="flex group items-center"
+              // onClick={async () => {
+              //   try {
+                  
+              //     if (!token) {
+              //       throw new Error("No token found in cookies");
+              //     }
+
+              //     // Assuming post._id is the ID of the article you're deleting
+                 
+
+              //     // API URL for the delete request
+              //     const apiUrl = `${process.env.NEXT_PUBLIC_API_URL}/article/delete/${id}`;
+
+              //     // Make DELETE request
+              //     const response = await fetch(apiUrl, {
+              //       method: "DELETE",
+              //       headers: {
+              //         "Content-Type": "application/json",
+              //         Authorization: `Bearer ${token}`,
+              //       },
+              //     });
+
+              //     if (!response.ok) {
+              //       throw new Error("Failed to delete article");
+              //     }
+
+              //     const data = await response.json();
+              //     alert("Article deleted successfully");
+
+                 
+              //     router.push(`${process.env.NEXT_PUBLIC_API_URL}/posts/article`)
+
+              //   } catch (error) {
+              //     console.log(error);
+                  
+              //     alert("Error deleting article: " + error.message);
+              //   }
+              // }}
+            >
               <FaTrash className="w-3 h-3 transition-all duration-100 mr-2" />
               Delete
-            </a>
+            </button>
           </li>
         </ul>
       </div>
