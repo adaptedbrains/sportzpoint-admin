@@ -30,7 +30,9 @@ const Page = () => {
           secure: true,
           sameSite: "Strict",
         });
-        localStorage.setItem('role',JSON.stringify(data.role))
+        localStorage.setItem('role',JSON.stringify(data.user.roles))
+        localStorage.setItem('id',(data.user.id))
+
         // Redirect to a secure route, e.g., /dashboard
         window.location.href = "/";
       } else {
