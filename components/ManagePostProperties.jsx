@@ -1,4 +1,5 @@
 "use client";
+import Cookies from 'js-cookie';
 
 import RichTextEditor from "./RichTextEditor";
 import RestOfPostEdit from "./RestOfPostEdit";
@@ -6,7 +7,6 @@ import ArticlePostEditComponent from "./ArticlePostEditComponent";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import useAllPostDataStore from "@/store/useAllPostDataStore";
-
 function ManagePostProperties() {
   const { allPosts } = useAllPostDataStore();
   const pathname = usePathname();
@@ -45,7 +45,7 @@ function ManagePostProperties() {
       const parts = pathname.split("/");
       const type = parts[2];
       const id = parts[3];
-  
+      
       if (id === "new-post") {
         // Fresh initialization for a new post
         setPost(null);
@@ -97,9 +97,9 @@ function ManagePostProperties() {
           });
           setFormDataPostEdit({
             title: requiredData.title || "",
-            englishTitle: requiredData.englishTitle || "",
+            englishTitle: requiredData.slug || "",
             summary: requiredData.summary || "",
-            metaDescription: requiredData.metaDescription || "",
+            seo_desc: requiredData.seo_desc || "",
             featuredImage: requiredData.featuredImage || "",
             banner_desc: requiredData.banner_desc || "",
           });
@@ -109,46 +109,80 @@ function ManagePostProperties() {
   }, [pathname, allPosts]);
   
 
-  const submitData = (status) => {
-    const transformedData = {
-      primary_category: formData.primaryCategory ? [formData.primaryCategory.value] : [],
-      title: formDataPostEdit.title,
-      summary: formDataPostEdit.summary,
-      legacy_url: id === 'new-post' ? formDataPostEdit.title.split(" ").join("-") : post.slug,
-      tags: formData.tags.map((tag) => tag.value),
-      categories: formData.additionalCategories.map((cat) => cat.value),
-      banner_desc: formDataPostEdit.banner_desc,
-      credits: formData.credits.map((credit) => credit.value),
-      focusKeyphrase: formData.focusKeyphrase,
-      content: htmlContent,
-      banner_desc:formDataPostEdit.banner_desc,
-      status: status,
-      type: pathname.split("/")[2],
-    };
+  const submitData = async (status) => {
+    try {
+      const token = Cookies.get('token');
+      if (!token) {
+        throw new Error("No token found in cookies");
+      }
   
-    // Conditionally add `seo_desc` if not a new post
-    if (id !== 'new-post') {
-      transformedData.seo_desc = formDataPostEdit.seo_desc;
+      // Transform data
+      const transformedData = {
+        primary_category: formData.primaryCategory
+          ? [formData.primaryCategory.value]
+          : [],
+        title: formDataPostEdit.title,
+        summary: formDataPostEdit.summary,
+        legacy_url:
+          pathname.split("/")[3] === 'new-post'
+            ? formDataPostEdit.title.split(" ").join("-")
+            : post.slug,
+        tags: formData.tags.map((tag) => tag.value),
+        categories: formData.additionalCategories.map((cat) => cat.value),
+        banner_desc: formDataPostEdit.banner_desc,
+        credits: formData.credits.map((credit) => credit.value),
+        focusKeyphrase: formData.focusKeyphrase,
+        content: htmlContent,
+        status: status,
+        author: JSON.parse(localStorage.getItem('id')),
+        slug: formDataPostEdit.title.split(" ").join("-"),
+        type: pathname.split("/")[2],
+      };
+  
+      // Add `published_at_datetime` for published status
+      if (status === "published") {
+        transformedData.published_at_datetime = new Date();
+      }
+  
+      // Add `seo_desc` if it's not a new post
+      if (pathname.split("/")[3] !== 'new-post') {
+        transformedData.seo_desc = formDataPostEdit.seo_desc;
+      }
+  
+      // Determine if it's a POST or PUT request
+      const isCreate = pathname.split("/")[3] === 'new-post';
+      const apiUrl = isCreate
+        ? `${process.env.NEXT_PUBLIC_API_URL}/article/create`
+        : `${process.env.NEXT_PUBLIC_API_URL}/article/update/${post._id}`;
+  
+      const method = isCreate ? 'POST' : 'PUT';
+  
+      // Make API call
+      const response = await fetch(apiUrl, {
+        method: method,
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(transformedData),
+      });
+  
+      if (!response.ok) {
+        throw new Error(
+          `${isCreate ? 'Creating' : 'Updating'} article failed: ${
+            response.statusText
+          }`
+        );
+      }
+      alert("Successdjfhbadufvbhjkk")
+  
+      const data = await response.json();
+      console.log(`Article ${isCreate ? 'created' : 'updated'} successfully:`, data);
+      return data;
+    } catch (error) {
+      console.error('Error:', error.message);
+      throw error; // Re-throw error to handle it in the calling code if necessary
     }
-    // Convert the object to a JSON string
-    const jsonData = JSON.stringify(transformedData, null, 2);
-  
-    // Create a blob with the JSON data and a URL for download
-    const blob = new Blob([jsonData], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-  
-    // Create a temporary link element to trigger the download
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = "postData.json"; // File name
-    document.body.appendChild(link);
-    link.click();
-  
-    // Clean up by revoking the URL and removing the link
-    URL.revokeObjectURL(url);
-    document.body.removeChild(link);
-   
-    console.log("Data saved as JSON file:", transformedData);
   };
   
   
@@ -166,7 +200,7 @@ function ManagePostProperties() {
       <RestOfPostEdit formData={formData} setFormData={setFormData} />
       {/* New Action Buttons Section */}
       <div className="flex justify-end gap-4 mt-6 bg-white p-4 rounded-lg shadow">
-        <button
+        <button 
           className="px-6 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors duration-200 flex items-center gap-2"
           onClick={() => {
             submitData('draft');
