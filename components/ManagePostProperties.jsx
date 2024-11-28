@@ -127,6 +127,7 @@ function ManagePostProperties() {
           handleArticleFromData={handleArticleFromData}
           formDataPostEdit={formDataPostEdit}
         />
+        
         <RichTextEditor content={htmlContent} htmlContentGrab={htmlContentGrab} />
         <RestOfPostEdit formData={formData} setFormData={setFormData} />
 

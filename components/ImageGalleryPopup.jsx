@@ -93,7 +93,7 @@ const ImageGalleryPopup = ({ onSelect, onClose ,onImageSelect}) => {
   };
 
   return (
-    <div className="fixed inset-0 z-[9200] bg-zinc-900/30 backdrop-blur-sm flex justify-center items-center ">
+    <div className="fixed inset-0 z-[9999] bg-zinc-900/30 backdrop-blur-sm flex justify-center items-center ">
       <div className="bg-white rounded-lg w-3/4 h-[70vh] max-w-4xl p-7 relative flex">
         {/* Left Section: Image Gallery */}
         <div className="w-2/3 pr-4 border-r">

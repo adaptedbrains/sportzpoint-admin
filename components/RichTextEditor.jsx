@@ -1,7 +1,7 @@
-'use client';
-import React, { useRef, useState } from 'react';
-import { Editor } from '@tinymce/tinymce-react';
-import ImageGalleryPopup from './ImageGalleryPopup';
+"use client";
+import React, { useRef, useState } from "react";
+import { Editor } from "@tinymce/tinymce-react";
+import ImageGalleryPopup from "./ImageGalleryPopup";
 
 const RichTextEditor = ({ content, htmlContentGrab }) => {
   const editorRef = useRef(null);
@@ -39,13 +39,29 @@ const RichTextEditor = ({ content, htmlContentGrab }) => {
           height: 500,
           menubar: true,
           plugins: [
-            'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
-            'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
-            'insertdatetime', 'media', 'table', 'help', 'wordcount', 'emoticons'
+            "advlist",
+            "autolink",
+            "lists",
+            "link",
+            "image",
+            "charmap",
+            "preview",
+            "anchor",
+            "searchreplace",
+            "visualblocks",
+            "code",
+            "fullscreen",
+            "insertdatetime",
+            "media",
+            "table",
+            "help",
+            "wordcount",
+            "emoticons",
           ],
-          toolbar: 'styles fontsize | bold italic | image media table link | alignleft aligncenter alignright | bullist numlist',
+          toolbar:
+            "styles fontsize | bold italic | image media table link | alignleft aligncenter alignright | bullist numlist",
           file_picker_callback: (callback, value, meta) => {
-            if (meta.filetype === 'image') {
+            if (meta.filetype === "image") {
               openImageGallery(callback);
             }
           },
@@ -54,10 +70,14 @@ const RichTextEditor = ({ content, htmlContentGrab }) => {
       />
 
       {isGalleryOpen && (
+       
+
         <ImageGalleryPopup
           onImageSelect={onImageSelect}
           onClose={() => setIsGalleryOpen(false)}
-        />
+          // This ensures the gallery stays on top
+          />
+        
       )}
     </div>
   );
