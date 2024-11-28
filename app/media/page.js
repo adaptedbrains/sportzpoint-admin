@@ -71,7 +71,7 @@ const Page = () => {
   };
 
   return (
-    <div className="p-6">
+    <div className="p-6 mt-12">
       <div className="mb-4">
         <label className="block text-center bg-blue-500 text-white py-2 px-4 rounded cursor-pointer hover:bg-blue-600">
           Upload Image
