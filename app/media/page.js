@@ -94,7 +94,7 @@ const Page = () => {
             onClick={() => handleImageClick(img)}
           >
             <Image
-              src={`https://sportzpoint-media.s3.ap-south-1.amazonaws.com/${img}`}
+              src={`https://sportzpoint.s3.ap-south-1.amazonaws.com/${img}`}
               alt={`Image ${index + 1}`}
               layout="fill"
               objectFit="cover"

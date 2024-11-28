@@ -28,7 +28,7 @@ const TagsPage = () => {
   return (
     <div className="flex justify-center min-h-screen bg-gray-50 pt-20 pb-6">
       <div className="w-full max-w-6xl px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center mb-4">
+        {/* <div className="flex justify-between items-center mb-4">
           <h1 className="text-xl font-semibold text-gray-800">Tags</h1>
           <button 
             onClick={() => setIsModalOpen(true)}
@@ -36,7 +36,7 @@ const TagsPage = () => {
           >
             Add Tag
           </button>
-        </div>
+        </div> */}
         
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 mt-2">
           <div className="overflow-x-auto">

@@ -23,7 +23,7 @@ useEffect(()=>{
   return (
     <div className="min-h-screen bg-gray-50 pt-20 pb-6">
       <div className="max-w-6xl mx-auto px-4">
-        <header className="flex justify-between items-center mb-4">
+        {/* <header className="flex justify-between items-center mb-4">
           <div>
             <h1 className="text-xl font-semibold text-gray-800">Categories</h1>
             <p className="text-sm text-gray-600">Manage your content categories</p>
@@ -34,7 +34,7 @@ useEffect(()=>{
           >
             Add Category
           </button>
-        </header>
+        </header> */}
 
         <div className="bg-white rounded-lg shadow-sm border border-gray-200">
           <table className="w-full">
@@ -60,14 +60,14 @@ useEffect(()=>{
                   <td className="px-6 py-4 text-sm text-gray-700 text-center">
                     
                   </td>
-                  <td className="px-6 py-4 text-sm text-right">
+                  {/* <td className="px-6 py-4 text-sm text-right">
                     <button className="text-blue-600 hover:text-blue-700 mr-3">
                       <FaEdit size={16} />
                     </button>
                     <button className="text-red-600 hover:text-red-700">
                       <FaTrash size={16} />
                     </button>
-                  </td>
+                  </td> */}
                 </tr>
               ))}
             </tbody>

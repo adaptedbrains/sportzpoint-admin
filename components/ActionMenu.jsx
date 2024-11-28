@@ -71,7 +71,7 @@ function ActionMenu({ actionText, id, type }) {
 
       <div className="absolute right-0 mt-2 w-48 bg-white shadow-md rounded-md z-10 text-xs">
         <ul>
-          <li className="py-2 px-4 hover:bg-gray-100 hover:text-blue-700">
+          {/* <li className="py-2 px-4 hover:bg-gray-100 hover:text-blue-700">
             <a href="#" className="flex group items-center">
               <FaEdit className="w-3 h-3 transition-all duration-100 mr-2" />
               Create AI Web Story
@@ -106,7 +106,7 @@ function ActionMenu({ actionText, id, type }) {
               <FaBan className="w-3 h-3 transition-all duration-100 mr-2" />
               Unpublish
             </a>
-          </li>
+          </li> */}
           <li className="py-2 px-4 hover:bg-gray-100 hover:text-blue-700">
             <button
               type="button"
