@@ -1,8 +1,10 @@
 "use client";
 import { useState, useEffect } from 'react';
 import Cookies from 'js-cookie';
+import useDropDownDataStore from '../../store/dropDownDataStore';
 
 const TeamPage = () => {
+  const { allRoleBaseUser,fetchDropDownData} = useDropDownDataStore();
   const [teamMembers, setTeamMembers] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -15,36 +17,7 @@ const TeamPage = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState(null);
 
-  useEffect(() => {
-    const fetchTeamMembers = async () => {
-      try {
-        setLoading(true);
-        const token = Cookies.get('token');
-        
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/user`, {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          },
-          credentials: 'include'
-        });
-
-        if (!response.ok) {
-          throw new Error('Failed to fetch team members');
-        }
-
-        const data = await response.json();
-        setTeamMembers(data.users || []);
-      } catch (err) {
-        console.error('Error fetching team members:', err);
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchTeamMembers();
-  }, []);
+  
 
   const getRoleBadgeColor = (role) => {
     switch (role) {
@@ -67,39 +40,44 @@ const TeamPage = () => {
     }));
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setSubmitError(null);
-    setIsSubmitting(true);
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault();
+  //   setSubmitError(null);
+  //   setIsSubmitting(true);
 
-    try {
-      const token = Cookies.get('token');
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/team/team-members/create`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-        credentials: 'include',
-        body: JSON.stringify(formData)
-      });
+  //   try {
+  //     const token = Cookies.get('token');
+  //     const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/team/team-members/create`, {
+  //       method: 'POST',
+  //       headers: {
+  //         'Authorization': `Bearer ${token}`,
+  //         'Content-Type': 'application/json'
+  //       },
+  //       credentials: 'include',
+  //       body: JSON.stringify(formData)
+  //     });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to create team member');
-      }
+  //     if (!response.ok) {
+  //       const errorData = await response.json();
+  //       throw new Error(errorData.message || 'Failed to create team member');
+  //     }
 
-      // Refresh team members list
-      await fetchTeamMembers();
-      setIsModalOpen(false);
-      setFormData({ name: '', email: '', role: '' });
-    } catch (err) {
-      console.error('Error creating team member:', err);
-      setSubmitError(err.message);
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
+  //     // Refresh team members list
+  //     await fetchTeamMembers();
+  //     setIsModalOpen(false);
+  //     setFormData({ name: '', email: '', role: '' });
+  //   } catch (err) {
+  //     console.error('Error creating team member:', err);
+  //     setSubmitError(err.message);
+  //   } finally {
+  //     setIsSubmitting(false);
+  //   }
+  // };
+
+  useEffect(()=>{
+    fetchDropDownData(`${process.env.NEXT_PUBLIC_API_URL}/users`,'roleBaseUser')
+
+  },[])
 
   if (loading) {
     return (
@@ -141,9 +119,9 @@ const TeamPage = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
-                {teamMembers.map((member) => (
+                {allRoleBaseUser.map((member) => (
                   <tr 
-                    key={member.id} 
+                    key={member._id} 
                     className="hover:bg-gray-50 transition-colors duration-200"
                   >
                     <td className="px-6 py-4 text-sm text-gray-700 whitespace-nowrap">
