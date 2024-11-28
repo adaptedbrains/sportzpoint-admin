@@ -2,12 +2,14 @@
 
 import Cookies from "js-cookie";
 import RichTextEditor from "./RichTextEditor";
+import WebStoryEditor from "./WebStoryEditor";
 import RestOfPostEdit from "./RestOfPostEdit";
 import ArticlePostEditComponent from "./ArticlePostEditComponent";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import useAllPostDataStore from "../store/useAllPostDataStore";
 import LiveBlogUpdate from './LiveBlogUpdate'
+
 function ManagePostProperties() {
   const router = useRouter();
   const { allPosts } = useAllPostDataStore();
@@ -128,7 +130,12 @@ function ManagePostProperties() {
           formDataPostEdit={formDataPostEdit}
         />
         
-        <RichTextEditor content={htmlContent} htmlContentGrab={htmlContentGrab} />
+        {post?.type === 'Web Story' ? (
+          <WebStoryEditor content={htmlContent} onContentChange={htmlContentGrab} />
+        ) : (
+          <RichTextEditor content={htmlContent} htmlContentGrab={htmlContentGrab} />
+        )}
+        
         <RestOfPostEdit formData={formData} setFormData={setFormData} />
 
         <div className="flex justify-end gap-4 mt-6 bg-white p-4 rounded-lg shadow">

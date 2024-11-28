@@ -4,7 +4,6 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import LoadingSpinner from '../../../../components/LoadingSpinner';
 import { toast } from 'react-hot-toast';
-import ManagePostProperties from "../../../../components/ManagePostProperties";
 
 const WebStorySlide = ({ slide, onSlideChange, onRemove }) => {
   const handleChange = (e) => {
@@ -151,48 +150,93 @@ export default function CreateWebStory() {
 
   return (
     <div className="max-w-4xl mx-auto p-6">
-      <ManagePostProperties type="Web Story" id="new" />
-      
-      <div className="mt-4 bg-white rounded-lg shadow p-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Add Slides
-          </label>
-          <input
-            type="file"
-            accept="image/*"
-            multiple
-            onChange={handleImageUpload}
-            className="w-full mb-4"
-          />
-          <div className="space-y-4">
-            {slides.map(slide => (
-              <WebStorySlide
-                key={slide.id}
-                slide={slide}
-                onSlideChange={handleSlideChange}
-                onRemove={handleSlideRemove}
-              />
-            ))}
+      <div className="bg-white rounded-lg shadow-md p-6">
+        <h1 className="text-2xl font-bold mb-6">Create New Web Story</h1>
+
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Story Title
+            </label>
+            <input
+              type="text"
+              name="title"
+              value={formData.title}
+              onChange={handleInputChange}
+              required
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
           </div>
-        </div>
-      </div>
-      <div className="flex justify-end gap-4">
-        <button
-          type="button"
-          onClick={() => router.back()}
-          className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50"
-        >
-          Cancel
-        </button>
-        <button
-          type="submit"
-          disabled={loading}
-          onClick={handleSubmit}
-          className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 disabled:bg-blue-300"
-        >
-          {loading ? <LoadingSpinner /> : 'Create Web Story'}
-        </button>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Story Description
+            </label>
+            <textarea
+              name="description"
+              value={formData.description}
+              onChange={handleInputChange}
+              required
+              rows={4}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Add Slides
+            </label>
+            <input
+              type="file"
+              accept="image/*"
+              multiple
+              onChange={handleImageUpload}
+              className="w-full mb-4"
+            />
+            <div className="space-y-4">
+              {slides.map(slide => (
+                <WebStorySlide
+                  key={slide.id}
+                  slide={slide}
+                  onSlideChange={handleSlideChange}
+                  onRemove={handleSlideRemove}
+                />
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Status
+            </label>
+            <select
+              name="status"
+              value={formData.status}
+              onChange={handleInputChange}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="draft">Draft</option>
+              <option value="published">Published</option>
+            </select>
+          </div>
+
+          <div className="flex justify-end gap-4">
+            <button
+              type="button"
+              onClick={() => router.back()}
+              className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={loading}
+              className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 disabled:bg-blue-300"
+            >
+              {loading ? <LoadingSpinner /> : 'Create Web Story'}
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   );

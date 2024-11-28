@@ -1,10 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import LoadingSpinner from '../../../../components/LoadingSpinner';
-import { toast } from 'react-hot-toast';
-import ManagePostProperties from "../../../../components/ManagePostProperties";
 
 const WebStorySlide = ({ slide, onSlideChange, onRemove }) => {
   const handleChange = (e) => {
@@ -65,12 +61,8 @@ const WebStorySlide = ({ slide, onSlideChange, onRemove }) => {
   );
 };
 
-export default function PostDetailsPage({ params }) {
-  const { type, id } = params;
-  const router = useRouter();
-  const [loading, setLoading] = useState(false);
-  const [slides, setSlides] = useState([]);
-  const isNewPost = id === 'new-post';
+const WebStoryEditor = ({ content, onContentChange }) => {
+  const [slides, setSlides] = useState(content?.slides || []);
 
   const handleImageUpload = (e) => {
     const files = Array.from(e.target.files);
@@ -83,49 +75,51 @@ export default function PostDetailsPage({ params }) {
       ctaText: '',
       ctaLink: ''
     }));
-    setSlides(prev => [...prev, ...newSlides]);
+    const updatedSlides = [...slides, ...newSlides];
+    setSlides(updatedSlides);
+    onContentChange(updatedSlides);
   };
 
   const handleSlideChange = (updatedSlide) => {
-    setSlides(prev => prev.map(slide => 
+    const updatedSlides = slides.map(slide => 
       slide.id === updatedSlide.id ? updatedSlide : slide
-    ));
+    );
+    setSlides(updatedSlides);
+    onContentChange(updatedSlides);
   };
 
   const handleSlideRemove = (slideId) => {
-    setSlides(prev => prev.filter(slide => slide.id !== slideId));
+    const updatedSlides = slides.filter(slide => slide.id !== slideId);
+    setSlides(updatedSlides);
+    onContentChange(updatedSlides);
   };
 
   return (
-    <div className="pt-2 p-1">
-      <ManagePostProperties type={type} id={id} />
-      
-      {type === 'Web Story' && (
-        <div className="mt-4 bg-white rounded-lg shadow p-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Add Slides
-            </label>
-            <input
-              type="file"
-              accept="image/*"
-              multiple
-              onChange={handleImageUpload}
-              className="w-full mb-4"
+    <div className="bg-white rounded-lg shadow-lg">
+      <div className="border-b border-gray-200 p-4">
+        <h2 className="text-xl font-semibold text-gray-800">Web Story Slides</h2>
+      </div>
+      <div className="p-4">
+        <input
+          type="file"
+          accept="image/*"
+          multiple
+          onChange={handleImageUpload}
+          className="w-full mb-4"
+        />
+        <div className="space-y-4">
+          {slides.map(slide => (
+            <WebStorySlide
+              key={slide.id}
+              slide={slide}
+              onSlideChange={handleSlideChange}
+              onRemove={handleSlideRemove}
             />
-            <div className="space-y-4">
-              {slides.map(slide => (
-                <WebStorySlide
-                  key={slide.id}
-                  slide={slide}
-                  onSlideChange={handleSlideChange}
-                  onRemove={handleSlideRemove}
-                />
-              ))}
-            </div>
-          </div>
+          ))}
         </div>
-      )}
+      </div>
     </div>
   );
-}
+};
+
+export default WebStoryEditor;
