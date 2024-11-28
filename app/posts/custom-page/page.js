@@ -15,7 +15,7 @@ const Page = () => {
     const url = `${process.env.NEXT_PUBLIC_API_URL}/posts/${status}?type=CustomPage&limit=${limit}&page=${currentPage}`;
     fetchAllPostedData(url, 'CustomPage');
   };
-
+  
   useEffect(() => {
     fetchData();
   }, [currentPage, status]);
