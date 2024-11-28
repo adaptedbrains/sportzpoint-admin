@@ -4,7 +4,9 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { AiOutlinePlus } from "react-icons/ai";
 import Link from "next/link";
+useDropDownDataStore
 import Cookies from "js-cookie";
+import useDropDownDataStore from "../store/dropDownDataStore";
 
 const EmptyDrafts = () => (
   <div className="col-span-full flex flex-col items-center justify-center py-12 bg-white rounded-lg border border-gray-200">
@@ -24,6 +26,8 @@ const EmptyDrafts = () => (
 );
 
 const HomePage = () => {
+  const { fetchDropDownData} = useDropDownDataStore();
+
   const [drafts, setDrafts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
@@ -68,6 +72,12 @@ const HomePage = () => {
 
     fetchUserAndDrafts();
   }, []);
+
+  useEffect(()=>{
+    fetchDropDownData(`${process.env.NEXT_PUBLIC_API_URL}/category`,'category')
+    fetchDropDownData(`${process.env.NEXT_PUBLIC_API_URL}/tag`,'tag')
+    fetchDropDownData(`${process.env.NEXT_PUBLIC_API_URL}/users`,'roleBaseUser')
+  },[])
 
   return (
     <div className="flex justify-center min-h-screen bg-gray-50 pt-20 pb-6">

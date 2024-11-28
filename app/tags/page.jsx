@@ -2,51 +2,20 @@
 import { useState, useEffect } from 'react';
 import { FaEdit, FaTrash } from 'react-icons/fa';
 import Cookies from 'js-cookie';
+import useDropDownDataStore from '../../store/dropDownDataStore';
 
 const TagsPage = () => {
+  const { allTags,fetchDropDownData} = useDropDownDataStore();
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [tags, setTags] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    const fetchTags = async () => {
-      try {
-        setLoading(true);
-        const token = Cookies.get('token');
-        
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/tag`, {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          },
-          credentials: 'include'
-        });
-
-        if (!response.ok) {
-          throw new Error('Failed to fetch tags');
-        }
-
-        const data = await response.json();
-        setTags(data.tags || []);
-      } catch (err) {
-        console.error('Error fetching tags:', err);
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchTags();
-  }, []);
-
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center min-h-screen bg-gray-50">
-        <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-500"></div>
-      </div>
-    );
-  }
+ 
+  useEffect(()=>{
+    fetchDropDownData(`${process.env.NEXT_PUBLIC_API_URL}/tag`,'tag')
+  },[])
 
   if (error) {
     return (
@@ -80,9 +49,9 @@ const TagsPage = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
-                {tags.map((tag) => (
+                {allTags && allTags.map((tag) => (
                   <tr 
-                    key={tag.id} 
+                    key={tag._id} 
                     className="hover:bg-gray-50 transition-colors duration-200"
                   >
                     <td className="px-6 py-4 text-sm text-gray-700 whitespace-nowrap">
