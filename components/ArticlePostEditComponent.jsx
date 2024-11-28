@@ -49,7 +49,7 @@ const ArticlePostEditComponent = ({
 
   const handleEnglishTitleChange = (e) => {
     // setEnglishTitle(e.target.value);
-    handleArticleFromData("englishTitle", e.target.value);
+    handleArticleFromData("slug", e.target.value);
   };
 
   const handleSummaryChange = (e) => {
@@ -59,7 +59,7 @@ const ArticlePostEditComponent = ({
 
   const handleMetaDescriptionChange = (e) => {
     // setMetaDescription(e.target.value.slice(0, 160));
-    handleArticleFromData("metaDescription", e.target.value);
+    handleArticleFromData("seo_desc", e.target.value);
   };
   const handleBanner_descDescriptionChange = (e) => {
     // setMetaDescription(e.target.value.slice(0, 160));
@@ -127,9 +127,9 @@ const ArticlePostEditComponent = ({
         </label>
         <input
           type="text"
-          disabled
+          
           id="englishTitle"
-          value={formDataPostEdit.englishTitle}
+          value={formDataPostEdit.slug}
           onChange={handleEnglishTitleChange}
           className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-200 focus:border-indigo-500 sm:text-sm"
         />
@@ -164,7 +164,7 @@ const ArticlePostEditComponent = ({
         </label>
         <textarea
           id="metaDescription"
-          disabled
+          
           value={formDataPostEdit.seo_desc}
           onChange={handleMetaDescriptionChange}
           className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-200 focus:border-indigo-500 sm:text-sm"

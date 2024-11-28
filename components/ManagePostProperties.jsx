@@ -7,7 +7,7 @@ import ArticlePostEditComponent from "./ArticlePostEditComponent";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import useAllPostDataStore from "../store/useAllPostDataStore";
-import LiveBlogUpdate from './LiveBlogUpdate'
+import LiveBlogUpdate from "./LiveBlogUpdate";
 function ManagePostProperties() {
   const router = useRouter();
   const { allPosts } = useAllPostDataStore();
@@ -45,6 +45,39 @@ function ManagePostProperties() {
       [name]: value,
     }));
   };
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   useEffect(() => {
     if (pathname) {
@@ -114,12 +147,111 @@ function ManagePostProperties() {
     }
   }, [pathname, allPosts]);
 
+
+
+
+
+
+
+
+
+
+
+
+
+  const submitData = async (status) => {
+    try {
+      setIsSubmitting(true);
+ 
+
+      const token = Cookies.get('token');
+      if (!token) {
+        throw new Error("No token found. Please login again.");
+      }
+
+      // Safely get author ID
+      let authorId;
+      try {
+        const storedId = localStorage.getItem('id');
+        authorId = storedId ? storedId.replace(/^"(.*)"$/, '$1') : null;
+        
+        if (!authorId) {
+          throw new Error("No author ID found. Please login again.");
+        }
+      } catch (e) {
+        console.error('Error getting author ID:', e);
+        throw new Error("Authentication error. Please login again.");
+      }
+
+      // Transform data
+      const transformedData = {
+        primary_category: formData.primaryCategory
+          ? [formData.primaryCategory.value]
+          : [],
+        title: formDataPostEdit.title.trim(),
+        summary: formDataPostEdit.summary.trim(),
+        legacy_url: pathname.split("/")[3] === 'new-post'
+          ? formDataPostEdit.title.trim().toLowerCase().split(" ").join("-")
+          : post.slug,
+        tags: formData.tags.map((tag) => tag.value),
+        categories: formData.additionalCategories.map((cat) => cat.value),
+        banner_desc: formDataPostEdit.banner_desc.trim(),
+        banner_image: formDataPostEdit.banner_image.trim(),
+        credits: formData.credits.map((credit) => credit.value),
+        focusKeyphrase: formData.focusKeyphrase.trim(),
+        content: htmlContent.trim(),
+        status: status,
+        author: authorId,
+        slug: formDataPostEdit.slug.trim().toLowerCase().split(" ").join("-"),
+        type: pathname.split("/")[2],
+        seo_desc: formDataPostEdit.seo_desc.trim(),
+      };
+
+      if (status === "published") {
+        transformedData.published_at_datetime = new Date().toISOString();
+      }
+
+      const isCreate = pathname.split("/")[3] === 'new-post';
+      const apiUrl = isCreate
+        ? `${process.env.NEXT_PUBLIC_API_URL}/article/create`
+        : `${process.env.NEXT_PUBLIC_API_URL}/article/update/${post._id}`;
+
+      const response = await fetch(apiUrl, {
+        method: isCreate ? 'POST' : 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify(transformedData),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || `Failed to ${isCreate ? 'create' : 'update'} article`);
+      }
+
+      const data = await response.json();
+      alert(`Article ${isCreate ? 'created' : 'updated'} successfully!`);
+      
+      // Redirect to the articles list page
+      router.push('/posts/article');
+      
+      return data;
+    } catch (error) {
+      console.error('Error:', error);
+      alert(error.message || 'An unexpected error occurred');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   const renderView = () => {
     if (view === "updates") {
-      return <div>   
-        <LiveBlogUpdate postId={post._id} />
-         
-            </div>;
+      return (
+        <div>
+          <LiveBlogUpdate postId={post._id} />
+        </div>
+      );
     }
     return (
       <>
@@ -127,38 +259,41 @@ function ManagePostProperties() {
           handleArticleFromData={handleArticleFromData}
           formDataPostEdit={formDataPostEdit}
         />
-        
-        <RichTextEditor content={htmlContent} htmlContentGrab={htmlContentGrab} />
+
+        <RichTextEditor
+          content={htmlContent}
+          htmlContentGrab={htmlContentGrab}
+        />
         <RestOfPostEdit formData={formData} setFormData={setFormData} />
 
         <div className="flex justify-end gap-4 mt-6 bg-white p-4 rounded-lg shadow">
-        <button
-          className="px-6 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors duration-200"
-          onClick={() => {
-            submitData("draft");
-          }}
-        >
-          {isSubmitting ? "Saving..." : "Save as Draft"}
-        </button>
+          <button
+            className="px-6 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors duration-200"
+            onClick={() => {
+              submitData("draft");
+            }}
+          >
+            {isSubmitting ? "Saving..." : "Save as Draft"}
+          </button>
 
-        <button
-          className="px-6 py-2 bg-blue-100 text-blue-700 rounded-md hover:bg-blue-200 transition-colors duration-200"
-          onClick={() => {
-            submitData("send-for-approval");
-          }}
-        >
-          {isSubmitting ? "Sending..." : "Send for Approval"}
-        </button>
+          <button
+            className="px-6 py-2 bg-blue-100 text-blue-700 rounded-md hover:bg-blue-200 transition-colors duration-200"
+            onClick={() => {
+              submitData("send-for-approval");
+            }}
+          >
+            {isSubmitting ? "Sending..." : "Send for Approval"}
+          </button>
 
-        <button
-          className="px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors duration-200"
-          onClick={() => {
-            submitData("published");
-          }}
-        >
-          {isSubmitting ? "Publishing..." : "Publish"}
-        </button>
-      </div>
+          <button
+            className="px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors duration-200"
+            onClick={() => {
+              submitData("published");
+            }}
+          >
+            {isSubmitting ? "Publishing..." : "Publish"}
+          </button>
+        </div>
       </>
     );
   };
@@ -169,7 +304,9 @@ function ManagePostProperties() {
         <div className="flex gap-4 mb-4">
           <button
             className={`px-4 py-2 rounded ${
-              view === "main" ? "bg-blue-500 text-white" : "bg-gray-200 text-gray-700"
+              view === "main"
+                ? "bg-blue-500 text-white"
+                : "bg-gray-200 text-gray-700"
             }`}
             onClick={() => setView("main")}
           >
@@ -177,7 +314,9 @@ function ManagePostProperties() {
           </button>
           <button
             className={`px-4 py-2 rounded ${
-              view === "updates" ? "bg-blue-500 text-white" : "bg-gray-200 text-gray-700"
+              view === "updates"
+                ? "bg-blue-500 text-white"
+                : "bg-gray-200 text-gray-700"
             }`}
             onClick={() => setView("updates")}
           >
@@ -187,8 +326,6 @@ function ManagePostProperties() {
       )}
 
       {renderView()}
-
-     
     </div>
   );
 }

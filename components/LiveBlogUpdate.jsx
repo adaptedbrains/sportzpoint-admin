@@ -249,15 +249,19 @@ const LiveBlogUpdate = ({ postId }) => {
             .map((update) => (
               <div
                 key={update._id}
-                className="bg-white p-4 shadow rounded flex justify-between"
+                className="bg-white p-4 shadow rounded flex justify-between relative"
               >
                 <div className="w-full">
+                  <div className="flex gap-3">
+
                   <p className="text-sm text-gray-500 mb-2">
                     {new Date(update.created_at).toLocaleString("en-US", {
                       dateStyle: "medium",
                       timeStyle: "short",
                     })}
                   </p>
+                  {update.pinned && <AiOutlinePushpin color="" className="text-blue-500"/>}
+                    </div>
                   <div className="flex justify-between w-full">
                     <div className="text-lg w-full font-semibold mb-2">
                       {update.title}
@@ -270,10 +274,12 @@ const LiveBlogUpdate = ({ postId }) => {
                           className="cursor-pointer"
                         />
                       </button>
-                      {currentPost === update._id && (
+                     
+                    </div>
+                    {currentPost === update._id && (
                         <div
                           ref={menuRef}
-                          className="absolute bg-gray-50 p-2 rounded z-50"
+                          className="absolute bg-white border border-blue-200 end-3 top-24  p-2 rounded z-50"
                         >
                           <ul className="space-y-1 cursor-pointer">
                             <li
@@ -288,7 +294,7 @@ const LiveBlogUpdate = ({ postId }) => {
                               className="flex items-center gap-2 py-2 px-1 hover:bg-blue-200 text-xs rounded-md"
                             >
                               <AiOutlinePushpin />
-                              <span>Pin</span>
+                              <span> {update.pinned ?'Unpin' :' Pin'} </span>
                             </li>
                             <li
                               onClick={() => handleDelete(update._id)}
@@ -300,7 +306,6 @@ const LiveBlogUpdate = ({ postId }) => {
                           </ul>
                         </div>
                       )}
-                    </div>
                   </div>
                 </div>
               </div>
