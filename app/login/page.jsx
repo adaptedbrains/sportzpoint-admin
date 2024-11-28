@@ -4,7 +4,7 @@ import Cookies from "js-cookie"; // Import js-cookie library
 import useDropDownDataStore from "../../store/dropDownDataStore";
 
 const Page = () => {
-  const {fetchDropDownData}=useDropDownDataStore()
+  
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
