@@ -71,7 +71,7 @@ const WebStoryEditor = ({ content, htmlJsonGrab }) => {
               >
                 {item.img_src && (
                   <Image
-                    src={`https://sportzpoint.s3.ap-south-1.amazonaws.com/${item.img_src}`}
+                    src={`https://dmpsza32x691.cloudfront.net/${item.img_src}`}
                     alt={item.title}
                     layout="fill"
                     objectFit="cover"
