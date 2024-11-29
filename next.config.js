@@ -1,7 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
-    domains: ['sportzpoint.s3.ap-south-1.amazonaws.com'],
+    domains: ['dmpsza32x691.cloudfront.net'],
   },
   // Enable if you need to allow specific headers or methods
   async headers() {
