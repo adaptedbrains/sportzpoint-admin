@@ -14,8 +14,6 @@
     "framer-motion": "^11.11.17",
     "js-cookie": "^3.0.5",
     "next": "15.0.3",
-    "quill": "^2.0.2",
-    "quill-better-table": "^1.2.10",
     "react": "19.0.0-rc-66855b96-20241106",
     "react-datepicker": "^7.5.0",
     "react-dom": "19.0.0-rc-66855b96-20241106",
