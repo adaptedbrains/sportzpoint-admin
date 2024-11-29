@@ -2,12 +2,13 @@
 
 import Cookies from "js-cookie";
 import RichTextEditor from "./RichTextEditor";
-import RestOfPostEdit from "./RestOfPostEdit";
+import RestOfPostEdit from "./RestOfPostEdits";
 import ArticlePostEditComponent from "./ArticlePostEditComponent";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import useAllPostDataStore from "../store/useAllPostDataStore";
 import LiveBlogUpdate from "./LiveBlogUpdate";
+import WebStoryEditor from "./WebStory";
 function ManagePostProperties() {
   const router = useRouter();
   const { allPosts } = useAllPostDataStore();
@@ -34,10 +35,14 @@ function ManagePostProperties() {
 
   const [htmlContent, setHtmlContent] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [webStory, setWebStory] = useState([]);
 
   const htmlContentGrab = (data) => {
     setHtmlContent(data);
   };
+  const htmlJsonGrab=(data)=>{
+    setWebStory(data)
+  }
 
   const handleArticleFromData = (name, value) => {
     setFormDataPostEdit((prev) => ({
@@ -46,39 +51,6 @@ function ManagePostProperties() {
     }));
   };
 
-
-
-
- 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
   useEffect(() => {
     if (pathname) {
       const parts = pathname.split("/");
@@ -86,9 +58,10 @@ function ManagePostProperties() {
       const id = parts[3];
 
       if (id === "new-post") {
-        // Fresh initialization for a new post
+        setWebStory([])
         setPost(null);
         setHtmlContent("");
+       
         setFormData({
           primaryCategory: null,
           additionalCategories: [],
@@ -107,8 +80,10 @@ function ManagePostProperties() {
       } else {
         // Fetch and initialize data for an existing post
         const requiredData = allPosts.find((a) => a._id === id);
-        setPost(requiredData);
+
+        
         setHtmlContent(requiredData?.content || "");
+        setWebStory(requiredData.web_story && requiredData.web_story)
         if (requiredData) {
           setFormData({
             primaryCategory: requiredData.primary_category?.[0]
@@ -147,24 +122,13 @@ function ManagePostProperties() {
     }
   }, [pathname, allPosts]);
 
-
-
-
-
-
-
-
-
-
-
-
-
   const submitData = async (status) => {
+
+
     try {
       setIsSubmitting(true);
- 
 
-      const token = Cookies.get('token');
+      const token = Cookies.get("token");
       if (!token) {
         throw new Error("No token found. Please login again.");
       }
@@ -172,14 +136,14 @@ function ManagePostProperties() {
       // Safely get author ID
       let authorId;
       try {
-        const storedId = localStorage.getItem('id');
-        authorId = storedId ? storedId.replace(/^"(.*)"$/, '$1') : null;
-        
+        const storedId = localStorage.getItem("id");
+        authorId = storedId ? storedId.replace(/^"(.*)"$/, "$1") : null;
+
         if (!authorId) {
           throw new Error("No author ID found. Please login again.");
         }
       } catch (e) {
-        console.error('Error getting author ID:', e);
+        console.error("Error getting author ID:", e);
         throw new Error("Authentication error. Please login again.");
       }
 
@@ -190,9 +154,10 @@ function ManagePostProperties() {
           : [],
         title: formDataPostEdit.title.trim(),
         summary: formDataPostEdit.summary.trim(),
-        legacy_url: pathname.split("/")[3] === 'new-post'
-          ? formDataPostEdit.title.trim().toLowerCase().split(" ").join("-")
-          : post.slug,
+        legacy_url:
+          pathname.split("/")[3] === "new-post"
+            ? formDataPostEdit.title.trim().toLowerCase().split(" ").join("-")
+            : formDataPostEdit.title.trim().toLowerCase().split(" ").join("-"),
         tags: formData.tags.map((tag) => tag.value),
         categories: formData.additionalCategories.map((cat) => cat.value),
         banner_desc: formDataPostEdit.banner_desc.trim(),
@@ -200,51 +165,75 @@ function ManagePostProperties() {
         credits: formData.credits.map((credit) => credit.value),
         focusKeyphrase: formData.focusKeyphrase.trim(),
         content: htmlContent.trim(),
+        
         status: status,
         author: authorId,
         slug: formDataPostEdit.slug.trim().toLowerCase().split(" ").join("-"),
-        type: pathname.split("/")[2],
+        type: pathname.split("/")[2] ==="Web%20Story" ?"Web Story":pathname.split("/")[2],
         seo_desc: formDataPostEdit.seo_desc.trim(),
       };
 
       if (status === "published") {
         transformedData.published_at_datetime = new Date().toISOString();
       }
-
-      const isCreate = pathname.split("/")[3] === 'new-post';
+      if ( pathname && pathname.split("/")[2] === "Web%20Story") {
+        transformedData.web_story = webStory;
+      }
+       
+        
+      const isCreate = pathname.split("/")[3] === "new-post";
       const apiUrl = isCreate
         ? `${process.env.NEXT_PUBLIC_API_URL}/article/create`
-        : `${process.env.NEXT_PUBLIC_API_URL}/article/update/${post._id}`;
+        : `${process.env.NEXT_PUBLIC_API_URL}/article/update/${pathname.split("/")[3]}`;
 
       const response = await fetch(apiUrl, {
-        method: isCreate ? 'POST' : 'PUT',
+        method: isCreate ? "POST" : "PUT",
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(transformedData),
       });
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || `Failed to ${isCreate ? 'create' : 'update'} article`);
+        throw new Error(
+          errorData.message ||
+            `Failed to ${isCreate ? "create" : "update"} article`
+        );
       }
 
       const data = await response.json();
-      alert(`Article ${isCreate ? 'created' : 'updated'} successfully!`);
-      
+      alert(`Article ${isCreate ? "created" : "updated"} successfully!`);
+
       // Redirect to the articles list page
-      router.push('/posts/article');
-      
+      if(pathname.split("/")[2]==='Article'){
+
+        router.push("/posts/article");
+      }else if(pathname.split("/")[2]==='Video'){
+
+        router.push("/posts/video");
+      }else if(pathname.split("/")[2]==='Video'){
+
+        router.push("/posts/video");
+      }else if(pathname.split("/")[2]==='Web%20Story'){
+
+        router.push("/posts/web-story");
+      }else if(pathname.split("/")[2]==='Gallery'){
+        router.push("/posts/photo-gallery");
+      }else if(pathname.split("/")[2]==='LiveBlog'){
+
+        router.push("/posts/photo-gallery");
+      }
+
       return data;
     } catch (error) {
-      console.error('Error:', error);
-      alert(error.message || 'An unexpected error occurred');
+      console.error("Error:", error);
+      alert(error.message || "An unexpected error occurred");
     } finally {
       setIsSubmitting(false);
     }
   };
-
   const renderView = () => {
     if (view === "updates") {
       return (
@@ -259,11 +248,16 @@ function ManagePostProperties() {
           handleArticleFromData={handleArticleFromData}
           formDataPostEdit={formDataPostEdit}
         />
+        
 
-        <RichTextEditor
-          content={htmlContent}
-          htmlContentGrab={htmlContentGrab}
-        />
+        {pathname && pathname.split("/")[2] === "Web%20Story" ? (
+          <WebStoryEditor  content={webStory} htmlJsonGrab={htmlJsonGrab}   />
+        ) : (
+          <RichTextEditor
+            content={htmlContent}
+            htmlContentGrab={htmlContentGrab}
+          />
+        )}
         <RestOfPostEdit formData={formData} setFormData={setFormData} />
 
         <div className="flex justify-end gap-4 mt-6 bg-white p-4 rounded-lg shadow">

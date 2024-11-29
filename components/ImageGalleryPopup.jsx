@@ -188,7 +188,7 @@ const ImageGalleryPopup = ({ onSelect, onClose ,onImageSelect}) => {
           {selectedImage && (
             <div className="w-full aspect-w-1 h-96 aspect-h-1 relative border rounded overflow-hidden">
               <Image
-                src={`https://sportzpoint.s3.ap-south-1.amazonaws.com/${selectedImage}`}
+                src={`https://dmpsza32x691.cloudfront.net/${selectedImage}`}
                 alt="Selected Image"
                 layout="fill"
                 objectFit="cover"
