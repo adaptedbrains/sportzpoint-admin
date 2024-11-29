@@ -1,77 +1,86 @@
-import Image from 'next/image';
-import React, { useState } from 'react';
+import Image from "next/image";
+import React, { useState } from "react";
+import ImageGalleryPopup from "./ImageGalleryPopup";
 
-const WebStoryEditor = () => {
-  const [webStory, setWebStory] = useState([
-    {
-      type: "image",
-      cta_link: "",
-      cta_text: "",
-      title: "Shorts: Most Premier League Hat-Tricks",
-      img_src: "media_files/HS0XY0piNxTd4bu6kcSZ.jpg",
-      desc: "After Erling Haland scored his second hat-trick of the Premier League 2024-25 season, we present you all the players with the most Premier League hat-tricks.",
-    },
-    {
-      type: "image",
-      cta_link: "",
-      cta_text: "",
-      title: "10. Luis Suarez | 6 hat-tricks",
-      img_src: "media_files/taLNv3ATwYkrqjWk84zg.jpg",
-      desc: "The former Liverpool star scored 6 hat-tricks in his Premier League stint with the Reds. Suarez took only 110 games to score those 6 hat-tricks.",
-    },
-    // Add more items here as needed
-  ]);
-
+const WebStoryEditor = ({ content, htmlJsonGrab }) => {
   const [selectedItem, setSelectedItem] = useState(null);
+  const [showImageGallery, setShowImageGallery] = useState(false);
 
+  // Handle item edit
   const handleEdit = (item) => {
     setSelectedItem(item);
   };
 
+  // Handle item save
   const handleSave = () => {
-    const updatedWebStory = webStory.map((item) =>
+    const updatedWebStory = content.map((item) =>
       item.title === selectedItem.title ? selectedItem : item
     );
-    setWebStory(updatedWebStory);
+    htmlJsonGrab(updatedWebStory);
     setSelectedItem(null);
   };
 
+  // Handle add new item
   const handleAdd = () => {
+    const newTitle = `New Story ${Date.now()}`;
     const newItem = {
       type: "image",
       cta_link: "",
       cta_text: "",
-      title: "",
-      img_src: "",
+      title: newTitle,
+      img_src: "placeholder.png",
       desc: "",
     };
-    setWebStory([...webStory, newItem]);
+
+    const updatedWebStory = Array.isArray(content) ? [...content, newItem] : [newItem];
+    htmlJsonGrab(updatedWebStory);
     setSelectedItem(newItem);
   };
 
+  // Handle item deletion
+  const handleDelete = (title) => {
+    const updatedWebStory = content.filter((item) => item.title !== title);
+    htmlJsonGrab(updatedWebStory);
+  };
+
   return (
-    <div className="container mx-auto p-4">
+    <div className="container mx-auto p-4 bg-white">
       <h1 className="text-2xl font-bold mb-4">Web Story Editor</h1>
 
       {/* Image Grid */}
       <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-        {webStory.map((item, index) => (
-          <div
-            key={index}
-            className="relative border rounded-lg overflow-hidden shadow-md cursor-pointer hover:shadow-lg"
-            onClick={() => handleEdit(item)}
-          >
+        {content &&
+          content.map((item, index) => (
+            <div
+              key={index}
+              className="relative border rounded-lg overflow-hidden shadow-md hover:shadow-lg"
+            >
+              {/* Delete Button */}
+              <button
+                className="absolute top-2 right-2 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center z-10"
+                onClick={() => handleDelete(item.title)}
+              >
+                ✕
+              </button>
 
-            <Image
-              src={item.img_src}
-              alt={item.title}
-              className=""
-              width={300}
-              height={200}
-            />
-           
-          </div>
-        ))}
+              {/* Image Display */}
+              <div
+                className="relative cursor-pointer"
+                style={{ width: "150px", height: "150px" }}
+                onClick={() => handleEdit(item)}
+              >
+                {item.img_src && (
+                  <Image
+                    src={`https://sportzpoint.s3.ap-south-1.amazonaws.com/${item.img_src}`}
+                    alt={item.title}
+                    layout="fill"
+                    objectFit="cover"
+                    className="rounded"
+                  />
+                )}
+              </div>
+            </div>
+          ))}
       </div>
 
       {/* Add Button */}
@@ -84,7 +93,7 @@ const WebStoryEditor = () => {
 
       {/* Edit Form */}
       {selectedItem && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+        <div className="fixed inset-0 flex items-center justify-center bg-black/10 backdrop-blur-sm z-50 bg-opacity-50">
           <div className="bg-white p-6 rounded-lg shadow-lg w-96">
             <h2 className="text-lg font-bold mb-4">Edit Story</h2>
             <div className="mb-4">
@@ -102,22 +111,20 @@ const WebStoryEditor = () => {
               <label className="block text-sm font-bold mb-2">Description</label>
               <textarea
                 value={selectedItem.desc}
+                rows={5}
                 onChange={(e) =>
                   setSelectedItem({ ...selectedItem, desc: e.target.value })
                 }
-                className="w-full border rounded-lg px-3 py-2"
+                className="w-full border rounded-lg px-3 py-2 h-32"
               />
             </div>
             <div className="mb-4">
-              <label className="block text-sm font-bold mb-2">Image URL</label>
-              <input
-                type="text"
-                value={selectedItem.img_src}
-                onChange={(e) =>
-                  setSelectedItem({ ...selectedItem, img_src: e.target.value })
-                }
-                className="w-full border rounded-lg px-3 py-2"
-              />
+              <button
+                className="bg-zinc-500 text-white px-2 py-1 rounded"
+                onClick={() => setShowImageGallery(true)}
+              >
+                Change Image
+              </button>
             </div>
             <div className="flex justify-end gap-4">
               <button
@@ -135,6 +142,16 @@ const WebStoryEditor = () => {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Image Gallery Popup */}
+      {showImageGallery && (
+        <ImageGalleryPopup
+          onSelect={(src) =>
+            setSelectedItem({ ...selectedItem, img_src: src })
+          }
+          onClose={() => setShowImageGallery(false)}
+        />
       )}
     </div>
   );
