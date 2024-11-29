@@ -2,7 +2,7 @@
 
 import Cookies from "js-cookie";
 import RichTextEditor from "./RichTextEditor";
-import RestOfPostEdit from "./RestOfPostEdits";
+import RestOfPostEdit from "./RestOfPostEdit";
 import ArticlePostEditComponent from "./ArticlePostEditComponent";
 import { usePathname, useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";

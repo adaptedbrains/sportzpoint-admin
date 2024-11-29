@@ -28,11 +28,13 @@ const WebStoryEditor = ({ content, htmlJsonGrab }) => {
       cta_link: "",
       cta_text: "",
       title: newTitle,
-      img_src: "placeholder.png",
+      img_src: "add",
       desc: "",
     };
 
-    const updatedWebStory = Array.isArray(content) ? [...content, newItem] : [newItem];
+    const updatedWebStory = Array.isArray(content)
+      ? [...content, newItem]
+      : [newItem];
     htmlJsonGrab(updatedWebStory);
     setSelectedItem(newItem);
   };
@@ -93,39 +95,62 @@ const WebStoryEditor = ({ content, htmlJsonGrab }) => {
 
       {/* Edit Form */}
       {selectedItem && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black/10 backdrop-blur-sm z-50 bg-opacity-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg w-96">
+        <div className="fixed  inset-0 flex items-center justify-center bg-black/10 backdrop-blur-sm z-50 bg-opacity-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-2/3">
             <h2 className="text-lg font-bold mb-4">Edit Story</h2>
-            <div className="mb-4">
-              <label className="block text-sm font-bold mb-2">Title</label>
-              <input
-                type="text"
-                value={selectedItem.title}
-                onChange={(e) =>
-                  setSelectedItem({ ...selectedItem, title: e.target.value })
-                }
-                className="w-full border rounded-lg px-3 py-2"
-              />
+
+            <div className="flex gap-2 items-center ">
+              <div className="flex-1">
+                <div className="w-full h-[300px] relative">
+                  <Image
+                    src={`https://dmpsza32x691.cloudfront.net/${selectedItem.img_src}`}
+                    alt=""
+                    layout="fill"
+                    objectFit="cover"
+                    objectPosition="center"
+                  />
+                </div>
+                <div className="mb-4 mt-1">
+                  <button
+                    className="bg-zinc-500 text-white px-2 py-1 rounded"
+                    onClick={() => setShowImageGallery(true)}
+                  >
+                    {selectedItem.img_src==='add'?'Add Image':'Change Image'}
+                   
+                  </button>
+                </div>
+              </div>
+              <div className="flex-1">
+
+             
+
+              <div className="mb-4">
+                <label className="block text-sm font-bold mb-2">Title</label>
+                <input
+                  type="text"
+                  value={selectedItem.title}
+                  onChange={(e) =>
+                    setSelectedItem({ ...selectedItem, title: e.target.value })
+                  }
+                  className="w-full border rounded-lg px-3 py-2"
+                />
+              </div>
+              <div className="mb-4">
+                <label className="block text-sm font-bold mb-2">
+                  Description
+                </label>
+                <textarea
+                  value={selectedItem.desc}
+                  rows={5}
+                  onChange={(e) =>
+                    setSelectedItem({ ...selectedItem, desc: e.target.value })
+                  }
+                  className="w-full border rounded-lg px-3 py-2 h-32"
+                />
+              </div>
+              </div>
             </div>
-            <div className="mb-4">
-              <label className="block text-sm font-bold mb-2">Description</label>
-              <textarea
-                value={selectedItem.desc}
-                rows={5}
-                onChange={(e) =>
-                  setSelectedItem({ ...selectedItem, desc: e.target.value })
-                }
-                className="w-full border rounded-lg px-3 py-2 h-32"
-              />
-            </div>
-            <div className="mb-4">
-              <button
-                className="bg-zinc-500 text-white px-2 py-1 rounded"
-                onClick={() => setShowImageGallery(true)}
-              >
-                Change Image
-              </button>
-            </div>
+
             <div className="flex justify-end gap-4">
               <button
                 onClick={() => setSelectedItem(null)}
@@ -147,9 +172,7 @@ const WebStoryEditor = ({ content, htmlJsonGrab }) => {
       {/* Image Gallery Popup */}
       {showImageGallery && (
         <ImageGalleryPopup
-          onSelect={(src) =>
-            setSelectedItem({ ...selectedItem, img_src: src })
-          }
+          onSelect={(src) => setSelectedItem({ ...selectedItem, img_src: src })}
           onClose={() => setShowImageGallery(false)}
         />
       )}
