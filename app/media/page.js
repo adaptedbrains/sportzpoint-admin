@@ -114,7 +114,7 @@ const Page = () => {
             </button>
             <div className="aspect-w-1 aspect-h-1 relative w-full h-[70vh]">
               <Image
-                src={`https://sportzpoint-media.s3.ap-south-1.amazonaws.com/${selectedImage}`}
+                src={`https://sportzpoint.s3.ap-south-1.amazonaws.com/${selectedImage}`}
                 alt="Selected Image"
                 layout="fill"
                 objectFit="contain"

@@ -38,7 +38,7 @@ const ArticlePostEditComponent = ({
       handleArticleFromData("banner_desc", requiredData.banner_desc);
 
       setFeaturedImage(
-        `https://img-cdn.thepublive.com/fit-in/1280x960/filters:format(webp)/sportzpoint/media/${requiredData.banner_image}`
+        `https://sportzpoint.s3.ap-south-1.amazonaws.com/fit-in/1280x960/filters:format(webp)/sportzpoint/media/${requiredData.banner_image}`
       );
     }
   }, [id, allPosts]);
@@ -90,7 +90,7 @@ const ArticlePostEditComponent = ({
 
 
   const selecttedImageForBanner=(filename)=>{
-    setFeaturedImage(`https://sportzpoint-media.s3.ap-south-1.amazonaws.com/${filename}`)
+    setFeaturedImage(`https://sportzpoint.s3.ap-south-1.amazonaws.com/${filename}`)
     handleArticleFromData("banner_desc", filename);
     handleArticleFromData("banner_image", filename);
   }

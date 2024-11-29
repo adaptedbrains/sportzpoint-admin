@@ -126,7 +126,7 @@ const ImageGalleryPopup = ({ onSelect, onClose ,onImageSelect}) => {
                     onClick={() => handleImageClick(img)}
                   >
                     <Image
-                      src={`https://sportzpoint-media.s3.ap-south-1.amazonaws.com/${img}`}
+                      src={`https://sportzpoint.s3.ap-south-1.amazonaws.com/${img}`}
                       alt={`Image ${index + 1}`}
                       layout="fill"
                       objectFit="cover"
@@ -188,7 +188,7 @@ const ImageGalleryPopup = ({ onSelect, onClose ,onImageSelect}) => {
           {selectedImage && (
             <div className="w-full aspect-w-1 h-96 aspect-h-1 relative border rounded overflow-hidden">
               <Image
-                src={`https://sportzpoint-media.s3.ap-south-1.amazonaws.com/${selectedImage}`}
+                src={`https://sportzpoint.s3.ap-south-1.amazonaws.com/${selectedImage}`}
                 alt="Selected Image"
                 layout="fill"
                 objectFit="cover"

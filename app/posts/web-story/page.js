@@ -26,6 +26,7 @@ const Page = () => {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
+    
 
   const handleStatusChange = (newStatus) => {
     setStatus(newStatus);
