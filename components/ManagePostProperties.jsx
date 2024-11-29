@@ -181,6 +181,16 @@ function ManagePostProperties({ type, id }) {
         transformedData.web_story = webStory;
       }
 
+      if (
+        !transformedData.categories.length || 
+        !transformedData.primary_category.length || 
+        !transformedData.slug.trim() || 
+        !transformedData.title.trim()
+      ) {
+        alert("Please fill Categories, Primary Category, Slug, and Title properly.");
+        return;
+      }
+
       const isCreate = pathname.split("/")[3] === "new-post";
       const apiUrl = isCreate
         ? `${process.env.NEXT_PUBLIC_API_URL}/article/create`
