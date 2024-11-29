@@ -202,7 +202,7 @@ const ArticlePostEditComponent = ({
             {featuredImage ? (
               <Image
                 src={featuredImage}
-                //  https://sportzpoint-media.s3.ap-south-1.amazonaws.com
+                //  https://sportzpoint.s3.ap-south-1.amazonaws.com
                 alt={featuredImage}
                 width={500}
                 height={400}
