@@ -81,7 +81,7 @@ function ManagePostProperties({ type, id }) {
         // Fetch and initialize data for an existing post
         const requiredData = allPosts.find((a) => a._id === id);
 
-        
+        setPost(requiredData)
         setHtmlContent(requiredData?.content || "");
         setWebStory(requiredData.web_story && requiredData.web_story)
         if (requiredData) {
@@ -301,6 +301,7 @@ function ManagePostProperties({ type, id }) {
 
   return (
     <div className="flex flex-col gap-2">
+     
       {post?.type === "LiveBlog" && (
         <div className="flex gap-4 mb-4">
           <button
