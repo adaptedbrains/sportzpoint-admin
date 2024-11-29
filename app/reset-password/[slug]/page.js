@@ -1,13 +1,20 @@
 "use client";
-import React, { useState } from "react";
-import Cookies from "js-cookie"; // Import js-cookie library
+import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation"; // Import useRouter for pathname access
 
 const ResetPasswordPage = () => {
-  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
+  const [token, setToken] = useState(""); // State to store the token from URL
+  const router = useRouter(); // Router to access pathname
+
+  // Extract the token from the pathname
+  useEffect(() => {
+    const tokenFromUrl = window.location.pathname.split("/")[2];
+    setToken(tokenFromUrl);
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -15,19 +22,24 @@ const ResetPasswordPage = () => {
       setError("Passwords do not match");
       return;
     }
+    if (!token) {
+      setError("Invalid token.");
+      return;
+    }
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/user/reset-password`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/user/reset-password/${token}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ password }),
       });
 
       const data = await res.json();
 
       if (res.ok) {
         setSuccess("Your password has been reset successfully.");
+        router.push('/login')
         setError(null);
       } else {
         setError(data.message || "Failed to reset password");
@@ -46,21 +58,6 @@ const ResetPasswordPage = () => {
         {error && <p className="text-red-500 text-center mb-4">{error}</p>}
         {success && <p className="text-green-500 text-center mb-4">{success}</p>}
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label htmlFor="email" className="block text-sm font-semibold mb-1">
-              Email
-            </label>
-            <input
-              type="email"
-              id="email"
-              name="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              className="w-full p-3 rounded-md border border-gray-600 bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-
           <div>
             <label htmlFor="password" className="block text-sm font-semibold mb-1">
               New Password
