@@ -29,7 +29,7 @@ const ArticlePostEditComponent = ({
 
   useEffect(() => {
     const requiredData = allPosts.find((a) => a._id === id);
-    console.log("requiredData", requiredData);
+   
     if (requiredData) {
       handleArticleFromData("title", requiredData.title);
       handleArticleFromData("englishTitle", requiredData.slug);
@@ -91,7 +91,7 @@ const ArticlePostEditComponent = ({
 
   const selecttedImageForBanner=(filename)=>{
     setFeaturedImage(`https://dmpsza32x691.cloudfront.net/${filename}`)
-    handleArticleFromData("banner_desc", filename);
+   
     handleArticleFromData("banner_image", filename);
   }
 

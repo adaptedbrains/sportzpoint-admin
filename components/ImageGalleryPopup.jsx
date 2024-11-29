@@ -57,7 +57,7 @@ const ImageGalleryPopup = ({ onSelect, onClose ,onImageSelect}) => {
 
   const handleConfirm = () => {
     if (selectedImage) {
-      onImageSelect &&  onImageSelect(`https://sportzpoint.s3.ap-south-1.amazonaws.com/${selectedImage}`)
+      onImageSelect &&  onImageSelect(`https://dmpsza32x691.cloudfront.net/${selectedImage}`)
       onSelect && onSelect(selectedImage);
       onClose();
     }
