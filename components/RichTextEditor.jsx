@@ -30,7 +30,6 @@ const RichTextEditor = ({ content, htmlContentGrab }) => {
 
       <Editor
         apiKey="qagffr3pkuv17a8on1afax661irst1hbr4e6tbv888sz91jc"
-        onInit={(evt, editor) => (editorRef.current = editor)}
         value={content}
         onEditorChange={(newContent) => {
           htmlContentGrab(newContent);
@@ -39,45 +38,42 @@ const RichTextEditor = ({ content, htmlContentGrab }) => {
           height: 500,
           menubar: true,
           plugins: [
-            "advlist",
-            "autolink",
-            "lists",
-            "link",
-            "image",
-            "charmap",
-            "preview",
-            "anchor",
-            "searchreplace",
-            "visualblocks",
-            "code",
-            "fullscreen",
-            "insertdatetime",
-            "media",
-            "table",
-            "help",
-            "wordcount",
-            "emoticons",
+            'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
+            'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
+            'insertdatetime', 'media', 'table', 'help', 'wordcount'
           ],
-          toolbar:
-            "styles fontsize | bold italic | image media table link | alignleft aligncenter alignright | bullist numlist",
+          toolbar: 'undo redo | formatselect | ' +
+            'bold italic backcolor | alignleft aligncenter ' +
+            'alignright alignjustify | bullist numlist outdent indent | ' +
+            'removeformat | help',
+          content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }',
           file_picker_callback: (callback, value, meta) => {
-            if (meta.filetype === "image") {
+            if (meta.filetype === 'image') {
               openImageGallery(callback);
             }
           },
-          content_style: `body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif; font-size: 14px; line-height: 1.6; color: #333; margin: 1rem; }`,
+          images_upload_handler: (blobInfo, progress) => {
+            return new Promise((resolve, reject) => {
+              // You can implement your image upload logic here
+              // For now, we'll use the image gallery
+              openImageGallery(resolve);
+            });
+          },
+          promotion: false,
+          setup: (editor) => {
+            editor.on('init', () => {
+              editorRef.current = editor;
+            });
+          }
         }}
       />
 
       {isGalleryOpen && (
-       
-
         <ImageGalleryPopup
           onImageSelect={onImageSelect}
           onClose={() => setIsGalleryOpen(false)}
           // This ensures the gallery stays on top
-          />
-        
+        />
       )}
     </div>
   );
