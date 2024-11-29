@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Image from 'next/image';
 import { initNotionClient, getPageContent } from '../util/notionService';
 
 const NotionContent = ({ notionToken, pageId }) => {
@@ -53,8 +54,16 @@ const NotionContent = ({ notionToken, pageId }) => {
             return <li key={index} className="ml-6 mb-2">{block.content}</li>;
           case 'image':
             return (
-              <figure key={index} className="mb-4">
-                <img src={block.url} alt={block.caption} className="max-w-full h-auto" />
+              <figure key={index} className="mb-4 relative">
+                <div className="relative w-full h-[400px]">
+                  <Image
+                    src={block.url}
+                    alt={block.caption}
+                    fill
+                    className="object-contain"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                  />
+                </div>
                 {block.caption && (
                   <figcaption className="text-sm text-gray-600 mt-2">{block.caption}</figcaption>
                 )}

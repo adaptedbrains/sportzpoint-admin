@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import NotionPageSelector from './NotionPageSelector';
+import Image from 'next/image';
 
 const RichTextEditor = ({ onContentChange }) => {
   const [content, setContent] = useState(null);
@@ -84,8 +85,16 @@ const RichTextEditor = ({ onContentChange }) => {
         const imageUrl = value.type === 'external' ? value.external.url : value.file.url;
         const caption = value.caption?.length > 0 ? value.caption[0].plain_text : '';
         return (
-          <figure key={id} className="mb-4">
-            <img src={imageUrl} alt={caption} className="max-w-full h-auto rounded-lg" />
+          <figure key={id} className="mb-4 relative">
+            <div className="relative w-full h-[400px]">
+              <Image
+                src={imageUrl}
+                alt={caption}
+                fill
+                className="object-contain rounded-lg"
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              />
+            </div>
             {caption && (
               <figcaption className="text-center text-sm text-gray-600 mt-2">
                 {caption}
@@ -174,7 +183,7 @@ const RichTextEditor = ({ onContentChange }) => {
           <div className="text-center text-red-500 py-4">Error: {error}</div>
         ) : !content ? (
           <div className="text-center text-gray-500 py-4">
-            No content yet. Click "Import from Notion" to get started.
+            No content yet. Click &quot;Import from Notion&quot; to get started.
           </div>
         ) : (
           <div className="notion-content">
