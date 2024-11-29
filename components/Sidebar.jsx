@@ -34,7 +34,7 @@ const Sidebar = () => {
 
   const menuItems = [
     { name: "Home", icon: FaHome, link: "/#", onClick: () => togglePostSidebar(false) },
-    { name: "Posts", icon: FaRegEdit, link: "/posts", onClick: handlePostsClick },
+    { name: "Posts", icon: FaRegEdit, link: "/posts/article", onClick: handlePostsClick },
     { name: "Media Library", icon: MdOutlinePermMedia, link: "/media", onClick: () => togglePostSidebar(false) },
     { name: "Categories", icon: TbCategoryPlus, link: "/categories", onClick: () => togglePostSidebar(false) },
     { name: "Tags", icon: IoPricetagsOutline, link: "/tags", onClick: () => togglePostSidebar(false) },

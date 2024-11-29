@@ -3,20 +3,17 @@
 import React, { useEffect, useRef, useState } from "react";
 import Cookies from "js-cookie";
 import { CiMenuKebab } from "react-icons/ci";
-import {
-  AiOutlineEdit,
-  AiOutlineDelete,
-  AiOutlinePushpin,
-} from "react-icons/ai";
+import { AiOutlineEdit, AiOutlineDelete, AiOutlinePushpin } from "react-icons/ai";
 import RichTextEditor from "./RichTextEditor"; // Adjust the path as necessary
 
 const LiveBlogUpdate = ({ postId }) => {
   const [updates, setUpdates] = useState([]);
   const [error, setError] = useState(null);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
-  const [editData, setEditData] = useState(null); // To handle edit/update
-  const [currentPost, setCurrentPost] = useState(""); // To handle edit/update
-  const [newUpdate, setNewUpdate] = useState({ title: "", content: "" }); // For creating new updates
+  const [editData, setEditData] = useState(null);
+  const [currentPost, setCurrentPost] = useState("");
+  const [newUpdate, setNewUpdate] = useState({ title: "", content: "" });
+  const [editPost, setEditPost] = useState("");
 
   useEffect(() => {
     const fetchUpdates = async () => {
@@ -38,8 +35,7 @@ const LiveBlogUpdate = ({ postId }) => {
         }
 
         const data = await response.json();
-        const { updates } = data;
-        setUpdates(updates);
+        setUpdates(data.updates);
       } catch (err) {
         setError("Failed to fetch updates. Please try again later.");
         console.error(err);
@@ -49,25 +45,53 @@ const LiveBlogUpdate = ({ postId }) => {
     fetchUpdates();
   }, [postId]);
 
-  const handlePin = (id) => {
-    setUpdates((prevUpdates) => {
-      const pinned = prevUpdates.find((update) => update._id === id);
-      const others = prevUpdates.filter((update) => update._id !== id);
-      return [pinned, ...others];
-    });
+  const handlePin = async (id, value) => {
+    try {
+      const token = Cookies.get("token");
+      const data = { pinned: value };
+
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/live-blog/update/${id}`,
+        {
+          method: "PATCH",
+          body: JSON.stringify(data),
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`Failed to update the post with ID: ${id}`);
+      }
+
+      const updatedPost = await response.json();
+      setCurrentPost("");
+
+      setUpdates((prevUpdates) => {
+        const others = prevUpdates.filter((update) => update._id !== id);
+        return [updatedPost.update, ...others];
+      });
+    } catch (err) {
+      console.error(err);
+      setError("Failed to update the post. Please try again later.");
+    }
   };
 
   const handleEdit = (update) => {
+    setEditPost(update._id)
     setEditData(update);
     setNewUpdate({ title: update.title, content: update.content });
     setIsPopupOpen(true);
+    window.scrollTo(0, 70);
   };
 
   const handleDelete = async (id) => {
     try {
       const token = Cookies.get("token");
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/post/${postId}/live-blog/updates/${id}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/live-blog/update/${id}`,
         {
           method: "DELETE",
           headers: {
@@ -93,11 +117,13 @@ const LiveBlogUpdate = ({ postId }) => {
   const handlePublish = async () => {
     try {
       const token = Cookies.get("token");
-      const endpoint = editData
-        ? `${process.env.NEXT_PUBLIC_API_URL}/live-blog/${currentPost}`
-        : `${process.env.NEXT_PUBLIC_API_URL}/posts/${postId}/live-blog/update`;
-      const method = editData ? "PUT" : "POST";
+      const endpoint =
+        editPost !== ""
+          ? `${process.env.NEXT_PUBLIC_API_URL}/live-blog/update/${editPost}`
+          : `${process.env.NEXT_PUBLIC_API_URL}/posts/${postId}/live-blog/update`;
 
+      const method = editPost !== "" ? "PATCH" : "POST";
+      alert(endpoint)
       const response = await fetch(endpoint, {
         method,
         headers: {
@@ -110,6 +136,8 @@ const LiveBlogUpdate = ({ postId }) => {
         }),
       });
 
+      
+
       if (!response.ok) {
         throw new Error(
           `Failed to ${editData ? "update" : "create"} the update.`
@@ -118,31 +146,30 @@ const LiveBlogUpdate = ({ postId }) => {
 
       const savedUpdate = await response.json();
 
-      if (editData) {
-        // Update existing post in state
-        setUpdates((prevUpdates) =>
-          prevUpdates.map((update) =>
-            update._id === editData._id ? { ...update, ...savedUpdate } : update
-          )
-        );
+      if (editPost !== "") {
+        const deleteThisData=updates.filter(up=>up._id!==editPost);
+        const newdata=[savedUpdate.update,...deleteThisData]
+        
+        setUpdates(newdata);
       } else {
-        // Add new post to state
-        setUpdates((prevUpdates) => [...prevUpdates, savedUpdate]);
+        setUpdates((prevUpdates) => [savedUpdate.update, ...prevUpdates]);
       }
 
       setIsPopupOpen(false);
       setEditData(null);
       setNewUpdate({ title: "", content: "" });
+      setEditPost("");
     } catch (err) {
       console.error(err);
       setError("Failed to save the update. Please try again later.");
     }
   };
+
   const menuRef = useRef(null);
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (menuRef.current && !menuRef.current.contains(event.target)) {
-        setCurrentPost(""); // Call actionText function with an empty string
+        setCurrentPost("");
       }
     };
 
@@ -151,11 +178,12 @@ const LiveBlogUpdate = ({ postId }) => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [currentPost]);
+
   return (
     <div className="py-6 min-h-screen bg-gray-50">
       {isPopupOpen && (
-        <div className=" w-full   inset-0  bg-opacity-50 flex items-center justify-center">
-          <div className="w-full bg-red-400 rounded-lg  relative">
+        <div className="w-full inset-0 bg-opacity-50 flex items-center justify-center">
+          <div className="w-full bg-red-400 rounded-lg relative">
             <div className="bg-gray-100 p-4">
               <h2 className="text-xl font-bold mb-4">
                 {editData ? "Edit Update" : "Create New Update"}
@@ -199,13 +227,10 @@ const LiveBlogUpdate = ({ postId }) => {
         <button
           onClick={() => {
             setIsPopupOpen(true);
-            setNewUpdate((prev) => ({
-              ...prev, // Preserve other properties of `prev`
-              title: "",
-              content: "",
-            }));
-            setEditData(null)
-            window.scrollTo(0, 70); // Correct method to scroll to a specific position
+            setNewUpdate({ title: "", content: "" });
+            setEditData(null);
+            setEditPost("")
+            window.scrollTo(0, 70);
           }}
           className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
         >
@@ -216,73 +241,77 @@ const LiveBlogUpdate = ({ postId }) => {
         <p className="text-red-500 text-center">{error}</p>
       ) : (
         <div className="space-y-4 px-28 bg-gray-50 py-10">
-          {updates.map((update) => (
-            <div
-              key={update._id}
-              className="bg-white p-4 shadow rounded flex justify-between "
-            >
-              <div className="w-full">
-                <p className="text-sm text-gray-500 mb-2">
-                  {new Date(update.created_at).toLocaleString("en-US", {
-                    dateStyle: "medium",
-                    timeStyle: "short",
-                  })}
-                </p>
-                <div className="flex justify-between w-full">
-                  <div className="text-lg w-full   font-semibold mb-2">
-                    {update.title}
-                  </div>
-                  <div className="shadow-inner  shadow-gray-200 p-2 rounded relative group z-30">
-                    <button onClick={() => setCurrentPost(update._id)}>
-                      <CiMenuKebab
-                        color="blue"
-                        size={20}
-                        className="cursor-pointer"
-                      />
-                    </button>
+          {updates
+            .sort((a, b) => {
+              if (b.pinned !== a.pinned) return b.pinned - a.pinned;
+              return new Date(b.updated_at) - new Date(a.updated_at);
+            })
+            .map((update) => (
+              <div
+                key={update._id}
+                className="bg-white p-4 shadow rounded flex justify-between relative"
+              >
+                <div className="w-full">
+                  <div className="flex gap-3">
+
+                  <p className="text-sm text-gray-500 mb-2">
+                    {new Date(update.created_at).toLocaleString("en-US", {
+                      dateStyle: "medium",
+                      timeStyle: "short",
+                    })}
+                  </p>
+                  {update.pinned && <AiOutlinePushpin color="" className="text-blue-500"/>}
+                    </div>
+                  <div className="flex justify-between w-full">
+                    <div className="text-lg w-full font-semibold mb-2">
+                      {update.title}
+                    </div>
+                    <div className="shadow-inner shadow-gray-200 p-2 rounded relative group z-30">
+                      <button onClick={() => setCurrentPost(update._id)}>
+                        <CiMenuKebab
+                          color="blue"
+                          size={20}
+                          className="cursor-pointer"
+                        />
+                      </button>
+                     
+                    </div>
                     {currentPost === update._id && (
-                      <div
-                        ref={menuRef}
-                        className="absolute bg-gray-100 border border-blue-500  z-50 -start-24    top-full  bg-white-500   rounded"
-                      >
-                        <button
-                          onClick={() => handlePin(update._id)}
-                          className="flex items-center px-4 py-2 hover:bg-gray-100 w-full text-left"
+                        <div
+                          ref={menuRef}
+                          className="absolute bg-white border border-blue-200 end-3 top-24  p-2 rounded z-50"
                         >
-                          <AiOutlinePushpin className="mr-2" /> Pin
-                        </button>
-                        <button
-                          onClick={() => {handleEdit(update);setIsPopupOpen(true);
-                            
-                            setEditData(null)
-                            window.scrollTo(0, 70);}}
-                          className="flex items-center px-4 py-2 hover:bg-gray-100 w-full text-left"
-                        >
-                          <AiOutlineEdit className="mr-2" /> Edit
-                        </button>
-                        <button
-                          onClick={() => handleDelete(update._id)}
-                          className="flex items-center px-4 py-2 hover:bg-gray-100 w-full text-left text-red-500"
-                        >
-                          <AiOutlineDelete className="mr-2" /> Delete
-                        </button>
-                      </div>
-                    )}
+                          <ul className="space-y-1 cursor-pointer">
+                            <li
+                              onClick={() => handleEdit(update)}
+                              className="flex items-center gap-2 py-2 px-1 hover:bg-blue-200 text-xs rounded-md"
+                            >
+                              <AiOutlineEdit />
+                              <span>Edit</span>
+                            </li>
+                            <li
+                              onClick={() => handlePin(update._id, !update.pinned)}
+                              className="flex items-center gap-2 py-2 px-1 hover:bg-blue-200 text-xs rounded-md"
+                            >
+                              <AiOutlinePushpin />
+                              <span> {update.pinned ?'Unpin' :' Pin'} </span>
+                            </li>
+                            <li
+                              onClick={() => handleDelete(update._id)}
+                              className="flex items-center gap-2 py-2 px-1 hover:bg-blue-200 text-xs rounded-md"
+                            >
+                              <AiOutlineDelete />
+                              <span>Delete</span>
+                            </li>
+                          </ul>
+                        </div>
+                      )}
                   </div>
                 </div>
-                {update.content && (
-                  <div
-                    className="prose"
-                    dangerouslySetInnerHTML={{ __html: update.content }}
-                  ></div>
-                )}
               </div>
-            </div>
-          ))}
+            ))}
         </div>
       )}
-
-      {/* Popup Modal */}
     </div>
   );
 };

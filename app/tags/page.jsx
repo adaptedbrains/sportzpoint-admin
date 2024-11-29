@@ -2,51 +2,20 @@
 import { useState, useEffect } from 'react';
 import { FaEdit, FaTrash } from 'react-icons/fa';
 import Cookies from 'js-cookie';
+import useDropDownDataStore from '../../store/dropDownDataStore';
 
 const TagsPage = () => {
+  const { allTags,fetchDropDownData} = useDropDownDataStore();
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [tags, setTags] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    const fetchTags = async () => {
-      try {
-        setLoading(true);
-        const token = Cookies.get('token');
-        
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/tag`, {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          },
-          credentials: 'include'
-        });
-
-        if (!response.ok) {
-          throw new Error('Failed to fetch tags');
-        }
-
-        const data = await response.json();
-        setTags(data.tags || []);
-      } catch (err) {
-        console.error('Error fetching tags:', err);
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchTags();
-  }, []);
-
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center min-h-screen bg-gray-50">
-        <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-500"></div>
-      </div>
-    );
-  }
+ 
+  useEffect(()=>{
+    fetchDropDownData(`${process.env.NEXT_PUBLIC_API_URL}/tag`,'tag')
+  },[])
 
   if (error) {
     return (
@@ -59,7 +28,7 @@ const TagsPage = () => {
   return (
     <div className="flex justify-center min-h-screen bg-gray-50 pt-20 pb-6">
       <div className="w-full max-w-6xl px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center mb-4">
+        {/* <div className="flex justify-between items-center mb-4">
           <h1 className="text-xl font-semibold text-gray-800">Tags</h1>
           <button 
             onClick={() => setIsModalOpen(true)}
@@ -67,7 +36,7 @@ const TagsPage = () => {
           >
             Add Tag
           </button>
-        </div>
+        </div> */}
         
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 mt-2">
           <div className="overflow-x-auto">
@@ -80,9 +49,9 @@ const TagsPage = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
-                {tags.map((tag) => (
+                {allTags && allTags.map((tag) => (
                   <tr 
-                    key={tag.id} 
+                    key={tag._id} 
                     className="hover:bg-gray-50 transition-colors duration-200"
                   >
                     <td className="px-6 py-4 text-sm text-gray-700 whitespace-nowrap">
