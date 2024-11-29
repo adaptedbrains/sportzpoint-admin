@@ -1,7 +1,7 @@
 "use client";
 
 import Cookies from "js-cookie";
-import GutenbergEditor from "./GutenbergEditor";
+import RichTextEditor from "./RichTextEditor";
 import RestOfPostEdit from "./RestOfPostEdit";
 import ArticlePostEditComponent from "./ArticlePostEditComponent";
 import { usePathname, useRouter } from "next/navigation";
@@ -21,6 +21,7 @@ function ManagePostProperties() {
     tags: [],
     credits: [],
     focusKeyphrase: "",
+    content: "",
   });
 
   const [formDataPostEdit, setFormDataPostEdit] = useState({
@@ -32,12 +33,7 @@ function ManagePostProperties() {
     banner_desc: "",
   });
 
-  const [htmlContent, setHtmlContent] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const htmlContentGrab = (data) => {
-    setHtmlContent(data);
-  };
 
   const handleArticleFromData = (name, value) => {
     setFormDataPostEdit((prev) => ({
@@ -45,39 +41,6 @@ function ManagePostProperties() {
       [name]: value,
     }));
   };
-
-
-
-
- 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
   useEffect(() => {
     if (pathname) {
@@ -88,13 +51,13 @@ function ManagePostProperties() {
       if (id === "new-post") {
         // Fresh initialization for a new post
         setPost(null);
-        setHtmlContent("");
         setFormData({
           primaryCategory: null,
           additionalCategories: [],
           tags: [],
           credits: [],
           focusKeyphrase: "",
+          content: "",
         });
         setFormDataPostEdit({
           title: "",
@@ -108,7 +71,6 @@ function ManagePostProperties() {
         // Fetch and initialize data for an existing post
         const requiredData = allPosts.find((a) => a._id === id);
         setPost(requiredData);
-        setHtmlContent(requiredData?.content || "");
         if (requiredData) {
           setFormData({
             primaryCategory: requiredData.primary_category?.[0]
@@ -133,6 +95,7 @@ function ManagePostProperties() {
                 }))
               : [],
             focusKeyphrase: requiredData.focusKeyphrase || "",
+            content: requiredData.content || "",
           });
           setFormDataPostEdit({
             title: requiredData.title || "",
@@ -147,22 +110,9 @@ function ManagePostProperties() {
     }
   }, [pathname, allPosts]);
 
-
-
-
-
-
-
-
-
-
-
-
-
   const submitData = async (status) => {
     try {
       setIsSubmitting(true);
- 
 
       const token = Cookies.get('token');
       if (!token) {
@@ -199,7 +149,7 @@ function ManagePostProperties() {
         banner_image: formDataPostEdit.banner_image.trim(),
         credits: formData.credits.map((credit) => credit.value),
         focusKeyphrase: formData.focusKeyphrase.trim(),
-        content: htmlContent.trim(),
+        content: formData.content.trim(),
         status: status,
         author: authorId,
         slug: formDataPostEdit.slug.trim().toLowerCase().split(" ").join("-"),
@@ -260,9 +210,13 @@ function ManagePostProperties() {
           formDataPostEdit={formDataPostEdit}
         />
 
-        <GutenbergEditor
-          content={htmlContent}
-          htmlContentGrab={htmlContentGrab}
+        <RichTextEditor
+          onContentChange={(content) => {
+            setFormData((prev) => ({
+              ...prev,
+              content: content,
+            }));
+          }}
         />
         <RestOfPostEdit formData={formData} setFormData={setFormData} />
 
