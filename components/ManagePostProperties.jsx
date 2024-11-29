@@ -9,7 +9,7 @@ import { useCallback, useEffect, useState } from "react";
 import useAllPostDataStore from "../store/useAllPostDataStore";
 import LiveBlogUpdate from "./LiveBlogUpdate";
 import WebStoryEditor from "./WebStory";
-function ManagePostProperties({type,id}) {
+function ManagePostProperties() {
   const router = useRouter();
   const { allPosts } = useAllPostDataStore();
   const pathname = usePathname();
@@ -53,9 +53,9 @@ function ManagePostProperties({type,id}) {
 
   useEffect(() => {
     if (pathname) {
-      
-      
-    
+      const parts = pathname.split("/");
+      const type = parts[2];
+      const id = parts[3];
 
       if (id === "new-post") {
         setWebStory([])
@@ -169,7 +169,7 @@ function ManagePostProperties({type,id}) {
         status: status,
         author: authorId,
         slug: formDataPostEdit.slug.trim().toLowerCase().split(" ").join("-"),
-        type:type,
+        type: pathname.split("/")[2] ==="Web%20Story" ?"Web Story":pathname.split("/")[2],
         seo_desc: formDataPostEdit.seo_desc.trim(),
       };
 
@@ -250,7 +250,7 @@ function ManagePostProperties({type,id}) {
         />
         
 
-        {type==='Web Story' ? (
+        {pathname && pathname.split("/")[2] === "Web%20Story" ? (
           <WebStoryEditor  content={webStory} htmlJsonGrab={htmlJsonGrab}   />
         ) : (
           <RichTextEditor
