@@ -38,7 +38,7 @@ const ArticlePostEditComponent = ({
       handleArticleFromData("banner_desc", requiredData.banner_desc);
 
       setFeaturedImage(
-        `https://img-cdn.thepublive.com/fit-in/1280x960/filters:format(webp)/sportzpoint/media/${requiredData.banner_image}`
+        `https://dmpsza32x691.cloudfront.net/${requiredData.banner_image}`
       );
     }
   }, [id, allPosts]);
@@ -202,7 +202,6 @@ const ArticlePostEditComponent = ({
             {featuredImage ? (
               <Image
                 src={featuredImage}
-                //  https://sportzpoint.s3.ap-south-1.amazonaws.com
                 alt={featuredImage}
                 width={500}
                 height={400}
