@@ -182,7 +182,7 @@ function ManagePostProperties({ type, id }) {
       }
 
       if (
-        !transformedData.categories.length || 
+        !transformedData.credits.length || 
         !transformedData.primary_category.length || 
         !transformedData.slug.trim() || 
         !transformedData.title.trim()
