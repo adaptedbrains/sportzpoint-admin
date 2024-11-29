@@ -1,7 +1,7 @@
 "use client";
 
 import Cookies from "js-cookie";
-import RichTextEditor from "./RichTextEditor";
+import TiptapEditor from "./TiptapEditor";
 import RestOfPostEdit from "./RestOfPostEdit";
 import ArticlePostEditComponent from "./ArticlePostEditComponent";
 import { usePathname, useRouter } from "next/navigation";
@@ -45,36 +45,6 @@ function ManagePostProperties() {
       [name]: value,
     }));
   };
-
-
-
-
- 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -146,18 +116,6 @@ function ManagePostProperties() {
       }
     }
   }, [pathname, allPosts]);
-
-
-
-
-
-
-
-
-
-
-
-
 
   const submitData = async (status) => {
     try {
@@ -260,9 +218,12 @@ function ManagePostProperties() {
           formDataPostEdit={formDataPostEdit}
         />
 
-        <RichTextEditor
+        <TiptapEditor
           content={htmlContent}
-          htmlContentGrab={htmlContentGrab}
+          onChange={(newContent) => {
+            setHtmlContent(newContent);
+            htmlContentGrab(newContent);
+          }}
         />
         <RestOfPostEdit formData={formData} setFormData={setFormData} />
 

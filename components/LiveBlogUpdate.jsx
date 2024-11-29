@@ -4,7 +4,7 @@ import React, { useEffect, useRef, useState } from "react";
 import Cookies from "js-cookie";
 import { CiMenuKebab } from "react-icons/ci";
 import { AiOutlineEdit, AiOutlineDelete, AiOutlinePushpin } from "react-icons/ai";
-import RichTextEditor from "./RichTextEditor"; // Adjust the path as necessary
+import TiptapEditor from "./TiptapEditor"; // Adjust the path as necessary
 
 const LiveBlogUpdate = ({ postId }) => {
   const [updates, setUpdates] = useState([]);
@@ -197,11 +197,11 @@ const LiveBlogUpdate = ({ postId }) => {
                 }
                 className="w-full p-2 mb-4 border rounded"
               />
-              <RichTextEditor
+              <TiptapEditor
                 content={newUpdate.content}
-                htmlContentGrab={(content) =>
-                  setNewUpdate((prev) => ({ ...prev, content }))
-                }
+                onChange={(newContent) => {
+                  setNewUpdate((prev) => ({ ...prev, content: newContent }));
+                }}
               />
               <div className="flex justify-end space-x-4 mt-4">
                 <button
