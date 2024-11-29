@@ -90,7 +90,7 @@ const ArticlePostEditComponent = ({
 
 
   const selecttedImageForBanner=(filename)=>{
-    setFeaturedImage(`https://sportzpoint-media.s3.ap-south-1.amazonaws.com/${filename}`)
+    setFeaturedImage(`https://dmpsza32x691.cloudfront.net/${filename}`)
     handleArticleFromData("banner_desc", filename);
     handleArticleFromData("banner_image", filename);
   }

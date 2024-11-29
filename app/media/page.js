@@ -94,7 +94,7 @@ const Page = () => {
             onClick={() => handleImageClick(img)}
           >
             <Image
-              src={`https://sportzpoint.s3.ap-south-1.amazonaws.com/${img}`}
+              src={`https://dmpsza32x691.cloudfront.net/${img}`}
               alt={`Image ${index + 1}`}
               layout="fill"
               objectFit="cover"
@@ -114,7 +114,7 @@ const Page = () => {
             </button>
             <div className="aspect-w-1 aspect-h-1 relative w-full h-[70vh]">
               <Image
-                src={`https://sportzpoint-media.s3.ap-south-1.amazonaws.com/${selectedImage}`}
+                src={`https://dmpsza32x691.cloudfront.net/${selectedImage}`}
                 alt="Selected Image"
                 layout="fill"
                 objectFit="contain"

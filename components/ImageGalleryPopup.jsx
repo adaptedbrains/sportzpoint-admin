@@ -126,7 +126,7 @@ const ImageGalleryPopup = ({ onSelect, onClose ,onImageSelect}) => {
                     onClick={() => handleImageClick(img)}
                   >
                     <Image
-                      src={`https://sportzpoint-media.s3.ap-south-1.amazonaws.com/${img}`}
+                      src={`https://dmpsza32x691.cloudfront.net/${img}`}
                       alt={`Image ${index + 1}`}
                       layout="fill"
                       objectFit="cover"
