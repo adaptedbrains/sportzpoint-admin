@@ -1,7 +1,7 @@
 "use client";
 
 import Cookies from "js-cookie";
-import RichTextEditor from "./RichTextEditor";
+import GutenbergEditor from "./GutenbergEditor";
 import RestOfPostEdit from "./RestOfPostEdit";
 import ArticlePostEditComponent from "./ArticlePostEditComponent";
 import { usePathname, useRouter } from "next/navigation";
@@ -260,7 +260,7 @@ function ManagePostProperties() {
           formDataPostEdit={formDataPostEdit}
         />
 
-        <RichTextEditor
+        <GutenbergEditor
           content={htmlContent}
           htmlContentGrab={htmlContentGrab}
         />
