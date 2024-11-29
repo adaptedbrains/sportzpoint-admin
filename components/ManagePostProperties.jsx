@@ -2,19 +2,21 @@
 
 import Cookies from "js-cookie";
 import RichTextEditor from "./RichTextEditor";
+import WebStoryEditor from "./WebStory";
+
 import RestOfPostEdit from "./RestOfPostEdit";
 import ArticlePostEditComponent from "./ArticlePostEditComponent";
 import { usePathname, useRouter } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import useAllPostDataStore from "../store/useAllPostDataStore";
 import LiveBlogUpdate from "./LiveBlogUpdate";
-import WebStoryEditor from "./WebStory";
-function ManagePostProperties() {
+function ManagePostProperties({ type, id }) {
   const router = useRouter();
   const { allPosts } = useAllPostDataStore();
   const pathname = usePathname();
   const [post, setPost] = useState(null);
   const [view, setView] = useState("main"); // Track active view ("main" or "updates")
+  const [webStory, setWebStory] = useState([]); // Track active view ("main" or "updates")
 
   const [formData, setFormData] = useState({
     primaryCategory: null,
@@ -35,7 +37,6 @@ function ManagePostProperties() {
 
   const [htmlContent, setHtmlContent] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [webStory, setWebStory] = useState([]);
 
   const htmlContentGrab = (data) => {
     setHtmlContent(data);
@@ -43,7 +44,6 @@ function ManagePostProperties() {
   const htmlJsonGrab=(data)=>{
     setWebStory(data)
   }
-
   const handleArticleFromData = (name, value) => {
     setFormDataPostEdit((prev) => ({
       ...prev,
@@ -123,8 +123,6 @@ function ManagePostProperties() {
   }, [pathname, allPosts]);
 
   const submitData = async (status) => {
-
-
     try {
       setIsSubmitting(true);
 
@@ -165,26 +163,30 @@ function ManagePostProperties() {
         credits: formData.credits.map((credit) => credit.value),
         focusKeyphrase: formData.focusKeyphrase.trim(),
         content: htmlContent.trim(),
-        
+
         status: status,
         author: authorId,
         slug: formDataPostEdit.slug.trim().toLowerCase().split(" ").join("-"),
-        type: pathname.split("/")[2] ==="Web%20Story" ?"Web Story":pathname.split("/")[2],
+        type:
+          pathname.split("/")[2] === "Web%20Story"
+            ? "Web Story"
+            : pathname.split("/")[2],
         seo_desc: formDataPostEdit.seo_desc.trim(),
       };
 
       if (status === "published") {
         transformedData.published_at_datetime = new Date().toISOString();
       }
-      if ( pathname && pathname.split("/")[2] === "Web%20Story") {
+      if (pathname && pathname.split("/")[2] === "Web%20Story") {
         transformedData.web_story = webStory;
       }
-       
-        
+
       const isCreate = pathname.split("/")[3] === "new-post";
       const apiUrl = isCreate
         ? `${process.env.NEXT_PUBLIC_API_URL}/article/create`
-        : `${process.env.NEXT_PUBLIC_API_URL}/article/update/${pathname.split("/")[3]}`;
+        : `${process.env.NEXT_PUBLIC_API_URL}/article/update/${
+            pathname.split("/")[3]
+          }`;
 
       const response = await fetch(apiUrl, {
         method: isCreate ? "POST" : "PUT",
@@ -207,22 +209,17 @@ function ManagePostProperties() {
       alert(`Article ${isCreate ? "created" : "updated"} successfully!`);
 
       // Redirect to the articles list page
-      if(pathname.split("/")[2]==='Article'){
-
+      if (pathname.split("/")[2] === "Article") {
         router.push("/posts/article");
-      }else if(pathname.split("/")[2]==='Video'){
-
+      } else if (pathname.split("/")[2] === "Video") {
         router.push("/posts/video");
-      }else if(pathname.split("/")[2]==='Video'){
-
+      } else if (pathname.split("/")[2] === "Video") {
         router.push("/posts/video");
-      }else if(pathname.split("/")[2]==='Web%20Story'){
-
+      } else if (pathname.split("/")[2] === "Web%20Story") {
         router.push("/posts/web-story");
-      }else if(pathname.split("/")[2]==='Gallery'){
+      } else if (pathname.split("/")[2] === "Gallery") {
         router.push("/posts/photo-gallery");
-      }else if(pathname.split("/")[2]==='LiveBlog'){
-
+      } else if (pathname.split("/")[2] === "LiveBlog") {
         router.push("/posts/photo-gallery");
       }
 
@@ -234,6 +231,7 @@ function ManagePostProperties() {
       setIsSubmitting(false);
     }
   };
+
   const renderView = () => {
     if (view === "updates") {
       return (
@@ -248,10 +246,9 @@ function ManagePostProperties() {
           handleArticleFromData={handleArticleFromData}
           formDataPostEdit={formDataPostEdit}
         />
-        
 
         {pathname && pathname.split("/")[2] === "Web%20Story" ? (
-          <WebStoryEditor  content={webStory} htmlJsonGrab={htmlJsonGrab}   />
+          <WebStoryEditor content={webStory} htmlJsonGrab={htmlJsonGrab} />
         ) : (
           <RichTextEditor
             content={htmlContent}
