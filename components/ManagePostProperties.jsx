@@ -2,10 +2,10 @@
 
 import Cookies from "js-cookie";
 import RichTextEditor from "./RichTextEditor";
-import RestOfPostEdit from "./RestOfPostEdit";
+import RestOfPostEdit from "./RestOfPostEdits";
 import ArticlePostEditComponent from "./ArticlePostEditComponent";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import useAllPostDataStore from "../store/useAllPostDataStore";
 import LiveBlogUpdate from "./LiveBlogUpdate";
 function ManagePostProperties() {
