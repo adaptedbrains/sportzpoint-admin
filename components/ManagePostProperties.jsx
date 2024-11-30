@@ -131,20 +131,6 @@ function ManagePostProperties({ type, id }) {
         throw new Error("No token found. Please login again.");
       }
 
-      // Safely get author ID
-      let authorId;
-      try {
-        const storedId = localStorage.getItem("id");
-        authorId = storedId ? storedId.replace(/^"(.*)"$/, "$1") : null;
-
-        if (!authorId) {
-          throw new Error("No author ID found. Please login again.");
-        }
-      } catch (e) {
-        console.error("Error getting author ID:", e);
-        throw new Error("Authentication error. Please login again.");
-      }
-
       // Transform data
       const transformedData = {
         primary_category: formData.primaryCategory
@@ -163,9 +149,7 @@ function ManagePostProperties({ type, id }) {
         credits: formData.credits.map((credit) => credit.value),
         focusKeyphrase: formData.focusKeyphrase.trim(),
         content: htmlContent.trim(),
-
         status: status,
-        author: authorId,
         slug: formDataPostEdit.slug.trim().toLowerCase().split(" ").join("-"),
         type:
           pathname.split("/")[2] === "Web%20Story"

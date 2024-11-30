@@ -136,7 +136,10 @@ export default function Table({
                 SEO Score
               </th>
               <th className="px-4 py-2 text-sm text-left border border-gray-300">
-                Timeline
+                Published
+              </th>
+              <th className="px-4 py-2 text-sm text-left border border-gray-300">
+                Last Updated
               </th>
               <th className="px-4 py-2 text-sm text-center border border-gray-300">
                 Actions
@@ -177,6 +180,9 @@ export default function Table({
                   >
                     {10}
                   </span>
+                </td>
+                <td className="px-4 py-2 border border-gray-300 text-sm">
+                  {article.status === 'published' && article.published_at_datetime ? formatDate(article.published_at_datetime) : '-'}
                 </td>
                 <td className="px-4 py-2 border border-gray-300 text-sm">
                   {formatDate(article.updated_at_datetime)}
