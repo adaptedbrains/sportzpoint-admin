@@ -62,8 +62,8 @@ const ArticlePostEditComponent = ({
     handleArticleFromData("seo_desc", e.target.value);
   };
   const handleBanner_descDescriptionChange = (e) => {
-    // setMetaDescription(e.target.value.slice(0, 160));
-    handleArticleFromData("banner_desc", e.target.value);
+    const value = e.target.value; 
+    handleArticleFromData("banner_desc", value);
   };
 
   
@@ -97,7 +97,7 @@ const ArticlePostEditComponent = ({
 
   return (
     <div className="bg-white p-6 rounded-lg shadow-md">
-      {gallery && <ImageGalleryPopup onClose={toggleGalleyButton}  onSelect={selecttedImageForBanner} />}
+      {gallery && <ImageGalleryPopup onClose={toggleGalleyButton}  onSelect={selecttedImageForBanner} onCaption={handleBanner_descDescriptionChange} caption={formDataPostEdit.banner_desc} />}
       <h2 className="text-xl font-bold mb-4">Manage Post Properties</h2>
 
       {/* Title */}

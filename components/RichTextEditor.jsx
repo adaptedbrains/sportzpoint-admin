@@ -2,23 +2,38 @@
 import React, { useRef, useState } from 'react';
 import { Editor } from '@tinymce/tinymce-react';
 import ImageGalleryPopup from './ImageGalleryPopup';
+
 const RichTextEditor = ({ content, htmlContentGrab }) => {
   const editorRef = useRef(null);
   const [isGalleryOpen, setIsGalleryOpen] = useState(false);
   const [imageCallback, setImageCallback] = useState(null);
   const [isEditorReady, setIsEditorReady] = useState(false);
-  // Function to handle opening the image gallery
+  const [imageCaption, setImageCaption] = useState("");
+
+  const grabImageCaption = (e) => {
+    setImageCaption(e.target.value);
+  };
+
   const openImageGallery = (callback) => {
     setImageCallback(() => callback);
     setIsGalleryOpen(true);
   };
-  // Function to handle image selection
+
   const onImageSelect = (url) => {
     if (imageCallback) {
-      imageCallback(url);
+      // Insert custom HTML with the image and caption
+      const editor = editorRef.current;
+      const captionHTML = `
+        <figure style="text-align: center;">
+          <img src="${url}" alt="${imageCaption}" style="max-width: 100%; height: auto;" />
+          <figcaption style="font-style: italic; color: #666;">${imageCaption}</figcaption>
+        </figure>
+      `;
+      editor.execCommand('mceInsertContent', false, captionHTML);
     }
     setIsGalleryOpen(false);
   };
+
   return (
     <div className="bg-white rounded-lg shadow-lg">
       <div className="border-b border-gray-200 p-4">
@@ -55,28 +70,23 @@ const RichTextEditor = ({ content, htmlContentGrab }) => {
               openImageGallery(callback);
             }
           },
-          content_style: `body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif; font-size: 14px; line-height: 1.6; color: #333; margin: 1rem; }`,
-          setup: (editor) => {
-            editor.on('init', () => {
-              setIsEditorReady(true);
-            });
-          },
-          images_upload_handler: (blobInfo, progress) => new Promise((resolve, reject) => {
-            // Implement your image upload logic here
-            // For now, we'll just use the image gallery
-            openImageGallery((url) => {
-              resolve(url);
-            });
-          }),
+          content_style: `
+            body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif; font-size: 14px; line-height: 1.6; color: #333; margin: 1rem; }
+            figure { margin: 0; padding: 0; }
+            figcaption { font-style: italic; color: #666; text-align: center; margin-top: 0.5rem; }
+          `,
         }}
       />
       {isGalleryOpen && (
         <ImageGalleryPopup
           onImageSelect={onImageSelect}
           onClose={() => setIsGalleryOpen(false)}
+          onCaption={grabImageCaption}
+          caption={imageCaption}
         />
       )}
     </div>
   );
 };
+
 export default RichTextEditor;
