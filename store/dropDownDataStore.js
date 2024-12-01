@@ -15,7 +15,7 @@ const useDropDownDataStore = create((set) => ({
   
     // Retrieve the token from cookies using js-cookie
     const token = Cookies.get('token'); // Replace 'token' with the name of your cookie key
-  
+   
     try {
       const response = await fetch(url, {
         method: 'GET', // Ensure the correct method is set (GET is assumed here)
@@ -30,7 +30,7 @@ const useDropDownDataStore = create((set) => ({
       }
   
       const data = await response.json();
-  
+      
       // Dynamically update the correct field based on the type
       set((state) => {
         if (type === "tag") {
@@ -39,7 +39,7 @@ const useDropDownDataStore = create((set) => ({
           return { allCategory: data.categories || [], loading: false };
         } else if (type === "roleBaseUser") {
           
-          console.log('allRoleBaseUser: ', data);
+          
           return { allRoleBaseUser: data.users || [], loading: false };
         }
         return { loading: false };

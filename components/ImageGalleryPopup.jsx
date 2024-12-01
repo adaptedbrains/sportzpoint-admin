@@ -33,8 +33,13 @@ const ImageGalleryPopup = ({ onSelect, onClose, onImageSelect,onCaption,caption 
         setIsLoading(false);
       }
     };
-
+    
+    if(caption==='deleteData'){
+      onCaption("")
+    }
+    onCaption("")
     fetchImages();
+
   }, []);
 
   const filteredImages = images.filter((img) =>
@@ -197,9 +202,9 @@ const ImageGalleryPopup = ({ onSelect, onClose, onImageSelect,onCaption,caption 
                   objectFit="cover"
                 />
               </div>
-              <div className="mt-2 bg-red-50 w-full">
-                <textarea type="text" placeholder="Enter image caption " className="border p-1 focus:outline-none text-sm w-full" value={caption} onChange={(e)=>onCaption(e)} />
-              </div>
+              {caption !== 'deleteData' && <div className="mt-2 bg-red-50 w-full">
+                <textarea type="text" placeholder="Alt Text " className="border p-1 focus:outline-none text-sm w-full" value={caption} onChange={(e)=>onCaption(e.target.value)} />
+              </div>}
             </>
           )}
         </div>
