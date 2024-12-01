@@ -87,12 +87,12 @@ const RichTextEditor = ({ content, htmlContentGrab }) => {
           plugins: [
             'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
             'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
-            'insertdatetime', 'media', 'table', 'help', 'wordcount', 'emoticons',
-            'spellchecker'
+            'insertdatetime', 'media', 'table', 'help', 'wordcount', 'emoticons'
           ],
-          toolbar: 'styles fontsize | bold italic | spellchecker | image media table link | alignleft aligncenter alignright | bullist numlist',
+          toolbar: 'styles fontsize | bold italic | image media table link | alignleft aligncenter alignright | bullist numlist',
           browser_spellcheck: true,
-          contextmenu: 'spellchecker',
+          gecko_spellcheck: true,
+          contextmenu: false,
           file_picker_callback: (callback, value, meta) => {
             if (meta.filetype === 'image') {
               openImageGallery(callback);
