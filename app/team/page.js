@@ -2,17 +2,20 @@
 import React, { useEffect, useState } from 'react';
 import useDropDownDataStore from '../../store/dropDownDataStore';
 import Cookies from 'js-cookie';
+import AddTeamMemberModal from '../../components/AddTeamMemberModal';
 
 const Page = () => {
   const { allRoleBaseUser, fetchDropDownData } = useDropDownDataStore();
-  const [users, setUsers] = useState([])
+  const [users, setUsers] = useState([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   useEffect(() => {
     fetchDropDownData(`https://sportzpoint-be.onrender.com/user`, 'roleBaseUser');
   }, [fetchDropDownData]);
-  
-  useEffect(()=>{
+
+  useEffect(() => {
     setUsers(allRoleBaseUser)
-  },[allRoleBaseUser])
+  }, [allRoleBaseUser])
 
   const getRoleColor = (role) => {
     switch (role) {
@@ -62,13 +65,25 @@ const Page = () => {
   };
 
   return (
-    <div className="p-6 pt-24">
-      <div className="mb-6">
-        <h1 className="text-2xl font-semibold text-gray-800">Team Members</h1>
-        <p className="text-sm text-gray-500 mt-1">Manage team members and their roles</p>
+    <div className="pt-24 px-4 sm:px-6 lg:px-8">
+      <div className="sm:flex sm:items-center mb-6">
+        <div className="sm:flex-auto">
+          <h1 className="text-2xl font-semibold text-gray-900">Team Members</h1>
+          <p className="mt-2 text-sm text-gray-700">
+            Manage team members and their roles
+          </p>
+        </div>
+        <div className="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
+          <button
+            onClick={() => setIsModalOpen(true)}
+            className="inline-flex items-center justify-center rounded-md border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:w-auto"
+          >
+            Add Member
+          </button>
+        </div>
       </div>
-      
-      <div className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
+
+      <div className="mt-8">
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
             <thead>
@@ -125,6 +140,14 @@ const Page = () => {
           </table>
         </div>
       </div>
+      <AddTeamMemberModal 
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSuccess={() => {
+          fetchDropDownData(`https://sportzpoint-be.onrender.com/user`, 'roleBaseUser');
+          setIsModalOpen(false);
+        }}
+      />
     </div>
   );
 };
