@@ -2,7 +2,7 @@ import Image from "next/image";
 import React, { useState, useEffect } from "react";
 import Cookies from "js-cookie";
 
-const ImageGalleryPopup = ({ onSelect, onClose ,onImageSelect}) => {
+const ImageGalleryPopup = ({ onSelect, onClose, onImageSelect,onCaption,caption }) => {
   const [images, setImages] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedImage, setSelectedImage] = useState(null);
@@ -33,8 +33,13 @@ const ImageGalleryPopup = ({ onSelect, onClose ,onImageSelect}) => {
         setIsLoading(false);
       }
     };
-
+    
+    if(caption==='deleteData'){
+      onCaption("")
+    }
+    onCaption("")
     fetchImages();
+
   }, []);
 
   const filteredImages = images.filter((img) =>
@@ -57,7 +62,8 @@ const ImageGalleryPopup = ({ onSelect, onClose ,onImageSelect}) => {
 
   const handleConfirm = () => {
     if (selectedImage) {
-      onImageSelect &&  onImageSelect(`https://dmpsza32x691.cloudfront.net/${selectedImage}`)
+      onImageSelect &&
+        onImageSelect(`https://dmpsza32x691.cloudfront.net/${selectedImage}`);
       onSelect && onSelect(selectedImage);
       onClose();
     }
@@ -83,7 +89,7 @@ const ImageGalleryPopup = ({ onSelect, onClose ,onImageSelect}) => {
         const data = await response.json();
         if (data.fileName) {
           setSelectedImage(data.fileName);
-          
+
           setImages((prev) => [data.fileName, ...prev]);
         }
       } catch (error) {
@@ -121,7 +127,9 @@ const ImageGalleryPopup = ({ onSelect, onClose ,onImageSelect}) => {
                   <div
                     key={index}
                     className={`aspect-w-1 aspect-h-1 relative h-32 cursor-pointer rounded overflow-hidden border ${
-                      selectedImage === img ? "border-blue-500" : "border-gray-300"
+                      selectedImage === img
+                        ? "border-blue-500"
+                        : "border-gray-300"
                     }`}
                     onClick={() => handleImageClick(img)}
                   >
@@ -131,7 +139,6 @@ const ImageGalleryPopup = ({ onSelect, onClose ,onImageSelect}) => {
                       layout="fill"
                       objectFit="cover"
                     />
-                    
                   </div>
                 ))}
               </div>
@@ -158,10 +165,10 @@ const ImageGalleryPopup = ({ onSelect, onClose ,onImageSelect}) => {
                 </div>
               )}
 
-              <div className="mt-4 flex justify-end">
+              <div className="mt-4 flex justify-end ">
                 <button
-                  className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:opacity-50"
-                  disabled={!selectedImage}
+                  className="px-4 py-2 bg-blue-500 w-full text-white rounded hover:bg-blue-600 disabled:opacity-50"
+                  disabled={!selectedImage ||caption==="" }
                   onClick={handleConfirm}
                 >
                   OK
@@ -186,14 +193,19 @@ const ImageGalleryPopup = ({ onSelect, onClose ,onImageSelect}) => {
           </div>
 
           {selectedImage && (
-            <div className="w-full aspect-w-1 h-96 aspect-h-1 relative border rounded overflow-hidden">
-              <Image
-                src={`https://dmpsza32x691.cloudfront.net/${selectedImage}`}
-                alt="Selected Image"
-                layout="fill"
-                objectFit="cover"
-              />
-            </div>
+            <>
+              <div className="w-full aspect-w-1 h-80 aspect-h-1 relative border rounded overflow-hidden">
+                <Image
+                  src={`https://dmpsza32x691.cloudfront.net/${selectedImage}`}
+                  alt="Selected Image"
+                  layout="fill"
+                  objectFit="cover"
+                />
+              </div>
+              {caption !== 'deleteData' && <div className="mt-2 bg-red-50 w-full">
+                <textarea type="text" placeholder="Alt Text " className="border p-1 focus:outline-none text-sm w-full" value={caption} onChange={(e)=>onCaption(e.target.value)} />
+              </div>}
+            </>
           )}
         </div>
       </div>
