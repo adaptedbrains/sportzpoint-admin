@@ -10,6 +10,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import useAllPostDataStore from "../store/useAllPostDataStore";
 import LiveBlogUpdate from "./LiveBlogUpdate";
+
 function ManagePostProperties({ type, id }) {
   const router = useRouter();
   const { allPosts } = useAllPostDataStore();
@@ -251,13 +252,12 @@ function ManagePostProperties({ type, id }) {
       );
     }
     return (
-      <>
+      <div className="w-full space-y-6">
         <ArticlePostEditComponent
           handleArticleFromData={handleArticleFromData}
           formDataPostEdit={formDataPostEdit}
         />
-
-        {pathname && pathname.split("/")[2] === "Web%20Story" ? (
+        {type === "webstory" ? (
           <WebStoryEditor content={webStory} htmlJsonGrab={htmlJsonGrab} />
         ) : (
           <RichTextEditor
@@ -266,68 +266,106 @@ function ManagePostProperties({ type, id }) {
           />
         )}
         <RestOfPostEdit formData={formData} setFormData={setFormData} />
-
-        <div className="flex justify-end gap-4 mt-6 bg-white p-4 rounded-lg shadow">
-          <button
-            className="px-6 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors duration-200"
-            onClick={() => {
-              submitData("draft");
-            }}
-          >
-            {isSubmitting ? "Saving..." : "Save as Draft"}
-          </button>
-
-          <button
-            className="px-6 py-2 bg-blue-100 text-blue-700 rounded-md hover:bg-blue-200 transition-colors duration-200"
-            onClick={() => {
-              submitData("send-for-approval");
-            }}
-          >
-            {isSubmitting ? "Sending..." : "Send for Approval"}
-          </button>
-
-          <button
-            className="px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors duration-200"
-            onClick={() => {
-              submitData("published");
-            }}
-          >
-            {isSubmitting ? "Publishing..." : "Publish"}
-          </button>
-        </div>
-      </>
+      </div>
     );
   };
 
   return (
     <div className="flex flex-col gap-2">
-     
-      {post?.type === "LiveBlog" && (
-        <div className="flex gap-4 mb-4">
-          <button
-            className={`px-4 py-2 rounded ${
-              view === "main"
-                ? "bg-blue-500 text-white"
-                : "bg-gray-200 text-gray-700"
-            }`}
-            onClick={() => setView("main")}
-          >
-            Main
-          </button>
-          <button
-            className={`px-4 py-2 rounded ${
-              view === "updates"
-                ? "bg-blue-500 text-white"
-                : "bg-gray-200 text-gray-700"
-            }`}
-            onClick={() => setView("updates")}
-          >
-            Updates
-          </button>
-        </div>
-      )}
+      <div className="sticky top-0 left-0 right-0 z-10 bg-white border-b border-gray-100 shadow-sm">
+        <div className="w-full px-4 sm:px-6 py-3">
+          <div className="flex justify-end gap-4">
+            <button
+              disabled={isSubmitting}
+              className={`px-4 py-2 text-sm font-medium transition-colors duration-200 ${
+                isSubmitting 
+                ? 'text-gray-400 cursor-not-allowed'
+                : 'text-gray-600 hover:text-gray-900'
+              }`}
+              onClick={() => submitData("draft")}
+            >
+              {isSubmitting ? (
+                <span className="flex items-center justify-center">
+                  <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Saving...
+                </span>
+              ) : "Save as Draft"}
+            </button>
 
-      {renderView()}
+            <button
+              disabled={isSubmitting}
+              className={`px-4 py-2 text-sm font-medium transition-colors duration-200 ${
+                isSubmitting 
+                ? 'text-blue-300 cursor-not-allowed'
+                : 'text-blue-600 hover:text-blue-800'
+              }`}
+              onClick={() => submitData("send-for-approval")}
+            >
+              {isSubmitting ? (
+                <span className="flex items-center justify-center">
+                  <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-blue-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Sending...
+                </span>
+              ) : "Send for Approval"}
+            </button>
+
+            <button
+              disabled={isSubmitting}
+              className={`px-4 py-2 text-sm font-medium transition-colors duration-200 ${
+                isSubmitting 
+                ? 'text-green-300 cursor-not-allowed'
+                : 'text-green-600 hover:text-green-800'
+              }`}
+              onClick={() => submitData("published")}
+            >
+              {isSubmitting ? (
+                <span className="flex items-center justify-center">
+                  <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-green-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Publishing...
+                </span>
+              ) : "Publish"}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div className="w-full px-4 sm:px-6 py-6 bg-white">
+        {post?.type === "LiveBlog" && (
+          <div className="flex gap-4 mb-4 w-full">
+            <button
+              className={`flex-1 px-4 py-2 rounded ${
+                view === "main"
+                  ? "bg-blue-500 text-white"
+                  : "bg-gray-200 text-gray-700"
+              }`}
+              onClick={() => setView("main")}
+            >
+              Main
+            </button>
+            <button
+              className={`flex-1 px-4 py-2 rounded ${
+                view === "updates"
+                  ? "bg-blue-500 text-white"
+                  : "bg-gray-200 text-gray-700"
+              }`}
+              onClick={() => setView("updates")}
+            >
+              Updates
+            </button>
+          </div>
+        )}
+
+        {renderView()}
+      </div>
     </div>
   );
 }

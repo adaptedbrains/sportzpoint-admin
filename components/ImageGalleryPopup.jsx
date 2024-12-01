@@ -2,14 +2,15 @@ import Image from "next/image";
 import React, { useState, useEffect } from "react";
 import Cookies from "js-cookie";
 
-const ImageGalleryPopup = ({ onSelect, onClose, onImageSelect, onCaption, caption }) => {
+const ImageGalleryPopup = ({ onSelect, onClose, onImageSelect }) => {
   const [images, setImages] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedImage, setSelectedImage] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
-  const [uploadCaption, setUploadCaption] = useState("");
+  const [altText, setAltText] = useState("");
   const [imageAltTexts, setImageAltTexts] = useState({});
+  const [error, setError] = useState("");
 
   const IMAGES_PER_PAGE = 8;
 
@@ -29,7 +30,6 @@ const ImageGalleryPopup = ({ onSelect, onClose, onImageSelect, onCaption, captio
         );
         const data = await response.json();
         setImages(data.files || []);
-        // Initialize alt texts from the API response if available
         if (data.altTexts) {
           setImageAltTexts(data.altTexts);
         }
@@ -42,6 +42,16 @@ const ImageGalleryPopup = ({ onSelect, onClose, onImageSelect, onCaption, captio
     
     fetchImages();
   }, []);
+
+  useEffect(() => {
+    // When an image is selected, populate alt text if it exists
+    if (selectedImage && imageAltTexts[selectedImage]) {
+      setAltText(imageAltTexts[selectedImage]);
+    } else {
+      setAltText(""); // Reset alt text when selecting a new image
+    }
+    setError(""); // Clear any previous errors
+  }, [selectedImage, imageAltTexts]);
 
   const filteredImages = images.filter((img) =>
     img.toLowerCase().includes(searchQuery.toLowerCase())
@@ -61,23 +71,43 @@ const ImageGalleryPopup = ({ onSelect, onClose, onImageSelect, onCaption, captio
     setCurrentPage(newPage);
   };
 
-  const handleConfirm = () => {
-    if (selectedImage && uploadCaption.trim()) {
-      onImageSelect &&
-        onImageSelect(`https://dmpsza32x691.cloudfront.net/${selectedImage}`);
-      onSelect && onSelect(selectedImage);
-      // Pass the alt text back when confirming image selection
-      onCaption && onCaption(uploadCaption.trim());
-      onClose();
+  const validateAndConfirm = () => {
+    if (!selectedImage) {
+      setError("Please select an image");
+      return;
     }
+    if (!altText.trim()) {
+      setError("Alt text is required");
+      return;
+    }
+
+    // Store the alt text for this image
+    setImageAltTexts(prev => ({
+      ...prev,
+      [selectedImage]: altText.trim()
+    }));
+    
+    if (onImageSelect) {
+      onImageSelect(`https://dmpsza32x691.cloudfront.net/${selectedImage}`, altText.trim());
+    }
+    if (onSelect) {
+      onSelect(selectedImage);
+    }
+    onClose();
   };
 
   const handleFileUpload = async (event) => {
     const file = event.target.files[0];
     if (file) {
+      if (!altText.trim()) {
+        setError("Please enter alt text before uploading an image");
+        return;
+      }
+
       const formData = new FormData();
       formData.append("file", file);
-      formData.append("altText", uploadCaption); // Send alt text with the upload
+      formData.append("altText", altText.trim());
+      
       try {
         const token = Cookies.get("token");
         const response = await fetch(
@@ -94,15 +124,14 @@ const ImageGalleryPopup = ({ onSelect, onClose, onImageSelect, onCaption, captio
         if (data.fileName) {
           setSelectedImage(data.fileName);
           setImages((prev) => [data.fileName, ...prev]);
-          // Store the alt text
           setImageAltTexts(prev => ({
             ...prev,
-            [data.fileName]: uploadCaption
+            [data.fileName]: altText.trim()
           }));
-          setUploadCaption(""); // Reset upload caption
         }
       } catch (error) {
         console.error("Error uploading file:", error);
+        setError("Failed to upload image. Please try again.");
       }
     }
   };
@@ -207,68 +236,59 @@ const ImageGalleryPopup = ({ onSelect, onClose, onImageSelect, onCaption, captio
             )}
           </div>
 
-          {/* Right Section: Selected Image and Upload */}
+          {/* Right Section: Image Details & Actions */}
           <div className="w-1/3 p-6 flex flex-col">
             <div className="mb-6">
-              <label className="block w-full text-center bg-blue-500 text-white py-3 px-4 rounded-lg cursor-pointer hover:bg-blue-600 transition-colors focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-blue-500">
-                <svg className="w-5 h-5 inline-block mr-2 -mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-                </svg>
-                Upload New Image
-                <input
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  onChange={handleFileUpload}
-                />
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Alt Text <span className="text-red-500">*</span>
               </label>
+              <input
+                type="text"
+                value={altText}
+                onChange={(e) => {
+                  setAltText(e.target.value);
+                  setError("");
+                }}
+                placeholder="Describe this image..."
+                className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 ${
+                  error && !altText.trim() ? 'border-red-500' : 'border-gray-300'
+                }`}
+              />
+              {error && (
+                <p className="mt-2 text-sm text-red-600">
+                  {error}
+                </p>
+              )}
             </div>
 
-            {selectedImage ? (
-              <>
-                <div className="flex-1 flex flex-col">
-                  <div className="relative aspect-video w-full rounded-lg overflow-hidden bg-gray-100 mb-4">
-                    <Image
-                      src={`https://dmpsza32x691.cloudfront.net/${selectedImage}`}
-                      alt={imageAltTexts[selectedImage] || "Selected Image"}
-                      layout="fill"
-                      objectFit="contain"
-                    />
-                  </div>
-                  <div className="space-y-4">
-                    <div>
-                      <label htmlFor="altText" className="block text-sm font-medium text-gray-700 mb-1">
-                        Alt Text (required)
-                      </label>
-                      <input
-                        id="altText"
-                        type="text"
-                        placeholder="Describe this image..."
-                        className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        value={uploadCaption}
-                        onChange={(e) => setUploadCaption(e.target.value)}
-                      />
-                    </div>
-                    <button
-                      className="w-full px-4 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                      disabled={!selectedImage || !uploadCaption.trim()}
-                      onClick={handleConfirm}
-                    >
-                      {!uploadCaption.trim() ? 'Please add alt text' : 'Insert Image'}
-                    </button>
-                  </div>
+            <div className="space-y-4">
+              <label className="block">
+                <span className="sr-only">Upload Image</span>
+                <div className="relative">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileUpload}
+                    className="hidden"
+                    id="file-upload"
+                  />
+                  <label
+                    htmlFor="file-upload"
+                    className="cursor-pointer w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                  >
+                    Upload New Image
+                  </label>
                 </div>
-              </>
-            ) : (
-              <div className="flex-1 flex items-center justify-center text-gray-500">
-                <div className="text-center">
-                  <svg className="w-16 h-16 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                  </svg>
-                  <p>Select an image to preview</p>
-                </div>
-              </div>
-            )}
+              </label>
+
+              <button
+                onClick={validateAndConfirm}
+                disabled={!selectedImage || !altText.trim()}
+                className="w-full inline-flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {!selectedImage ? 'Select an Image' : !altText.trim() ? 'Add Alt Text' : 'Confirm Selection'}
+              </button>
+            </div>
           </div>
         </div>
       </div>

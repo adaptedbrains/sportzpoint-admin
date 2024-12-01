@@ -1,142 +1,159 @@
 "use client";
 import { useState, useEffect } from 'react';
-import { FaEdit, FaTrash } from 'react-icons/fa';
+import { FaEdit, FaTrash, FaPlus } from 'react-icons/fa';
 import Cookies from 'js-cookie';
 import useDropDownDataStore from '../../store/dropDownDataStore';
 
 const TagsPage = () => {
-  const { allTags,fetchDropDownData} = useDropDownDataStore();
-
+  const { allTags, fetchDropDownData } = useDropDownDataStore();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [tags, setTags] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [newTag, setNewTag] = useState({ name: '', slug: '' });
 
- 
-  useEffect(()=>{
-    fetchDropDownData(`${process.env.NEXT_PUBLIC_API_URL}/tag`,'tag')
-  },[])
+  useEffect(() => {
+    fetchDropDownData(`${process.env.NEXT_PUBLIC_API_URL}/tag`, 'tag');
+  }, []);
 
   if (error) {
     return (
-      <div className="flex justify-center items-center min-h-screen bg-gray-50">
-        <p className="text-red-500">{error}</p>
+      <div className="flex justify-center items-center min-h-screen">
+        <div className="bg-red-50 text-red-700 px-4 py-3 rounded-lg">
+          {error}
+        </div>
       </div>
     );
   }
 
-  return (
-    <div className="flex justify-center min-h-screen bg-gray-50 pt-20 pb-6">
-      <div className="w-full max-w-6xl px-4 sm:px-6 lg:px-8">
-        {/* <div className="flex justify-between items-center mb-4">
-          <h1 className="text-xl font-semibold text-gray-800">Tags</h1>
-          <button 
-            onClick={() => setIsModalOpen(true)}
-            className="px-4 py-2 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700 transition-colors duration-200 shadow-sm"
-          >
-            Add Tag
-          </button>
-        </div> */}
-        
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 mt-2">
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b">
-                  <th className="text-left px-6 py-4 text-sm font-medium text-gray-500">Name</th>
-                  <th className="text-left px-6 py-4 text-sm font-medium text-gray-500">Slug</th>
-                  <th className="text-right px-6 py-4 text-sm font-medium text-gray-500">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100">
-                {allTags && allTags.map((tag) => (
-                  <tr 
-                    key={tag._id} 
-                    className="hover:bg-gray-50 transition-colors duration-200"
-                  >
-                    <td className="px-6 py-4 text-sm text-gray-700 whitespace-nowrap">
-                      {tag.name}
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-700 whitespace-nowrap">
-                      {tag.slug}
-                    </td>
-                    <td className="px-6 py-4 text-sm whitespace-nowrap text-right">
-                      <button className="text-blue-600 hover:text-blue-700 mr-3">
-                        <FaEdit size={16} />
-                      </button>
-                      <button className="text-red-600 hover:text-red-700">
-                        <FaTrash size={16} />
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    // Add tag submission logic here
+    setIsModalOpen(false);
+  };
 
-        {/* Add Tag Modal */}
-        {isModalOpen && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-lg p-6 w-full max-w-md">
-              <div className="flex justify-between items-center mb-4">
-                <h2 className="text-xl font-semibold">Add New Tag</h2>
-                <button 
-                  onClick={() => setIsModalOpen(false)}
-                  className="text-gray-500 hover:text-gray-700"
+  return (
+    <div className="p-6 pt-24">
+      <div className="flex justify-between items-center mb-8">
+        <div>
+          <h1 className="text-2xl font-semibold text-gray-800">Tags</h1>
+          <p className="text-sm text-gray-500 mt-1">Manage content tags and categories</p>
+        </div>
+        <button 
+          onClick={() => setIsModalOpen(true)}
+          className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200"
+        >
+          <FaPlus className="w-4 h-4 mr-2" />
+          Add Tag
+        </button>
+      </div>
+      
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead>
+              <tr className="bg-gray-50 border-b border-gray-200">
+                <th className="text-left px-6 py-4 text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                <th className="text-left px-6 py-4 text-xs font-medium text-gray-500 uppercase tracking-wider">Slug</th>
+                <th className="text-right px-6 py-4 text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-200">
+              {allTags && allTags.map((tag) => (
+                <tr 
+                  key={tag._id} 
+                  className="hover:bg-gray-50 transition-colors duration-200"
                 >
-                  ×
-                </button>
+                  <td className="px-6 py-4 text-sm font-medium text-gray-900 whitespace-nowrap">
+                    {tag.name}
+                  </td>
+                  <td className="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">
+                    {tag.slug}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-right">
+                    <button 
+                      className="text-blue-600 hover:text-blue-700 p-1 rounded-full hover:bg-blue-50 transition-colors duration-200 mr-2"
+                      title="Edit tag"
+                    >
+                      <FaEdit size={16} />
+                    </button>
+                    <button 
+                      className="text-red-600 hover:text-red-700 p-1 rounded-full hover:bg-red-50 transition-colors duration-200"
+                      title="Delete tag"
+                    >
+                      <FaTrash size={16} />
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* Add Tag Modal */}
+      {isModalOpen && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-xl p-6 w-full max-w-md relative">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-xl font-semibold text-gray-900">Add New Tag</h2>
+              <button 
+                onClick={() => setIsModalOpen(false)}
+                className="text-gray-400 hover:text-gray-500 p-1 rounded-full hover:bg-gray-100 transition-colors duration-200"
+              >
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Name
+                </label>
+                <input
+                  type="text"
+                  value={newTag.name}
+                  onChange={(e) => setNewTag({ ...newTag, name: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow duration-200"
+                  placeholder="Enter tag name"
+                />
               </div>
 
-              <form className="space-y-4">
-                {/* Name Input */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Name
-                  </label>
-                  <input
-                    type="text"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Enter tag name"
-                  />
-                </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Slug
+                </label>
+                <input
+                  type="text"
+                  value={newTag.slug}
+                  onChange={(e) => setNewTag({ ...newTag, slug: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow duration-200"
+                  placeholder="Enter tag slug"
+                />
+              </div>
 
-                {/* Slug Input */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Slug
-                  </label>
-                  <input
-                    type="text"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="enter-slug"
-                  />
-                </div>
-
-                {/* Submit Buttons */}
-                <div className="flex justify-end gap-3 mt-6">
-                  <button
-                    type="button"
-                    onClick={() => setIsModalOpen(false)}
-                    className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md transition-colors duration-200"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    className="px-4 py-2 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700 transition-colors duration-200"
-                  >
-                    Add Tag
-                  </button>
-                </div>
-              </form>
-            </div>
+              <div className="flex justify-end space-x-3 pt-4">
+                <button
+                  type="button"
+                  onClick={() => setIsModalOpen(false)}
+                  className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors duration-200"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200"
+                >
+                  Add Tag
+                </button>
+              </div>
+            </form>
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 };
 
-export default TagsPage; 
+export default TagsPage;
