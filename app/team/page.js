@@ -5,11 +5,11 @@ import Cookies from 'js-cookie';
 
 const Page = () => {
   const { allRoleBaseUser, fetchDropDownData } = useDropDownDataStore();
- const [users, setUsers] = useState([])
+  const [users, setUsers] = useState([])
   useEffect(() => {
     fetchDropDownData(`https://sportzpoint-be.onrender.com/user`, 'roleBaseUser');
-    
   }, [fetchDropDownData]);
+  
   useEffect(()=>{
     setUsers(allRoleBaseUser)
   },[allRoleBaseUser])
@@ -17,11 +17,11 @@ const Page = () => {
   const getRoleColor = (role) => {
     switch (role) {
       case 'Author':
-        return 'bg-blue-200 text-blue-800';
+        return 'bg-blue-50 text-blue-700 ring-1 ring-inset ring-blue-600/20';
       case 'Editor':
-        return 'bg-yellow-200 text-yellow-800';
+        return 'bg-amber-50 text-amber-700 ring-1 ring-inset ring-amber-600/20';
       case 'Admin':
-        return 'bg-red-200 text-red-800';
+        return 'bg-red-50 text-red-700 ring-1 ring-inset ring-red-600/20';
       default:
         return '';
     }
@@ -44,14 +44,12 @@ const Page = () => {
 
       if (response.ok) {
         const updatedUser = await response.json();
-
         setUsers((prevUsers) => {
           const index = prevUsers.findIndex((user) => user._id === userId);
           if (index !== -1) {
             const updatedUsers = [...prevUsers];
             updatedUsers[index] = updatedUser.updatedUser;
             return updatedUsers;
-            
           }
           return prevUsers;
         });
@@ -64,47 +62,69 @@ const Page = () => {
   };
 
   return (
-    <div className="mx-[15px] mt-16 bg-white rounded">
-      <table className="min-w-full table-auto border-collapse">
-        <thead>
-          <tr className="bg-gray-100 text-left">
-            <th className="px-4 py-2 border-b font-semibold">Name</th>
-            <th className="px-4 py-2 border-b font-semibold">Email</th>
-            <th className="px-4 py-2 border-b font-semibold">Roles</th>
-            <th className="px-4 py-2 border-b font-semibold">Edit</th>
-          </tr>
-        </thead>
-        <tbody>
-          {users &&
-            users.map((user) => (
-              <tr key={user._id} className="border-b hover:bg-gray-50">
-                <td className="px-4 py-2">{user.name}</td>
-                <td className="px-4 py-2">{user.email}</td>
-                <td className="px-4 py-2">
-                  {user.roles.map((role, index) => (
-                    <span
-                      key={index}
-                      className={`px-2 py-1 rounded ${getRoleColor(role)}`}
-                    >
-                      {role}
-                    </span>
-                  ))}
-                </td>
-                <td className="px-4 py-2">
-                  <select
-                    onChange={(e) => handleRoleChange(user._id, e.target.value)}
-                    className="px-4 py-2 border rounded"
-                    defaultValue={user.roles[0]}
-                  >
-                    <option value="Editor">Editor</option>
-                    <option value="Author">Author</option>
-                    <option value="Admin">Admin</option>
-                  </select>
-                </td>
+    <div className="p-6 pt-24">
+      <div className="mb-6">
+        <h1 className="text-2xl font-semibold text-gray-800">Team Members</h1>
+        <p className="text-sm text-gray-500 mt-1">Manage team members and their roles</p>
+      </div>
+      
+      <div className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead>
+              <tr className="bg-gray-50">
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Name
+                </th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Email
+                </th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Role
+                </th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Actions
+                </th>
               </tr>
-            ))}
-        </tbody>
-      </table>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {users && users.map((user) => (
+                <tr key={user._id} className="hover:bg-gray-50 transition-colors duration-200">
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm font-medium text-gray-900">{user.name}</div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm text-gray-500">{user.email}</div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="flex gap-2">
+                      {user.roles.map((role, index) => (
+                        <span
+                          key={index}
+                          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getRoleColor(role)}`}
+                        >
+                          {role}
+                        </span>
+                      ))}
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <select
+                      onChange={(e) => handleRoleChange(user._id, e.target.value)}
+                      className="block w-full text-sm rounded-lg border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200"
+                      defaultValue={user.roles[0]}
+                    >
+                      <option value="Editor">Editor</option>
+                      <option value="Author">Author</option>
+                      <option value="Admin">Admin</option>
+                    </select>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
   );
 };
