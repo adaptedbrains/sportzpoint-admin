@@ -40,29 +40,44 @@ function RestOfPostEdit({ formData, setFormData }) {
   };
 
   return (
-    <div className="rounded-lg border bg-white">
-      <div className="p-4 border-b">
-        <h2 className="text-lg font-medium">Manage Post Properties</h2>
+    <div className="w-full rounded-xl border border-gray-100 bg-white shadow-sm">
+      <div className="p-6 border-b border-gray-100">
+        <h2 className="text-xl font-semibold text-gray-800">Post Properties</h2>
       </div>
       
-      <div className="p-4 space-y-4">
-        <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-500 mb-1">
-            Primary Category *
+      <div className="p-6 space-y-6">
+        <div className="space-y-2 w-full">
+          <label className="block text-sm font-medium text-gray-700">
+            Primary Category <span className="text-red-500">*</span>
           </label>
           <Select
             value={formData.primaryCategory}
             onChange={(value) => handleChange(value, 'primaryCategory')}
             options={categoryOptions}
-            className="basic-single"
+            className="basic-single w-full"
             classNamePrefix="select"
             isClearable
             placeholder="Select Primary Category"
+            styles={{
+              control: (base) => ({
+                ...base,
+                width: '100%',
+                padding: '2px',
+                borderColor: '#e5e7eb',
+                '&:hover': {
+                  borderColor: '#3b82f6'
+                }
+              }),
+              placeholder: (base) => ({
+                ...base,
+                color: '#9ca3af'
+              })
+            }}
           />
         </div>
 
-        <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+        <div className="space-y-2 w-full">
+          <label className="block text-sm font-medium text-gray-700">
             Additional Categories
           </label>
           <Select
@@ -70,14 +85,34 @@ function RestOfPostEdit({ formData, setFormData }) {
             value={formData.additionalCategories}
             onChange={(value) => handleChange(value, 'additionalCategories')}
             options={categoryOptions}
-            className="basic-multi-select"
+            className="basic-multi-select w-full"
             classNamePrefix="select"
             placeholder="Select Additional Categories"
+            styles={{
+              control: (base) => ({
+                ...base,
+                width: '100%',
+                padding: '2px',
+                borderColor: '#e5e7eb',
+                '&:hover': {
+                  borderColor: '#3b82f6'
+                }
+              }),
+              multiValue: (base) => ({
+                ...base,
+                backgroundColor: '#f3f4f6',
+                borderRadius: '4px'
+              }),
+              placeholder: (base) => ({
+                ...base,
+                color: '#9ca3af'
+              })
+            }}
           />
         </div>
 
-        <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+        <div className="space-y-2 w-full">
+          <label className="block text-sm font-medium text-gray-700">
             Tags
           </label>
           <Select
@@ -85,36 +120,76 @@ function RestOfPostEdit({ formData, setFormData }) {
             value={formData.tags}
             onChange={(value) => handleChange(value, 'tags')}
             options={tagOptions}
-            className="basic-multi-select"
+            className="basic-multi-select w-full"
             classNamePrefix="select"
             placeholder="Select Tags"
+            styles={{
+              control: (base) => ({
+                ...base,
+                width: '100%',
+                padding: '2px',
+                borderColor: '#e5e7eb',
+                '&:hover': {
+                  borderColor: '#3b82f6'
+                }
+              }),
+              multiValue: (base) => ({
+                ...base,
+                backgroundColor: '#f3f4f6',
+                borderRadius: '4px'
+              }),
+              placeholder: (base) => ({
+                ...base,
+                color: '#9ca3af'
+              })
+            }}
           />
         </div>
 
-        <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Credits *
+        <div className="space-y-2 w-full">
+          <label className="block text-sm font-medium text-gray-700">
+            Credits <span className="text-red-500">*</span>
           </label>
           <Select
             isMulti
             value={formData.credits}
             onChange={(value) => handleChange(value, 'credits')}
             options={creditOptions}
-            className="basic-multi-select"
+            className="basic-multi-select w-full"
             classNamePrefix="select"
             placeholder="Select Credits"
+            styles={{
+              control: (base) => ({
+                ...base,
+                width: '100%',
+                padding: '2px',
+                borderColor: '#e5e7eb',
+                '&:hover': {
+                  borderColor: '#3b82f6'
+                }
+              }),
+              multiValue: (base) => ({
+                ...base,
+                backgroundColor: '#f3f4f6',
+                borderRadius: '4px'
+              }),
+              placeholder: (base) => ({
+                ...base,
+                color: '#9ca3af'
+              })
+            }}
           />
         </div>
 
-        <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+        <div className="space-y-2 w-full">
+          <label className="block text-sm font-medium text-gray-700">
             Focus Keyphrase
           </label>
           <input
             type="text"
             value={formData.focusKeyphrase}
             onChange={(e) => handleChange(e.target.value, 'focusKeyphrase')}
-            className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-200 focus:border-indigo-500 sm:text-sm"
+            className="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-150"
             placeholder="Enter focus keyphrase"
           />
         </div>
