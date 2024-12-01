@@ -11,7 +11,7 @@ const RichTextEditor = ({ content, htmlContentGrab }) => {
   const [imageCaption, setImageCaption] = useState("");
 
   const grabImageCaption = (e) => {
-    setImageCaption(e.target.value);
+    setImageCaption(e?.target?.value || e);
   };
 
   const openImageGallery = (callback) => {
@@ -26,7 +26,7 @@ const RichTextEditor = ({ content, htmlContentGrab }) => {
       const captionHTML = `
         <figure style="text-align: center;">
           <img src="${url}" alt="${imageCaption}" style="max-width: 100%; height: auto;" />
-          <figcaption style="font-style: italic; color: #666;">${imageCaption}</figcaption>
+           <figcaption style="font-style: italic; color: #666;">${imageCaption}</figcaption>
         </figure>
       `;
       editor.execCommand('mceInsertContent', false, captionHTML);
