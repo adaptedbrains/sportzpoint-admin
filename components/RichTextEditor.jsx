@@ -1,6 +1,13 @@
 'use client';
-import React, { useRef, useState } from 'react';
-import { Editor } from '@tinymce/tinymce-react';
+import React, { useRef, useState, useEffect } from 'react';
+import dynamic from 'next/dynamic';
+
+// Dynamically import TinyMCE with no SSR
+const Editor = dynamic(
+  () => import('@tinymce/tinymce-react').then(mod => mod.Editor),
+  { ssr: false }
+);
+
 import ImageGalleryPopup from './ImageGalleryPopup';
 
 const RichTextEditor = ({ content, htmlContentGrab }) => {
@@ -9,6 +16,11 @@ const RichTextEditor = ({ content, htmlContentGrab }) => {
   const [imageCallback, setImageCallback] = useState(null);
   const [isEditorReady, setIsEditorReady] = useState(false);
   const [imageCaption, setImageCaption] = useState("");
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   const grabImageCaption = (e) => {
     setImageCaption(e?.target?.value || e);
@@ -33,6 +45,19 @@ const RichTextEditor = ({ content, htmlContentGrab }) => {
     }
     setIsGalleryOpen(false);
   };
+
+  if (!isMounted) {
+    return (
+      <div className="bg-white rounded-lg shadow-lg">
+        <div className="border-b border-gray-200 p-4">
+          <h2 className="text-xl font-semibold text-gray-800">Content</h2>
+        </div>
+        <div className="p-4 text-center text-gray-600">
+          Loading editor...
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-white rounded-lg shadow-lg">
@@ -65,6 +90,9 @@ const RichTextEditor = ({ content, htmlContentGrab }) => {
             'insertdatetime', 'media', 'table', 'help', 'wordcount', 'emoticons'
           ],
           toolbar: 'styles fontsize | bold italic | image media table link | alignleft aligncenter alignright | bullist numlist',
+          browser_spellcheck: true,
+          gecko_spellcheck: true,
+          contextmenu: false,
           file_picker_callback: (callback, value, meta) => {
             if (meta.filetype === 'image') {
               openImageGallery(callback);

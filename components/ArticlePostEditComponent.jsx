@@ -66,7 +66,14 @@ const ArticlePostEditComponent = ({
     handleArticleFromData("banner_desc", value);
   };
 
-  
+  const selecttedImageForBanner = (filename) => {
+    setFeaturedImage(`https://dmpsza32x691.cloudfront.net/${filename}`);
+    handleArticleFromData("banner_image", filename);
+  };
+
+  const handleImageAltText = (altText) => {
+    handleArticleFromData("banner_desc", altText);
+  };
 
   // const handleDragOver = (e) => {
   //   e.preventDefault();
@@ -87,19 +94,17 @@ const ArticlePostEditComponent = ({
   //     alert("Please upload a valid image file!");
   //   }
   // };
-  const deleteImageCaption=()=>{
-    handleArticleFromData("banner_desc", "");
-  }
-
-  const selecttedImageForBanner=(filename)=>{
-    setFeaturedImage(`https://dmpsza32x691.cloudfront.net/${filename}`)
-   
-    handleArticleFromData("banner_image", filename);
-  }
 
   return (
     <div className="bg-white p-6 rounded-lg shadow-md">
-      {gallery && <ImageGalleryPopup onClose={toggleGalleyButton}  onSelect={selecttedImageForBanner} onCaption={deleteImageCaption} caption={"deleteData"}  />}
+      {gallery && (
+        <ImageGalleryPopup 
+          onClose={toggleGalleyButton}  
+          onSelect={selecttedImageForBanner} 
+          onCaption={handleImageAltText}
+          caption={formDataPostEdit.banner_desc || ""}
+        />
+      )}
       <h2 className="text-xl font-bold mb-4">Manage Post Properties</h2>
 
       {/* Title */}
@@ -166,15 +171,12 @@ const ArticlePostEditComponent = ({
         </label>
         <textarea
           id="metaDescription"
-          
           value={formDataPostEdit.seo_desc}
           onChange={handleMetaDescriptionChange}
           className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-200 focus:border-indigo-500 sm:text-sm"
         />
         <div className="text-sm text-gray-500 mt-1">
-          {formDataPostEdit.seo_desc &&
-            formDataPostEdit.seo_desc.split(" ").length}{" "}
-          / 160
+          {formDataPostEdit.seo_desc ? formDataPostEdit.seo_desc.length : 0} / 160
         </div>
       </div>
 
