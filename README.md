@@ -2,7 +2,19 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 
 ## Getting Started
 
-First, run the development server:
+First, install the dependencies:
+
+```bash
+npm install
+# or
+yarn install
+# or
+pnpm install
+# or
+bun install  # Fastest option
+```
+
+Then, run the development server:
 
 ```bash
 npm run dev
@@ -11,8 +23,29 @@ yarn dev
 # or
 pnpm dev
 # or
+bun dev     # Fastest option
+```
+
+### Using Bun (Optional)
+
+This project supports [Bun](https://bun.sh) as an optional, faster alternative to Node.js. To use Bun:
+
+1. Install Bun:
+```bash
+curl -fsSL https://bun.sh/install | bash
+```
+
+2. Install dependencies:
+```bash
+bun install
+```
+
+3. Start the development server:
+```bash
 bun dev
 ```
+
+Bun provides faster installation and development server startup times compared to Node.js. However, using Node.js (npm, yarn, or pnpm) remains fully supported.
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
