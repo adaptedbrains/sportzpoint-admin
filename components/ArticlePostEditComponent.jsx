@@ -87,7 +87,9 @@ const ArticlePostEditComponent = ({
   //     alert("Please upload a valid image file!");
   //   }
   // };
-
+  const deleteImageCaption=()=>{
+    handleArticleFromData("banner_desc", "");
+  }
 
   const selecttedImageForBanner=(filename)=>{
     setFeaturedImage(`https://dmpsza32x691.cloudfront.net/${filename}`)
@@ -97,7 +99,7 @@ const ArticlePostEditComponent = ({
 
   return (
     <div className="bg-white p-6 rounded-lg shadow-md">
-      {gallery && <ImageGalleryPopup onClose={toggleGalleyButton}  onSelect={selecttedImageForBanner} onCaption={handleBanner_descDescriptionChange} caption={formDataPostEdit.banner_desc} />}
+      {gallery && <ImageGalleryPopup onClose={toggleGalleyButton}  onSelect={selecttedImageForBanner} onCaption={deleteImageCaption} caption={"deleteData"}  />}
       <h2 className="text-xl font-bold mb-4">Manage Post Properties</h2>
 
       {/* Title */}
@@ -220,7 +222,7 @@ const ArticlePostEditComponent = ({
             {/* <input type="text" value={formDataPostEdit.banner_image}  onChange={(e)=>handleArticleFromData(e.target.value)}   /> */}
           </label>
         </div>
-          <input type="text" onChange={handleBanner_descDescriptionChange} value={formDataPostEdit.banner_desc} placeholder="Banner Desc" className="mt-4 border border-dashed rounded outline-none focus:outline-none px-5 py-1 w-1/2 border-gray-100 bg-gray-100 mx-auto" />
+          <input type="text" onChange={handleBanner_descDescriptionChange} value={formDataPostEdit.banner_desc} placeholder="Alt Text" className="mt-4 border border-dashed rounded outline-none focus:outline-none px-5 py-1 w-1/2 border-gray-100 bg-gray-100 mx-auto" />
       </div>
     </div>
   );
