@@ -15,33 +15,22 @@ const RichTextEditor = ({ content, htmlContentGrab }) => {
   const [isGalleryOpen, setIsGalleryOpen] = useState(false);
   const [imageCallback, setImageCallback] = useState(null);
   const [isEditorReady, setIsEditorReady] = useState(false);
-  const [imageCaption, setImageCaption] = useState("");
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
     setIsMounted(true);
   }, []);
 
-  const grabImageCaption = (e) => {
-    setImageCaption(e?.target?.value || e);
-  };
-
   const openImageGallery = (callback) => {
     setImageCallback(() => callback);
     setIsGalleryOpen(true);
   };
 
-  const onImageSelect = (url) => {
+  const onImageSelect = (url, altText) => {
     if (imageCallback) {
-      // Insert custom HTML with the image and caption
-      const editor = editorRef.current;
-      const captionHTML = `
-        <figure style="text-align: center;">
-          <img src="${url}" alt="${imageCaption}" style="max-width: 100%; height: auto;" />
-           <figcaption style="font-style: italic; color: #666;">${imageCaption}</figcaption>
-        </figure>
-      `;
-      editor.execCommand('mceInsertContent', false, captionHTML);
+      // Call the TinyMCE callback with the image URL
+      // This ensures TinyMCE handles the image insertion with proper attributes
+      imageCallback(url, { alt: altText });
     }
     setIsGalleryOpen(false);
   };
@@ -93,24 +82,44 @@ const RichTextEditor = ({ content, htmlContentGrab }) => {
           browser_spellcheck: true,
           gecko_spellcheck: true,
           contextmenu: false,
-          file_picker_callback: (callback, value, meta) => {
+          file_picker_callback: function(callback, value, meta) {
+            // Only register callback for images
             if (meta.filetype === 'image') {
-              openImageGallery(callback);
+              openImageGallery((url, info) => {
+                callback(url, info);
+              });
             }
           },
+          // Image settings
+          image_caption: true,
+          image_advtab: true,
+          image_dimensions: true,
+          image_description: true,
+          image_title: true,
+          automatic_uploads: false,
+          images_upload_handler: function(blobInfo, progress) {
+            return new Promise((resolve, reject) => {
+              reject('Please use the image gallery to upload images');
+            });
+          },
+          // Extended image styles
+          image_class_list: [
+            { title: 'None', value: '' },
+            { title: 'Responsive', value: 'img-fluid' }
+          ],
           content_style: `
             body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif; font-size: 14px; line-height: 1.6; color: #333; margin: 1rem; }
-            figure { margin: 0; padding: 0; }
-            figcaption { font-style: italic; color: #666; text-align: center; margin-top: 0.5rem; }
-          `,
+            figure { margin: 1em 0; padding: 0; text-align: center; }
+            figure img { max-width: 100%; height: auto; }
+            figure figcaption { font-style: italic; color: #666; margin-top: 0.5em; font-size: 0.9em; }
+            .img-fluid { max-width: 100%; height: auto; }
+          `
         }}
       />
       {isGalleryOpen && (
         <ImageGalleryPopup
           onImageSelect={onImageSelect}
           onClose={() => setIsGalleryOpen(false)}
-          onCaption={grabImageCaption}
-          caption={imageCaption}
         />
       )}
     </div>
