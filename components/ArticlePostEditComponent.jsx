@@ -66,7 +66,14 @@ const ArticlePostEditComponent = ({
     handleArticleFromData("banner_desc", value);
   };
 
-  
+  const selecttedImageForBanner = (filename) => {
+    setFeaturedImage(`https://dmpsza32x691.cloudfront.net/${filename}`);
+    handleArticleFromData("banner_image", filename);
+  };
+
+  const handleImageAltText = (altText) => {
+    handleArticleFromData("banner_desc", altText);
+  };
 
   // const handleDragOver = (e) => {
   //   e.preventDefault();
@@ -87,19 +94,17 @@ const ArticlePostEditComponent = ({
   //     alert("Please upload a valid image file!");
   //   }
   // };
-  const deleteImageCaption=()=>{
-    handleArticleFromData("banner_desc", "");
-  }
-
-  const selecttedImageForBanner=(filename)=>{
-    setFeaturedImage(`https://dmpsza32x691.cloudfront.net/${filename}`)
-   
-    handleArticleFromData("banner_image", filename);
-  }
 
   return (
     <div className="bg-white p-6 rounded-lg shadow-md">
-      {gallery && <ImageGalleryPopup onClose={toggleGalleyButton}  onSelect={selecttedImageForBanner} onCaption={deleteImageCaption} caption={"deleteData"}  />}
+      {gallery && (
+        <ImageGalleryPopup 
+          onClose={toggleGalleyButton}  
+          onSelect={selecttedImageForBanner} 
+          onCaption={handleImageAltText}
+          caption={formDataPostEdit.banner_desc || ""}
+        />
+      )}
       <h2 className="text-xl font-bold mb-4">Manage Post Properties</h2>
 
       {/* Title */}
