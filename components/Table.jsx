@@ -148,57 +148,56 @@ export default function Table({
               <tr key={index} className="hover:bg-gray-50 transition-colors duration-150">
                 <td className="px-4 py-3">
                   <div className="text-sm font-medium text-gray-900 truncate max-w-md">
-                    {article.title}
+                    {article?.title || 'Untitled'}
                   </div>
                 </td>
                 <td className="px-4 py-3">
                   <div className="text-sm text-gray-500">
-                    {article.primary_category?.map((e, i) => (
+                    {article?.primary_category?.map((e, i) => (
                       <div key={i}>
-                        {e.name}
-                        {i < article.primary_category.length - 1 && ", "}
+                        {e?.name}
+                        {i < (article?.primary_category?.length || 0) - 1 && ", "}
                       </div>
-                    ))}
+                    )) || 'Uncategorized'}
                   </div>
                 </td>
                 <td className="px-4 py-3">
                   <div className="text-sm text-gray-500">
-                    {article.credits?.map((c, i) => (
+                    {article?.credits?.map((c, i) => (
                       <span key={i}>
-                        {c.name}
-                        {i < article.credits.length - 1 ? ", " : ""}
+                        {c?.name}
+                        {i < (article?.credits?.length || 0) - 1 ? ", " : ""}
                       </span>
-                    ))}
+                    )) || 'No credits'}
                   </div>
                 </td>
                 <td className="px-4 py-3 text-center">
                   <div className="text-sm text-gray-500">
-                    {article.content && article.content.split(" ").length}
+                    {article?.content ? article.content.split(" ").length : 0}
                   </div>
                 </td>
                 <td className="px-4 py-3 text-center">
                   <span
                     className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
-                      article.seoScore === 100
+                      (article?.seoScore || 0) === 100
                         ? "bg-green-100 text-green-800"
                         : "bg-yellow-100 text-yellow-800"
                     }`}
                   >
-                    {10}
+                    {article?.seoScore || 0}
                   </span>
                 </td>
                 <td className="px-4 py-3">
                   <div className="text-sm text-gray-500">
-                    {formatDate(article.published_at_datetime)}
+                    {article?.published_at_datetime ? formatDate(article.published_at_datetime) : 'Not published'}
                   </div>
                 </td>
                 <td className="px-4 py-3 text-center">
                   <div className="flex items-center justify-center gap-2">
                     <button
                       onClick={() => {
-                        const type = article?.type ?? "defaultType";
-                        const views = article?.views ?? "0";
-                        router.push(`/posts/${type}/${article._id}`);
+                        const type = article?.type?.toLowerCase() ?? "article";
+                        router.push(`/posts/${type}/${article?._id}`);
                       }}
                       className="p-1 text-gray-600 hover:text-blue-600 transition-colors duration-150"
                     >
@@ -206,7 +205,8 @@ export default function Table({
                     </button>
                     <button
                       onClick={() => {
-                        router.push(`/posts/${type}/edit/${article._id}`);
+                        const type = article?.type?.toLowerCase() ?? "article";
+                        router.push(`/posts/${type}/edit/${article?._id}`);
                       }}
                       className="p-1 text-gray-600 hover:text-blue-600 transition-colors duration-150"
                     >
@@ -214,6 +214,10 @@ export default function Table({
                     </button>
                     <button 
                       onClick={() => {
+                        if (!article?.primary_category?.[0]?.slug || !article?.slug) {
+                          alert('URL not available');
+                          return;
+                        }
                         const url = `${process.env.NEXT_PUBLIC_API_URL2}/${article.primary_category[0].slug}/${article.slug}`;
                         navigator.clipboard
                           .writeText(url)
