@@ -1,167 +1,195 @@
 'use client';
 import { useState, useRef } from 'react';
-import { FaTimes, FaCamera } from 'react-icons/fa';
+import { FaTimes, FaCamera, FaFacebookF, FaLinkedinIn } from 'react-icons/fa';
+import { FaXTwitter } from 'react-icons/fa6';
 import Image from 'next/image';
 
 const ProfileModal = ({ isOpen, onClose, userData }) => {
+  // TODO: Implement actual user data fetching and state management
   const fileInputRef = useRef(null);
   const [formData, setFormData] = useState({
-    name: userData?.name || '',
-    email: userData?.email || '',
-    avatar: null
+    name: 'John Doe', // TODO: Replace with actual user data
+    email: 'john@example.com',
+    avatar: null,
+    bio: '',
+    twitter: '',
+    facebook: '',
+    linkedin: ''
   });
-  const [previewUrl, setPreviewUrl] = useState(userData?.avatar || '');
+  const [previewUrl, setPreviewUrl] = useState('/default-avatar.png');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
+  // TODO: Implement actual image upload functionality
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      if (file.size > 5 * 1024 * 1024) { // 5MB limit
-        setError('Image size should be less than 5MB');
-        return;
-      }
-      
-      setFormData(prev => ({ ...prev, avatar: file }));
-      setPreviewUrl(URL.createObjectURL(file));
+      setError('Image upload functionality will be implemented later');
     }
   };
 
+  // TODO: Implement actual form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
-    setError('');
-
-    try {
-      const token = localStorage.getItem('token');
-      const userId = localStorage.getItem('userId');
-      
-      // Create FormData to handle file upload
-      const formDataToSend = new FormData();
-      formDataToSend.append('name', formData.name);
-      formDataToSend.append('email', formData.email);
-      if (formData.avatar) {
-        formDataToSend.append('avatar', formData.avatar);
-      }
-
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/user/team-members/update/${userId}`, {
-        method: 'PUT',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          // Don't set Content-Type here, let the browser set it with the boundary
-        },
-        body: formDataToSend
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to update profile');
-      }
-
-      const data = await response.json();
-      onClose();
-      window.location.reload(); // Refresh to show updated data
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
+    setError('Profile update functionality will be implemented later');
   };
 
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
-      <div className="bg-white rounded-lg w-full max-w-md p-6 relative">
-        <button
-          onClick={onClose}
-          className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
-        >
-          <FaTimes />
-        </button>
-
-        <h2 className="text-xl font-semibold mb-6">Edit Profile</h2>
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+      <div className="bg-white rounded-lg w-full max-w-md overflow-hidden shadow-xl">
+        {/* Header */}
+        <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center">
+          <h2 className="text-lg font-medium text-gray-900">Edit Profile</h2>
+          <button
+            onClick={onClose}
+            className="text-gray-400 hover:text-gray-500 transition-colors"
+          >
+            <FaTimes />
+          </button>
+        </div>
 
         {error && (
-          <div className="mb-4 p-2 bg-red-100 text-red-600 rounded">
+          <div className="mx-6 mt-4 p-2 bg-red-50 border border-red-100 text-red-600 text-sm rounded">
             {error}
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="p-6">
           {/* Avatar Upload Section */}
-          <div className="flex flex-col items-center mb-6">
+          <div className="flex justify-center mb-6">
             <div className="relative">
-              <div className="w-24 h-24 rounded-full overflow-hidden bg-gray-100">
-                {previewUrl ? (
-                  <Image
-                    src={previewUrl}
-                    alt="Profile"
-                    width={96}
-                    height={96}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center bg-gray-200">
-                    <FaCamera className="text-gray-400 text-2xl" />
-                  </div>
-                )}
+              <div className="w-20 h-20 rounded-full overflow-hidden bg-gray-50 ring-2 ring-gray-100">
+                <Image
+                  src={previewUrl}
+                  alt="Profile"
+                  width={80}
+                  height={80}
+                  className="w-full h-full object-cover"
+                />
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current.click()}
+                  className="absolute bottom-0 right-0 bg-white shadow-md text-gray-600 rounded-full p-1.5 hover:text-gray-900 transition-colors"
+                >
+                  <FaCamera className="text-sm" />
+                </button>
               </div>
-              <button
-                type="button"
-                onClick={() => fileInputRef.current.click()}
-                className="absolute bottom-0 right-0 bg-blue-500 text-white rounded-full p-2 hover:bg-blue-600"
-              >
-                <FaCamera className="text-2xl" />
-              </button>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleImageChange}
+                className="hidden"
+              />
             </div>
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              onChange={handleImageChange}
-              className="hidden"
-            />
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Name
-            </label>
-            <input
-              type="text"
-              value={formData.name}
-              onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
-              required
-            />
+          <div className="space-y-4">
+            {/* Basic Info */}
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs font-medium text-gray-500 mb-1">
+                  Name
+                </label>
+                <input
+                  type="text"
+                  value={formData.name}
+                  onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                  className="w-full px-3 py-1.5 text-sm border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-500 mb-1">
+                  Email
+                </label>
+                <input
+                  type="email"
+                  value={formData.email}
+                  onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
+                  className="w-full px-3 py-1.5 text-sm border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                  required
+                />
+              </div>
+            </div>
+
+            {/* Bio */}
+            <div>
+              <label className="block text-xs font-medium text-gray-500 mb-1">
+                Bio
+              </label>
+              <textarea
+                value={formData.bio}
+                onChange={(e) => setFormData(prev => ({ ...prev, bio: e.target.value }))}
+                className="w-full px-3 py-1.5 text-sm border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 min-h-[80px] resize-none"
+                placeholder="Tell us about yourself..."
+              />
+            </div>
+
+            {/* Social Links */}
+            <div>
+              <label className="block text-xs font-medium text-gray-500 mb-3">
+                Social Links
+              </label>
+              <div className="space-y-3">
+                <div className="flex items-center">
+                  <span className="text-gray-900 w-6">
+                    <FaXTwitter />
+                  </span>
+                  <input
+                    type="url"
+                    value={formData.twitter}
+                    onChange={(e) => setFormData(prev => ({ ...prev, twitter: e.target.value }))}
+                    className="flex-1 ml-2 px-3 py-1.5 text-sm border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="X (Twitter) profile URL"
+                  />
+                </div>
+                <div className="flex items-center">
+                  <span className="text-[#1877F2] w-6">
+                    <FaFacebookF />
+                  </span>
+                  <input
+                    type="url"
+                    value={formData.facebook}
+                    onChange={(e) => setFormData(prev => ({ ...prev, facebook: e.target.value }))}
+                    className="flex-1 ml-2 px-3 py-1.5 text-sm border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="Facebook profile URL"
+                  />
+                </div>
+                <div className="flex items-center">
+                  <span className="text-[#0A66C2] w-6">
+                    <FaLinkedinIn />
+                  </span>
+                  <input
+                    type="url"
+                    value={formData.linkedin}
+                    onChange={(e) => setFormData(prev => ({ ...prev, linkedin: e.target.value }))}
+                    className="flex-1 ml-2 px-3 py-1.5 text-sm border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="LinkedIn profile URL"
+                  />
+                </div>
+              </div>
+            </div>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Email
-            </label>
-            <input
-              type="email"
-              value={formData.email}
-              onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
-              required
-            />
+          {/* Submit Button */}
+          <div className="mt-6">
+            <button
+              type="submit"
+              disabled={loading}
+              className={`w-full py-2 px-4 bg-blue-600 text-white text-sm font-medium rounded hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
+                loading ? 'opacity-50 cursor-not-allowed' : ''
+              }`}
+            >
+              {loading ? 'Updating...' : 'Save Changes'}
+            </button>
           </div>
-
-          <button
-            type="submit"
-            disabled={loading}
-            className={`w-full py-2 px-4 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors ${
-              loading ? 'opacity-50 cursor-not-allowed' : ''
-            }`}
-          >
-            {loading ? 'Updating...' : 'Update Profile'}
-          </button>
         </form>
       </div>
     </div>
   );
 };
 
-export default ProfileModal; 
+export default ProfileModal;
