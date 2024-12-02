@@ -34,7 +34,7 @@ const TagsPage = () => {
     );
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
