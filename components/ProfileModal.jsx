@@ -1,18 +1,42 @@
 'use client';
-import { useState, useRef } from 'react';
-import { FaTimes, FaCamera } from 'react-icons/fa';
+import { useState, useRef, useEffect } from 'react';
+import { FaTimes, FaCamera, FaFacebookF, FaLinkedinIn } from 'react-icons/fa';
+import { FaXTwitter } from 'react-icons/fa6';
 import Image from 'next/image';
+import Cookies from 'js-cookie';
+import toast from 'react-hot-toast';
 
 const ProfileModal = ({ isOpen, onClose, userData }) => {
   const fileInputRef = useRef(null);
   const [formData, setFormData] = useState({
-    name: userData?.name || '',
-    email: userData?.email || '',
-    avatar: null
+    name: '',
+    email: '',
+    avatar: null,
+    bio: '',
+    twitter: '',
+    facebook: '',
+    linkedin: ''
   });
   const [previewUrl, setPreviewUrl] = useState(userData?.avatar || '');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+
+  // Initialize form data with user data
+  useEffect(() => {
+    if (userData) {
+      setFormData({
+        name: userData.name || '',
+        email: userData.email || '',
+        bio: userData.bio || '',
+        twitter: userData.twitter || '',
+        facebook: userData.facebook || '',
+        linkedin: userData.linkedin || ''
+      });
+      if (userData.avatar) {
+        setPreviewUrl(userData.avatar);
+      }
+    }
+  }, [userData]);
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -21,47 +45,59 @@ const ProfileModal = ({ isOpen, onClose, userData }) => {
         setError('Image size should be less than 5MB');
         return;
       }
-      
-      setFormData(prev => ({ ...prev, avatar: file }));
-      setPreviewUrl(URL.createObjectURL(file));
+
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPreviewUrl(reader.result);
+        setFormData(prev => ({ ...prev, avatar: file }));
+      };
+      reader.readAsDataURL(file);
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
     setError('');
+    setLoading(true);
 
     try {
-      const token = localStorage.getItem('token');
-      const userId = localStorage.getItem('userId');
-      
-      // Create FormData to handle file upload
+      const token = Cookies.get('token');
+      if (!token) {
+        throw new Error('Authentication token not found');
+      }
+
+      // Create FormData for multipart/form-data
       const formDataToSend = new FormData();
       formDataToSend.append('name', formData.name);
       formDataToSend.append('email', formData.email);
+      formDataToSend.append('bio', formData.bio);
+      formDataToSend.append('twitter', formData.twitter);
+      formDataToSend.append('facebook', formData.facebook);
+      formDataToSend.append('linkedin', formData.linkedin);
+      
       if (formData.avatar) {
         formDataToSend.append('avatar', formData.avatar);
       }
 
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/user/team-members/update/${userId}`, {
-        method: 'PUT',
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/user/profile/update`, {
+        method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
-          // Don't set Content-Type here, let the browser set it with the boundary
         },
-        body: formDataToSend
+        body: formDataToSend,
       });
 
+      const data = await response.json();
+
       if (!response.ok) {
-        throw new Error('Failed to update profile');
+        throw new Error(data.message || 'Failed to update profile');
       }
 
-      const data = await response.json();
+      toast.success('Profile updated successfully');
       onClose();
-      window.location.reload(); // Refresh to show updated data
     } catch (err) {
-      setError(err.message);
+      setError(err.message || 'An error occurred while updating profile');
+      toast.error(err.message || 'Failed to update profile');
     } finally {
       setLoading(false);
     }
