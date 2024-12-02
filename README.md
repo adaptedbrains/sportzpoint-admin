@@ -28,22 +28,83 @@ bun dev     # Fastest option
 
 ### Using Bun (Optional)
 
-This project supports [Bun](https://bun.sh) as an optional, faster alternative to Node.js. To use Bun:
+This project supports [Bun](https://bun.sh) as an optional, faster alternative to Node.js.
 
-1. Install Bun:
+#### Installation
+
+##### On macOS or Linux:
 ```bash
 curl -fsSL https://bun.sh/install | bash
 ```
 
-2. Install dependencies:
+##### On Windows:
+1. First, install Windows Subsystem for Linux (WSL):
+   ```powershell
+   # Run in PowerShell as Administrator
+   wsl --install
+   ```
+   After installation, restart your computer.
+
+2. Install Bun in WSL:
+   ```bash
+   # Open WSL terminal and run:
+   curl -fsSL https://bun.sh/install | bash
+   ```
+
+3. For the best experience on Windows:
+   - Install VSCode with the "Remote - WSL" extension
+   - Open your project folder in WSL: `code .`
+   - Run all Bun commands in the WSL terminal
+
+#### Using Bun
+
+##### On macOS/Linux:
 ```bash
+# Install dependencies
 bun install
+
+# Start development server
+bun dev
+
+# Build for production
+bun run build
+
+# Start production server
+bun run start
 ```
 
-3. Start the development server:
+##### On Windows (via WSL):
 ```bash
-bun dev
+# Install dependencies
+wsl bun install
+
+# Start development server
+wsl bun dev
+
+# Build for production
+wsl bun run build
+
+# Start production server
+wsl bun run start
 ```
+
+#### Troubleshooting on Windows
+
+1. If WSL is not installed:
+   ```powershell
+   # Run in PowerShell as Administrator
+   wsl --install
+   ```
+
+2. If you need to update WSL:
+   ```powershell
+   wsl --update
+   ```
+
+3. Common issues:
+   - If Bun commands aren't working, make sure you're running them in a WSL terminal
+   - If you can't access the development server, check that port forwarding is enabled in WSL
+   - For VSCode integration, install the "Remote - WSL" extension and use the WSL terminal
 
 Bun provides faster installation and development server startup times compared to Node.js. However, using Node.js (npm, yarn, or pnpm) remains fully supported.
 
@@ -55,10 +116,12 @@ This project uses [`next/font`](https://nextjs.org/docs/app/building-your-applic
 
 ## Learn More
 
-To learn more about Next.js, take a look at the following resources:
+To learn more about Next.js and Bun, take a look at the following resources:
 
 - [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
 - [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- [Bun Documentation](https://bun.sh) - learn about Bun runtime.
+- [WSL Documentation](https://learn.microsoft.com/en-us/windows/wsl/) - learn about Windows Subsystem for Linux.
 
 You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
