@@ -68,7 +68,7 @@ const Page = () => {
  
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-black text-white flex justify-center items-center p-4">
+    <div className="min-h-screen z-50 start-0 fixed w-full bg-gradient-to-br from-gray-900 to-black text-white flex justify-center items-center p-4">
       <div className="w-full max-w-md">
         {/* Logo/Branding Section */}
         <div className="text-center mb-8">

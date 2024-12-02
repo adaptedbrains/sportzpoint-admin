@@ -36,7 +36,9 @@ const HomePage = () => {
     const fetchUserAndDrafts = async () => {
       try {
         const token = Cookies.get("token");
-        const userId = localStorage.getItem("id");
+        const userId = typeof window !== 'undefined' ? localStorage.getItem("id") : null;
+
+        if (!userId) return;
 
         const userResponse = await fetch(
           `${process.env.NEXT_PUBLIC_API_URL}/user/${userId}`,
@@ -154,4 +156,3 @@ const HomePage = () => {
 };
 
 export default HomePage;
-

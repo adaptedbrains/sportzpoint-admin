@@ -1,11 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { FaEdit, FaEye, FaEllipsisV } from "react-icons/fa";
+import { FaEdit, FaEye, FaEllipsisV, FaSearch } from "react-icons/fa";
 import { GoLink } from "react-icons/go";
 import { useRouter, usePathname } from "next/navigation";
 import CalendarModal from "./CalendarModal";
 import { formatDate } from "../util/timeFormat";
+import useAllPostDataStore from "../store/useAllPostDataStore";
 
 export default function Table({
   posts,
@@ -17,7 +18,9 @@ export default function Table({
   totalPage,
   loading,
 }) {
+  const {fetchAllPostedData}=useAllPostDataStore()
   const router = useRouter();
+  const [searchQuery, setSearchQuery] = useState("");
 
   const [filter, setFilter] = useState("Published");
   const [startDate, setStartDate] = useState("");
@@ -40,6 +43,14 @@ export default function Table({
     console.log("Date Range:", { startDate, endDate });
     // Update your table data based on the selected date range
   };
+  const handleSearch = async () => {
+   
+    const apiUrl = `${
+      process.env.NEXT_PUBLIC_API_URL
+    }/articles/search?title=${searchQuery}&type=${type}`;
+
+    fetchAllPostedData(apiUrl)
+  };
 
   return (
     <>
@@ -57,6 +68,27 @@ export default function Table({
             </button>
           </div>
           <div className="flex items-center gap-4">
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                handleSearch();
+              }}
+              className="border rounded "
+            >
+              <div className="search-bar">
+                <input
+                  type="text"
+                  placeholder="Search..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="search-input px-4 py-1 border-0   outline-none focus:outline-none"
+                />
+                <button type="submit" className="search-icon px-2 py-2  border-0 border-l ">
+                <FaSearch className=" text-gray-400" />
+                </button>
+              </div>
+            </form>
+
             <CalendarModal onApply={handleDateRangeChange} />
           </div>
         </div>
@@ -87,20 +119,23 @@ export default function Table({
           >
             Draft
           </button>
-          <button
-            className={`${
-              filter === "PendingApproval"
-                ? "border-b-2 border-blue-600 text-blue-600 font-medium"
-                : "border-b-2 border-transparent text-gray-600 hover:text-gray-800"
-            } transition-all duration-200 pb-3 px-2`}
-            onClick={() => {
-              setFilter("PendingApproval");
-              onStatusChange("pending-approval");
-            }}
-          >
-            Pending Approval
-          </button>
-          <button
+          {typeof window !== "undefined" &&
+            JSON.parse(localStorage.getItem("role"))?.includes("Admin") && (
+              <button
+                className={`${
+                  filter === "PendingApproval"
+                    ? "border-b-2 border-blue-600 text-blue-600 font-medium"
+                    : "border-b-2 border-transparent text-gray-600 hover:text-gray-800"
+                } transition-all duration-200 pb-3 px-2`}
+                onClick={() => {
+                  setFilter("PendingApproval");
+                  onStatusChange("pending-approval");
+                }}
+              >
+                Pending Approval
+              </button>
+            )}
+          {/* <button
             className={`${
               filter === "Scheduled"
                 ? "border-b-2 border-blue-600 text-blue-600 font-medium"
@@ -112,7 +147,7 @@ export default function Table({
             }}
           >
             Scheduled
-          </button>
+          </button> */}
         </div>
       </div>
 
@@ -145,7 +180,10 @@ export default function Table({
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
             {posts?.map((article, index) => (
-              <tr key={index} className="hover:bg-gray-50 transition-colors duration-150">
+              <tr
+                key={index}
+                className="hover:bg-gray-50 transition-colors duration-150"
+              >
                 <td className="px-4 py-3">
                   <div className="text-sm font-medium text-gray-900 truncate max-w-md">
                     {article.title}
@@ -155,8 +193,8 @@ export default function Table({
                   <div className="text-sm text-gray-500">
                     {article.primary_category?.map((e, i) => (
                       <div key={i}>
-                        {e.name}
-                        {i < article.primary_category.length - 1 && ", "}
+                        {e?.name}
+                        {i < article?.primary_category.length - 1 && ", "}
                       </div>
                     ))}
                   </div>
@@ -165,8 +203,8 @@ export default function Table({
                   <div className="text-sm text-gray-500">
                     {article.credits?.map((c, i) => (
                       <span key={i}>
-                        {c.name}
-                        {i < article.credits.length - 1 ? ", " : ""}
+                        {c?.name}
+                        {i < article.credits?.length - 1 ? ", " : ""}
                       </span>
                     ))}
                   </div>
@@ -196,9 +234,8 @@ export default function Table({
                   <div className="flex items-center justify-center gap-2">
                     <button
                       onClick={() => {
-                        const type = article?.type ?? "defaultType";
-                        const views = article?.views ?? "0";
-                        router.push(`/posts/${type}/${article._id}`);
+                        const url = `https://sportzpoint.com/${article.primary_category[0].slug}/${article.slug}`;
+                        window.open(url, "_blank");
                       }}
                       className="p-1 text-gray-600 hover:text-blue-600 transition-colors duration-150"
                     >
@@ -206,13 +243,14 @@ export default function Table({
                     </button>
                     <button
                       onClick={() => {
-                        router.push(`/posts/${type}/edit/${article._id}`);
+                        const views = article?.views ?? "0";
+                        router.push(`/posts/${type}/${article._id}`);
                       }}
                       className="p-1 text-gray-600 hover:text-blue-600 transition-colors duration-150"
                     >
                       <FaEdit className="w-4 h-4" />
                     </button>
-                    <button 
+                    <button
                       onClick={() => {
                         const url = `${process.env.NEXT_PUBLIC_API_URL2}/${article.primary_category[0].slug}/${article.slug}`;
                         navigator.clipboard
