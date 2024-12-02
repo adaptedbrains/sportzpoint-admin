@@ -3,6 +3,8 @@ import { useState, useEffect } from 'react';
 import { FaEdit, FaTrash, FaPlus } from 'react-icons/fa';
 import Cookies from 'js-cookie';
 import useDropDownDataStore from '../../store/dropDownDataStore';
+import SearchInput from '../../components/SearchInput';
+import { toast } from 'react-hot-toast';
 
 const TagsPage = () => {
   const { allTags, fetchDropDownData } = useDropDownDataStore();
@@ -29,6 +31,43 @@ const TagsPage = () => {
     e.preventDefault();
     // Add tag submission logic here
     setIsModalOpen(false);
+  };
+
+  const handleEditSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/tags/${editTag._id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${Cookies.get('token')}`
+        },
+        body: JSON.stringify({
+          name: editTag.name,
+          description: editTag.description,
+          slug: editTag.slug
+        })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to update tag');
+      }
+
+      toast.success('Tag updated successfully');
+      setEditTag(null);
+      // Refresh tags list
+      fetchDropDownData(`${process.env.NEXT_PUBLIC_API_URL}/tags`, 'tags');
+    } catch (err) {
+      setError(err.message);
+      toast.error(err.message || 'Failed to update tag');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -146,6 +185,85 @@ const TagsPage = () => {
                   className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200"
                 >
                   Add Tag
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+      
+      {/* Edit Tag Modal */}
+      {editTag && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6">
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="text-lg font-semibold text-gray-900">Edit Tag</h3>
+              <button
+                onClick={() => setEditTag(null)}
+                className="text-gray-400 hover:text-gray-500"
+              >
+                ×
+              </button>
+            </div>
+
+            <form onSubmit={handleEditSubmit} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Name
+                </label>
+                <input
+                  type="text"
+                  value={editTag.name}
+                  onChange={(e) => setEditTag({ ...editTag, name: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Slug
+                </label>
+                <input
+                  type="text"
+                  value={editTag.slug}
+                  onChange={(e) => setEditTag({ ...editTag, slug: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Description
+                </label>
+                <textarea
+                  value={editTag.description || ''}
+                  onChange={(e) => setEditTag({ ...editTag, description: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                  rows="3"
+                  placeholder="Enter tag description..."
+                />
+              </div>
+              {error && (
+                <div className="text-red-500 text-sm mt-2">
+                  {error}
+                </div>
+              )}
+              <div className="flex justify-end gap-3 mt-6">
+                <button
+                  type="button"
+                  onClick={() => setEditTag(null)}
+                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className={`px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${
+                    loading ? 'opacity-50 cursor-not-allowed' : ''
+                  }`}
+                >
+                  {loading ? 'Updating...' : 'Update Tag'}
                 </button>
               </div>
             </form>
