@@ -97,11 +97,8 @@ const RichTextEditor = ({ content, htmlContentGrab }) => {
           image_description: true,
           image_title: true,
           automatic_uploads: false,
-          images_upload_handler: function(blobInfo, progress) {
-            return new Promise((resolve, reject) => {
-              reject('Please use the image gallery to upload images');
-            });
-          },
+          images_upload_handler: null,
+          image_uploadtab: false,
           // Extended image styles
           image_class_list: [
             { title: 'None', value: '' },

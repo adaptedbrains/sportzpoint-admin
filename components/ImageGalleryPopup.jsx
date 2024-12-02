@@ -77,7 +77,7 @@ const ImageGalleryPopup = ({ onSelect, onClose, onImageSelect }) => {
       return;
     }
     if (!altText.trim()) {
-      setError("Alt text is required");
+      setError("Alt text is required for accessibility. Please describe the image.");
       return;
     }
 
@@ -99,16 +99,12 @@ const ImageGalleryPopup = ({ onSelect, onClose, onImageSelect }) => {
   const handleFileUpload = async (event) => {
     const file = event.target.files[0];
     if (file) {
-      if (!altText.trim()) {
-        setError("Please enter alt text before uploading an image");
-        return;
-      }
-
       const formData = new FormData();
       formData.append("file", file);
-      formData.append("altText", altText.trim());
+      formData.append("altText", ""); // No default alt text
       
       try {
+        setIsLoading(true);
         const token = Cookies.get("token");
         const response = await fetch(
           `${process.env.NEXT_PUBLIC_API_URL}/media/upload`,
@@ -120,18 +116,39 @@ const ImageGalleryPopup = ({ onSelect, onClose, onImageSelect }) => {
             body: formData,
           }
         );
+
+        if (!response.ok) {
+          throw new Error('Upload failed');
+        }
+
         const data = await response.json();
         if (data.fileName) {
           setSelectedImage(data.fileName);
-          setImages((prev) => [data.fileName, ...prev]);
+          // Update the images list and refresh from server
+          const updatedResponse = await fetch(
+            `${process.env.NEXT_PUBLIC_API_URL}/media/img`,
+            {
+              method: "GET",
+              headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
+              },
+            }
+          );
+          const updatedData = await updatedResponse.json();
+          setImages(updatedData.files || []);
           setImageAltTexts(prev => ({
             ...prev,
-            [data.fileName]: altText.trim()
+            [data.fileName]: "" // No default alt text
           }));
+          setCurrentPage(1);
+          setError("");
         }
       } catch (error) {
         console.error("Error uploading file:", error);
         setError("Failed to upload image. Please try again.");
+      } finally {
+        setIsLoading(false);
       }
     }
   };
@@ -249,7 +266,7 @@ const ImageGalleryPopup = ({ onSelect, onClose, onImageSelect }) => {
                   setAltText(e.target.value);
                   setError("");
                 }}
-                placeholder="Describe this image..."
+                placeholder="Alt text is required"
                 className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 ${
                   error && !altText.trim() ? 'border-red-500' : 'border-gray-300'
                 }`}
