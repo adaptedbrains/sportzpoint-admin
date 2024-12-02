@@ -13,6 +13,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Restored advanced image settings
   - Added image class options for responsiveness
   - Enhanced alt text preservation
+- Implemented profile update functionality in ProfileModal
+  - Added image upload with preview and size validation
+  - Added form data initialization with user data
+  - Implemented profile update API integration
+  - Added loading states and error handling
+  - Added success/error notifications
+- Enhanced login page UI with modern design
+  - Added gradient backgrounds and animations
+  - Improved form layout and styling
+  - Added better error message presentation
+  - Enhanced responsive design
 
 ### Changed
 - Improved Media Gallery UI/UX
