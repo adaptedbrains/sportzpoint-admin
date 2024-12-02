@@ -11,7 +11,9 @@ const TagsPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [newTag, setNewTag] = useState({ name: '', slug: '' });
+  const [newTag, setNewTag] = useState({ name: '', description: '', slug: '', metaDescription: '' });
+  const [editTag, setEditTag] = useState(null);
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     fetchDropDownData(`${process.env.NEXT_PUBLIC_API_URL}/tag`, 'tag');
@@ -27,10 +29,38 @@ const TagsPage = () => {
     );
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Add tag submission logic here
-    setIsModalOpen(false);
+    setLoading(true);
+    setError(null);
+
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/tags`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${Cookies.get('token')}`
+        },
+        body: JSON.stringify(newTag)
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to create tag');
+      }
+
+      toast.success('Tag created successfully');
+      setIsModalOpen(false);
+      setNewTag({ name: '', description: '', slug: '', metaDescription: '' });
+      // Refresh tags list
+      fetchDropDownData(`${process.env.NEXT_PUBLIC_API_URL}/tags`, 'tags');
+    } catch (err) {
+      setError(err.message);
+      toast.error(err.message || 'Failed to create tag');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleEditSubmit = async (e) => {
@@ -171,8 +201,39 @@ const TagsPage = () => {
                   placeholder="Enter tag slug"
                 />
               </div>
-
-              <div className="flex justify-end space-x-3 pt-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Meta Description
+                </label>
+                <textarea
+                  value={newTag.metaDescription}
+                  onChange={(e) => setNewTag({ ...newTag, metaDescription: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                  rows="3"
+                  placeholder="Enter meta description for SEO purposes..."
+                />
+                <p className="mt-1 text-sm text-gray-500">
+                  Brief description for SEO purposes. Recommended length: 150-160 characters.
+                </p>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Description
+                </label>
+                <textarea
+                  value={newTag.description}
+                  onChange={(e) => setNewTag({ ...newTag, description: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                  rows="3"
+                  placeholder="Enter tag description..."
+                />
+              </div>
+              {error && (
+                <div className="text-red-500 text-sm mt-2">
+                  {error}
+                </div>
+              )}
+              <div className="flex justify-end gap-3 mt-6">
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
@@ -182,9 +243,12 @@ const TagsPage = () => {
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200"
+                  disabled={loading}
+                  className={`px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${
+                    loading ? 'opacity-50 cursor-not-allowed' : ''
+                  }`}
                 >
-                  Add Tag
+                  {loading ? 'Creating...' : 'Create Tag'}
                 </button>
               </div>
             </form>
