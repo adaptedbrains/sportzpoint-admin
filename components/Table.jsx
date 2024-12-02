@@ -87,7 +87,7 @@ export default function Table({
           >
             Draft
           </button>
-          {JSON.parse(localStorage.getItem("role"))?.includes("Admin") && (
+          {typeof window !== 'undefined' && JSON.parse(localStorage.getItem("role"))?.includes("Admin") && (
             <button
               className={`${
                 filter === "PendingApproval"

@@ -135,7 +135,8 @@ function ManagePostProperties({ type, id }) {
       // Safely get author ID
       let authorId;
       try {
-        const storedId = localStorage.getItem("id");
+        const storedId = typeof window !== 'undefined' ? localStorage.getItem("id") : null;
+        if (!storedId) return;
         authorId = storedId ? storedId.replace(/^"(.*)"$/, "$1") : null;
 
         if (!authorId) {
