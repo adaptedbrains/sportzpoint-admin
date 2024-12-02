@@ -1,9 +1,13 @@
 import { NextResponse } from 'next/server';
 
+
+
+
+
+
 export function middleware(request) {
   const token = request.cookies.get('token'); // Retrieve token from cookies
   const pathname = request.nextUrl.pathname; // Get the current path
-
 
   // Allow requests to the /login route or static files to proceed without checking the token
   if (pathname === '/login'||pathname.startsWith('/reset-password/') || pathname.startsWith('/_next')) {
