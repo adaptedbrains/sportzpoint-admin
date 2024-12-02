@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { FaEdit, FaTrash, FaPlus } from 'react-icons/fa';
 import Cookies from 'js-cookie';
 import useDropDownDataStore from '../../store/dropDownDataStore';
@@ -7,13 +7,22 @@ import useDropDownDataStore from '../../store/dropDownDataStore';
 const TagsPage = () => {
   const { allTags, fetchDropDownData } = useDropDownDataStore();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [newTag, setNewTag] = useState({ name: '', slug: '' });
 
   useEffect(() => {
-    fetchDropDownData(`${process.env.NEXT_PUBLIC_API_URL}/tag`, 'tag');
-  }, []);
+    fetchDropDownData(`${process.env.NEXT_PUBLIC_API_URL}/tags`, 'tags');
+  }, [fetchDropDownData]);
+
+  const filteredTags = useMemo(() => {
+    if (!searchQuery.trim()) return allTags;
+    return allTags?.filter(tag => 
+      tag.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      tag.slug.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (tag.description && tag.description.toLowerCase().includes(searchQuery.toLowerCase()))
+    );
+  }, [allTags, searchQuery]);
 
   if (error) {
     return (
@@ -27,8 +36,71 @@ const TagsPage = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Add tag submission logic here
-    setIsModalOpen(false);
+    setLoading(true);
+    setError(null);
+
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/tags`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${Cookies.get('token')}`
+        },
+        body: JSON.stringify(newTag)
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to create tag');
+      }
+
+      toast.success('Tag created successfully');
+      setIsModalOpen(false);
+      setNewTag({ name: '', description: '', slug: '', metaDescription: '' });
+      fetchDropDownData(`${process.env.NEXT_PUBLIC_API_URL}/tags`, 'tags');
+    } catch (err) {
+      setError(err.message);
+      toast.error(err.message || 'Failed to create tag');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleEditSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/tags/${editTag._id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${Cookies.get('token')}`
+        },
+        body: JSON.stringify({
+          name: editTag.name,
+          description: editTag.description,
+          slug: editTag.slug
+        })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to update tag');
+      }
+
+      toast.success('Tag updated successfully');
+      setEditTag(null);
+      fetchDropDownData(`${process.env.NEXT_PUBLIC_API_URL}/tags`, 'tags');
+    } catch (err) {
+      setError(err.message);
+      toast.error(err.message || 'Failed to update tag');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -47,9 +119,18 @@ const TagsPage = () => {
         </button>
       </div>
       
+      <div className="mb-4">
+        <SearchInput
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          onClear={() => setSearchQuery("")}
+          placeholder="Search tags..."
+        />
+      </div>
+
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full">
+          <table className="w-full table-auto">
             <thead>
               <tr className="bg-gray-50 border-b border-gray-200">
                 <th className="text-left px-6 py-4 text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
@@ -57,8 +138,8 @@ const TagsPage = () => {
                 <th className="text-right px-6 py-4 text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-200">
-              {allTags && allTags.map((tag) => (
+            <tbody className="bg-white divide-y divide-gray-200">
+              {filteredTags?.map((tag) => (
                 <tr 
                   key={tag._id} 
                   className="hover:bg-gray-50 transition-colors duration-200"
