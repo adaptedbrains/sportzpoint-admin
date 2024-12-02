@@ -21,7 +21,7 @@ const Navbar = () => {
           return;
         }
 
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/user/${userId}`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/user/profile/${userId}`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }
@@ -32,6 +32,8 @@ const Navbar = () => {
         }
 
         const data = await response.json();
+       
+        localStorage.setItem("role", JSON.stringify(data.roles));
         setUserData(data);
       } catch (error) {
         console.error('Error fetching user data:', error);

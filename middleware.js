@@ -1,10 +1,5 @@
 import { NextResponse } from 'next/server';
 
-
-
-
-
-
 export function middleware(request) {
   const token = request.cookies.get('token'); // Retrieve token from cookies
   const pathname = request.nextUrl.pathname; // Get the current path
