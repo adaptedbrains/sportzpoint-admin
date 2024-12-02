@@ -166,6 +166,7 @@ function ManagePostProperties({ type, id }) {
         content: htmlContent.trim(),
 
         status: status,
+
         author: authorId,
         slug: formDataPostEdit.slug.trim().toLowerCase().split(" ").join("-"),
         type:
@@ -175,12 +176,17 @@ function ManagePostProperties({ type, id }) {
         seo_desc: formDataPostEdit.seo_desc.trim(),
       };
 
-      if (status === "published") {
+      if (status === "published"   ) {
         transformedData.published_at_datetime = new Date().toISOString();
       }
+      if (status === "draft" ||status === "pending_approval") {
+        transformedData.published_at_datetime = null;
+      }
+      
       if (pathname && pathname.split("/")[2] === "Web%20Story") {
         transformedData.web_story = webStory;
       }
+
 
       if (
         !transformedData.credits.length || 
@@ -302,7 +308,7 @@ function ManagePostProperties({ type, id }) {
                 ? 'text-blue-300 cursor-not-allowed'
                 : 'text-blue-600 hover:text-blue-800'
               }`}
-              onClick={() => submitData("send-for-approval")}
+              onClick={() => submitData("pending_approval")}
             >
               {isSubmitting ? (
                 <span className="flex items-center justify-center">

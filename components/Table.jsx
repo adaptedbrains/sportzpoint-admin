@@ -87,20 +87,22 @@ export default function Table({
           >
             Draft
           </button>
-          <button
-            className={`${
-              filter === "PendingApproval"
-                ? "border-b-2 border-blue-600 text-blue-600 font-medium"
-                : "border-b-2 border-transparent text-gray-600 hover:text-gray-800"
-            } transition-all duration-200 pb-3 px-2`}
-            onClick={() => {
-              setFilter("PendingApproval");
-              onStatusChange("pending-approval");
-            }}
-          >
-            Pending Approval
-          </button>
-          <button
+          {JSON.parse(localStorage.getItem("role"))?.includes("Admin") && (
+            <button
+              className={`${
+                filter === "PendingApproval"
+                  ? "border-b-2 border-blue-600 text-blue-600 font-medium"
+                  : "border-b-2 border-transparent text-gray-600 hover:text-gray-800"
+              } transition-all duration-200 pb-3 px-2`}
+              onClick={() => {
+                setFilter("PendingApproval");
+                onStatusChange("pending-approval");
+              }}
+            >
+              Pending Approval
+            </button>
+          )}
+          {/* <button
             className={`${
               filter === "Scheduled"
                 ? "border-b-2 border-blue-600 text-blue-600 font-medium"
@@ -112,7 +114,7 @@ export default function Table({
             }}
           >
             Scheduled
-          </button>
+          </button> */}
         </div>
       </div>
 
@@ -145,7 +147,10 @@ export default function Table({
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
             {posts?.map((article, index) => (
-              <tr key={index} className="hover:bg-gray-50 transition-colors duration-150">
+              <tr
+                key={index}
+                className="hover:bg-gray-50 transition-colors duration-150"
+              >
                 <td className="px-4 py-3">
                   <div className="text-sm font-medium text-gray-900 truncate max-w-md">
                     {article.title}
@@ -155,8 +160,8 @@ export default function Table({
                   <div className="text-sm text-gray-500">
                     {article.primary_category?.map((e, i) => (
                       <div key={i}>
-                        {e.name}
-                        {i < article.primary_category.length - 1 && ", "}
+                        {e?.name}
+                        {i < article?.primary_category.length - 1 && ", "}
                       </div>
                     ))}
                   </div>
@@ -165,8 +170,8 @@ export default function Table({
                   <div className="text-sm text-gray-500">
                     {article.credits?.map((c, i) => (
                       <span key={i}>
-                        {c.name}
-                        {i < article.credits.length - 1 ? ", " : ""}
+                        {c?.name}
+                        {i < article.credits?.length - 1 ? ", " : ""}
                       </span>
                     ))}
                   </div>
@@ -196,10 +201,11 @@ export default function Table({
                 <td className="px-4 py-3 text-center">
                   <div className="flex items-center justify-center gap-2">
                     <button
+                     
                       onClick={() => {
-                        const type = article?.type ?? "defaultType";
-                        const views = article?.views ?? "0";
-                        router.push(`/posts/${type}/${article._id}`);
+                       
+                        const url = `https://sportzpoint.com/${article.primary_category[0].slug}/${article.slug}`;
+                        window.open(url, "_blank");
                       }}
                       className="p-1 text-gray-600 hover:text-blue-600 transition-colors duration-150"
                     >
@@ -207,13 +213,15 @@ export default function Table({
                     </button>
                     <button
                       onClick={() => {
-                        router.push(`/posts/${type}/edit/${article._id}`);
+                      
+                        const views = article?.views ?? "0";
+                        router.push(`/posts/${type}/${article._id}`);
                       }}
                       className="p-1 text-gray-600 hover:text-blue-600 transition-colors duration-150"
                     >
                       <FaEdit className="w-4 h-4" />
                     </button>
-                    <button 
+                    <button
                       onClick={() => {
                         const url = `${process.env.NEXT_PUBLIC_API_URL2}/${article.primary_category[0].slug}/${article.slug}`;
                         navigator.clipboard
