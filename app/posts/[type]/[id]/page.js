@@ -1,11 +1,15 @@
-'use client'; // Add 'use client' since you're using hooks in a client-side component
-import { useSearchParams } from 'next/navigation';
+'use client';
+import { useParams } from 'next/navigation';
 import ManagePostProperties from "../../../../components/ManagePostProperties";
 
 export default function PostDetailsPage() {
-  const searchParams = useSearchParams();
-  const type = searchParams.get('type');
-  const id = searchParams.get('id');
+  const params = useParams();
+  const type = params.type;
+  const id = params.id;
+
+  if (!type || !id) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <div className="pt-2 p-1">
