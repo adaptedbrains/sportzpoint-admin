@@ -4,17 +4,18 @@ import { FaEdit, FaTrash, FaPlus } from 'react-icons/fa';
 import Cookies from 'js-cookie';
 import useDropDownDataStore from '../../store/dropDownDataStore';
 import SearchInput from '../../components/SearchInput';
+import { toast } from 'react-hot-toast';
 
 const TagsPage = () => {
   const { allTags, fetchDropDownData } = useDropDownDataStore();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [newTag, setNewTag] = useState({ name: '', slug: '' });
+  const [newTag, setNewTag] = useState({ name: '', slug: '', metaDescription: '' });
   const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
-    fetchDropDownData(`${process.env.NEXT_PUBLIC_API_URL}/tag`, 'tag');
+    fetchDropDownData(`${process.env.NEXT_PUBLIC_API_URL}/tags`, 'tag');
   }, [fetchDropDownData]);
 
   const filteredTags = useMemo(() => {
@@ -41,7 +42,7 @@ const TagsPage = () => {
     setError(null);
 
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/tag`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/tags`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -51,7 +52,7 @@ const TagsPage = () => {
           tag: {
             name: newTag.name,
             slug: newTag.slug,
-            description: ""
+            description: newTag.metaDescription || ""
           }
         })
       });
@@ -64,7 +65,7 @@ const TagsPage = () => {
 
       toast.success('Tag created successfully');
       setIsModalOpen(false);
-      setNewTag({ name: '', slug: '' });
+      setNewTag({ name: '', slug: '', metaDescription: '' });
       fetchDropDownData(`${process.env.NEXT_PUBLIC_API_URL}/tags`, 'tag');
     } catch (err) {
       setError(err.message);
@@ -132,7 +133,17 @@ const TagsPage = () => {
       {isModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">Create New Tag</h2>
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-semibold text-gray-900">Create New Tag</h2>
+              <button
+                onClick={() => setIsModalOpen(false)}
+                className="text-gray-400 hover:text-gray-500"
+              >
+                <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
             <form onSubmit={handleSubmit}>
               <div className="space-y-4">
                 <div>
@@ -142,7 +153,7 @@ const TagsPage = () => {
                     id="name"
                     value={newTag.name}
                     onChange={(e) => setNewTag({ ...newTag, name: e.target.value })}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                    className="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm px-3 py-2"
                     required
                   />
                 </div>
@@ -153,9 +164,21 @@ const TagsPage = () => {
                     id="slug"
                     value={newTag.slug}
                     onChange={(e) => setNewTag({ ...newTag, slug: e.target.value })}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                    className="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm px-3 py-2"
                     required
                   />
+                </div>
+                <div>
+                  <label htmlFor="metaDescription" className="block text-sm font-medium text-gray-700">Meta Description</label>
+                  <textarea
+                    id="metaDescription"
+                    value={newTag.metaDescription}
+                    onChange={(e) => setNewTag({ ...newTag, metaDescription: e.target.value })}
+                    className="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm px-3 py-2"
+                    placeholder="Enter meta description for SEO purposes"
+                    rows={3}
+                  />
+                  <p className="mt-1 text-sm text-gray-500">This description will be used for SEO purposes.</p>
                 </div>
               </div>
               <div className="mt-6 flex justify-end space-x-3">
