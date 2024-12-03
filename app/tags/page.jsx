@@ -100,7 +100,7 @@ const TagsPage = () => {
   }
 
   return (
-    <div className="p-6 pt-24">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24">
       <div className="flex justify-between items-center mb-8">
         <div>
           <h1 className="text-2xl font-semibold text-gray-800">Tags</h1>
@@ -126,25 +126,26 @@ const TagsPage = () => {
       
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full table-auto">
+          <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Slug</th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-2/5">Name</th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-2/5">Slug</th>
+                <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider w-1/5">Actions</th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {filteredTags?.map((tag) => (
                 <tr key={tag._id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{tag.name}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{tag.slug}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                  <td className="px-6 py-4 text-sm text-gray-900 truncate max-w-0">{tag.name}</td>
+                  <td className="px-6 py-4 text-sm text-gray-500 truncate max-w-0">{tag.slug}</td>
+                  <td className="px-6 py-4 text-right text-sm font-medium whitespace-nowrap">
                     <button
                       onClick={() => handleEditClick(tag)}
-                      className="text-blue-600 hover:text-blue-900 mr-4"
+                      className="text-blue-600 hover:text-blue-900 inline-flex items-center"
                     >
                       <FaEdit className="w-4 h-4" />
+                      <span className="ml-2">Edit</span>
                     </button>
                   </td>
                 </tr>
