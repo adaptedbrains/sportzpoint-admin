@@ -73,7 +73,7 @@ const ImageGalleryPopup = ({ onSelect, onClose, caption }) => {
       setError("Alt text is required");
       return;
     }
-    onSelect(selectedImage, altText.trim());
+    onSelect(selectedImage, { altText: altText.trim() });
     onClose();
   };
 
