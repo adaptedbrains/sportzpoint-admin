@@ -196,7 +196,7 @@ const ImageGalleryPopup = ({ onSelect, onClose, onImageSelect }) => {
                   <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                     {displayedImages.map((img, index) => (
                       <div
-                        key={index}
+                        key={`image-${img}-${index}`}
                         className={`group aspect-square relative cursor-pointer rounded-lg overflow-hidden transition-transform hover:scale-[1.02] ${
                           selectedImage === img
                             ? "ring-2 ring-blue-500 ring-offset-2"
@@ -228,27 +228,21 @@ const ImageGalleryPopup = ({ onSelect, onClose, onImageSelect }) => {
                   </div>
                 </div>
 
-                {totalPages > 1 && (
-                  <div className="flex justify-between items-center mt-6 pt-4 border-t">
+                <div className="flex justify-center mt-4 space-x-2">
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
                     <button
-                      disabled={currentPage === 1}
-                      className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
-                      onClick={() => handlePageChange(currentPage - 1)}
+                      key={`page-${page}`}
+                      onClick={() => handlePageChange(page)}
+                      className={`px-3 py-1 rounded ${
+                        currentPage === page
+                          ? "bg-blue-500 text-white"
+                          : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                      }`}
                     >
-                      Previous
+                      {page}
                     </button>
-                    <span className="text-sm text-gray-600">
-                      Page {currentPage} of {totalPages}
-                    </span>
-                    <button
-                      disabled={currentPage === totalPages}
-                      className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
-                      onClick={() => handlePageChange(currentPage + 1)}
-                    >
-                      Next
-                    </button>
-                  </div>
-                )}
+                  ))}
+                </div>
               </>
             )}
           </div>

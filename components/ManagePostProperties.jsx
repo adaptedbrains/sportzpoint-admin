@@ -1,9 +1,8 @@
-"use client";
+'use client';
 
 import Cookies from "js-cookie";
 import RichTextEditor from "./RichTextEditor";
 import WebStoryEditor from "./WebStory";
-
 import RestOfPostEdit from "./RestOfPostEdit";
 import ArticlePostEditComponent from "./ArticlePostEditComponent";
 import { usePathname, useRouter } from "next/navigation";
@@ -13,9 +12,10 @@ import LiveBlogUpdate from "./LiveBlogUpdate";
 
 function ManagePostProperties({ type, id }) {
   const router = useRouter();
-  const { allPosts } = useAllPostDataStore();
+  const { allPosts, fetchAllPostedData } = useAllPostDataStore();
   const pathname = usePathname();
   const [post, setPost] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [view, setView] = useState("main"); // Track active view ("main" or "updates")
   const [webStory, setWebStory] = useState([]); // Track active view ("main" or "updates")
 
@@ -39,6 +39,107 @@ function ManagePostProperties({ type, id }) {
   const [htmlContent, setHtmlContent] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // Fetch post data when component mounts
+  useEffect(() => {
+    const loadPostData = async () => {
+      try {
+        setLoading(true);
+        const token = Cookies.get('token');
+        if (!token) {
+          throw new Error('No authentication token found');
+        }
+
+        // Fetch posts data if not already loaded
+        if (!allPosts || allPosts.length === 0) {
+          await fetchAllPostedData(`${process.env.NEXT_PUBLIC_API_URL}/posts`, type);
+        }
+
+        // Get post from store after fetching
+        const currentPost = allPosts?.find((a) => a._id === id);
+        if (!currentPost && id !== 'new-post') {
+          throw new Error('Post not found');
+        }
+
+        if (id === "new-post") {
+          resetForm();
+        } else {
+          initializeFormWithPost(currentPost);
+        }
+      } catch (error) {
+        console.error('Error loading post:', error.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadPostData();
+  }, [id, type]);
+
+  const resetForm = () => {
+    setWebStory([]);
+    setPost(null);
+    setHtmlContent("");
+    setFormData({
+      primaryCategory: null,
+      additionalCategories: [],
+      tags: [],
+      credits: [],
+      focusKeyphrase: "",
+    });
+    setFormDataPostEdit({
+      title: "",
+      slug: "",
+      summary: "",
+      seo_desc: "",
+      banner_image: "",
+      banner_desc: "",
+    });
+  };
+
+  const initializeFormWithPost = (postData) => {
+    if (!postData) return;
+
+    setPost(postData);
+    setHtmlContent(postData?.content || "");
+    setWebStory(postData?.web_story || []);
+    
+    setFormData({
+      primaryCategory: postData?.primary_category?.[0]
+        ? {
+            value: postData.primary_category[0]._id,
+            label: postData.primary_category[0].name,
+          }
+        : null,
+      additionalCategories: postData?.categories
+        ? postData.categories
+            .filter(cat => cat && cat._id && cat.name)
+            .map((cat) => ({
+              value: cat._id,
+              label: cat.name,
+            }))
+        : [],
+      tags: postData?.tags
+        ? postData.tags
+            .filter(tag => tag && tag._id && tag.name)
+            .map((tag) => ({
+              value: tag._id,
+              label: tag.name,
+            }))
+        : [],
+      credits: postData?.credits || [],
+      focusKeyphrase: postData?.focus_keyphrase || "",
+    });
+
+    setFormDataPostEdit({
+      title: postData?.title || "",
+      slug: postData?.slug || "",
+      summary: postData?.summary || "",
+      seo_desc: postData?.seo_desc || "",
+      banner_image: postData?.banner_image || "",
+      banner_desc: postData?.banner_desc || "",
+    });
+  };
+
   const htmlContentGrab = (data) => {
     setHtmlContent(data);
   };
@@ -51,77 +152,6 @@ function ManagePostProperties({ type, id }) {
       [name]: value,
     }));
   };
-
-  useEffect(() => {
-    if (pathname) {
-      const parts = pathname.split("/");
-      const type = parts[2];
-      const id = parts[3];
-
-      if (id === "new-post") {
-        setWebStory([])
-        setPost(null);
-        setHtmlContent("");
-       
-        setFormData({
-          primaryCategory: null,
-          additionalCategories: [],
-          tags: [],
-          credits: [],
-          focusKeyphrase: "",
-        });
-        setFormDataPostEdit({
-          title: "",
-          slug: "",
-          summary: "",
-          seo_desc: "",
-          banner_image: "",
-          banner_desc: "",
-        });
-      } else {
-        // Fetch and initialize data for an existing post
-        const requiredData = allPosts.find((a) => a._id === id);
-
-        setPost(requiredData)
-        setHtmlContent(requiredData?.content || "");
-        setWebStory(requiredData.web_story && requiredData.web_story)
-        if (requiredData) {
-          setFormData({
-            primaryCategory: requiredData.primary_category?.[0]
-              ? {
-                  value: requiredData.primary_category[0]._id,
-                  label: requiredData.primary_category[0].name,
-                }
-              : null,
-            additionalCategories: requiredData.categories
-              ? requiredData.categories.map((cat) => ({
-                  value: cat._id,
-                  label: cat.name,
-                }))
-              : [],
-            tags: requiredData.tags
-              ? requiredData.tags.map((t) => ({ value: t._id, label: t.name }))
-              : [],
-            credits: requiredData.credits
-              ? requiredData.credits.map((credit) => ({
-                  value: credit._id,
-                  label: credit.name,
-                }))
-              : [],
-            focusKeyphrase: requiredData.focusKeyphrase || "",
-          });
-          setFormDataPostEdit({
-            title: requiredData.title || "",
-            slug: requiredData.slug || "",
-            summary: requiredData.summary || "",
-            seo_desc: requiredData.seo_desc || "",
-            banner_image: requiredData.banner_image || "",
-            banner_desc: requiredData.banner_desc || "",
-          });
-        }
-      }
-    }
-  }, [pathname, allPosts]);
 
   const submitData = async (status) => {
     try {

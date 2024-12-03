@@ -28,18 +28,20 @@ const ArticlePostEditComponent = ({
   const [dragOver, setDragOver] = useState(false);
 
   useEffect(() => {
-    const requiredData = allPosts.find((a) => a._id === id);
+    const requiredData = allPosts?.find((a) => a._id === id);
    
     if (requiredData) {
-      handleArticleFromData("title", requiredData.title);
-      handleArticleFromData("englishTitle", requiredData.slug);
-      handleArticleFromData("summary", requiredData.summary);
-      handleArticleFromData("seo_desc", requiredData.seo_desc);
-      handleArticleFromData("banner_desc", requiredData.banner_desc);
+      handleArticleFromData("title", requiredData?.title || "");
+      handleArticleFromData("slug", requiredData?.slug || "");
+      handleArticleFromData("summary", requiredData?.summary || "");
+      handleArticleFromData("seo_desc", requiredData?.seo_desc || "");
+      handleArticleFromData("banner_desc", requiredData?.banner_desc || "");
 
-      setFeaturedImage(
-        `https://dmpsza32x691.cloudfront.net/${requiredData.banner_image}`
-      );
+      if (requiredData.banner_image) {
+        setFeaturedImage(
+          `https://dmpsza32x691.cloudfront.net/${requiredData.banner_image}`
+        );
+      }
     }
   }, [id, allPosts]);
 
@@ -99,10 +101,12 @@ const ArticlePostEditComponent = ({
     <div className="bg-white p-6 rounded-lg shadow-md">
       {gallery && (
         <ImageGalleryPopup 
-          onClose={toggleGalleyButton}  
-          onSelect={selecttedImageForBanner} 
-          onCaption={handleImageAltText}
-          caption={formDataPostEdit.banner_desc || ""}
+          onSelect={selecttedImageForBanner}
+          onImageSelect={(url, altText) => {
+            setFeaturedImage(url);
+            handleImageAltText(altText);
+          }}
+          onClose={toggleGalleyButton}
         />
       )}
       <h2 className="text-xl font-bold mb-4">Manage Post Properties</h2>
