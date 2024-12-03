@@ -66,9 +66,12 @@ const ArticlePostEditComponent = ({
     handleArticleFromData("banner_desc", value);
   };
 
-  const selecttedImageForBanner = (filename) => {
+  const selecttedImageForBanner = (filename, imageInfo) => {
     setFeaturedImage(`https://dmpsza32x691.cloudfront.net/${filename}`);
     handleArticleFromData("banner_image", filename);
+    if (imageInfo && imageInfo.altText) {
+      handleArticleFromData("banner_desc", imageInfo.altText);
+    }
   };
 
   const handleImageAltText = (altText) => {
