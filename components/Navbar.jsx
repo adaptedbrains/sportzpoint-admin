@@ -6,6 +6,9 @@ import { FaUserCircle } from 'react-icons/fa';
 import ProfileModal from './ProfileModal';
 import Cookies from 'js-cookie';
 
+
+
+
 const Navbar = () => {
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [userData, setUserData] = useState(null);
@@ -21,7 +24,9 @@ const Navbar = () => {
           return;
         }
 
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/user/profile/${userId}`, {
+
+
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/user/${userId}`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }
@@ -32,8 +37,6 @@ const Navbar = () => {
         }
 
         const data = await response.json();
-       
-        localStorage.setItem("role", JSON.stringify(data.roles));
         setUserData(data);
       } catch (error) {
         console.error('Error fetching user data:', error);
@@ -42,6 +45,8 @@ const Navbar = () => {
 
     fetchUserData();
   }, []);
+
+  
 
   return (
     <nav className="fixed top-0 left-0 right-0 bg-[#f7f7f7] z-50">
@@ -60,7 +65,7 @@ const Navbar = () => {
               onClick={() => setIsProfileModalOpen(true)}
               className="flex items-center gap-2 px-2 py-1 rounded-lg hover:bg-gray-200 transition-colors"
             >
-              {userData?.avatar ? (
+              {userData?.data?.avatar ? (
                 <Image
                   src={userData.avatar}
                   alt="Profile"
@@ -71,8 +76,8 @@ const Navbar = () => {
               ) : (
                 <FaUserCircle className="w-6 h-6 text-gray-600" />
               )}
-              <span className="text-sm font-medium text-gray-700">
-                {userData?.name || 'Loading...'}
+              <span className="text-sm font-medium text-gray-700 capitalize">
+                {userData?.data?.name || 'Loading...'}
               </span>
             </button>
           </div>
