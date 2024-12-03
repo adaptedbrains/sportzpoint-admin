@@ -227,7 +227,8 @@ export default function Table({
                 </td>
                 <td className="px-4 py-3">
                   <div className="text-sm text-gray-500">
-                    {formatDate(article.published_at_datetime)}
+                    {}
+                    {article.status==='draft'?  formatDate(article.updatedAt ):  formatDate(article.published_at_datetime)}
                   </div>
                 </td>
                 <td className="px-4 py-3 text-center">
