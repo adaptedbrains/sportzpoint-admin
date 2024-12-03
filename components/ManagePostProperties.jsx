@@ -135,8 +135,7 @@ function ManagePostProperties({ type, id }) {
       // Safely get author ID
       let authorId;
       try {
-        const storedId = typeof window !== 'undefined' ? localStorage.getItem("id") : null;
-        if (!storedId) return;
+        const storedId = localStorage.getItem("id");
         authorId = storedId ? storedId.replace(/^"(.*)"$/, "$1") : null;
 
         if (!authorId) {
@@ -167,7 +166,6 @@ function ManagePostProperties({ type, id }) {
         content: htmlContent.trim(),
 
         status: status,
-
         author: authorId,
         slug: formDataPostEdit.slug.trim().toLowerCase().split(" ").join("-"),
         type:
@@ -177,17 +175,12 @@ function ManagePostProperties({ type, id }) {
         seo_desc: formDataPostEdit.seo_desc.trim(),
       };
 
-      if (status === "published"   ) {
+      if (status === "published") {
         transformedData.published_at_datetime = new Date().toISOString();
       }
-      if (status === "draft" ||status === "pending_approval") {
-        transformedData.published_at_datetime = null;
-      }
-      
       if (pathname && pathname.split("/")[2] === "Web%20Story") {
         transformedData.web_story = webStory;
       }
-
 
       if (
         !transformedData.credits.length || 
@@ -309,7 +302,7 @@ function ManagePostProperties({ type, id }) {
                 ? 'text-blue-300 cursor-not-allowed'
                 : 'text-blue-600 hover:text-blue-800'
               }`}
-              onClick={() => submitData("pending_approval")}
+              onClick={() => submitData("send-for-approval")}
             >
               {isSubmitting ? (
                 <span className="flex items-center justify-center">
