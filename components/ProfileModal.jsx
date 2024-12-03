@@ -62,10 +62,8 @@ const ProfileModal = ({ isOpen, onClose, userData }) => {
 
     try {
       const token = Cookies.get('token');
-      const userId = localStorage.getItem('id');
-      
-      if (!token || !userId) {
-        throw new Error('Authentication token or user ID not found');
+      if (!token) {
+        throw new Error('Authentication token not found');
       }
 
       // Create FormData for multipart/form-data
@@ -81,8 +79,8 @@ const ProfileModal = ({ isOpen, onClose, userData }) => {
         formDataToSend.append('avatar', formData.avatar);
       }
 
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/user/${userId}`, {
-        method: 'PUT',
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/user/profile/update`, {
+        method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
         },
@@ -98,7 +96,6 @@ const ProfileModal = ({ isOpen, onClose, userData }) => {
       toast.success('Profile updated successfully');
       onClose();
     } catch (err) {
-      console.error('Profile update error:', err);
       setError(err.message || 'An error occurred while updating profile');
       toast.error(err.message || 'Failed to update profile');
     } finally {

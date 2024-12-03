@@ -1,47 +1,18 @@
 'use client';
-import { useState, useEffect } from 'react';
 import Image from "next/image";
 import Link from "next/link";
-import { FaUserCircle } from 'react-icons/fa';
-import ProfileModal from './ProfileModal';
-import Cookies from 'js-cookie';
+import { useState } from "react";
+import ProfileModal from "./ProfileModal";
+import { FaRegUser } from "react-icons/fa6";
 
 const Navbar = () => {
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
-  const [userData, setUserData] = useState(null);
-
-  useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        const token = Cookies.get('token');
-        const userId = localStorage.getItem('id');
-        
-        if (!token || !userId) {
-          console.error('No token or userId found');
-          return;
-        }
-
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/user/profile/${userId}`, {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        });
-
-        if (!response.ok) {
-          throw new Error('Failed to fetch user data');
-        }
-
-        const data = await response.json();
-       
-        localStorage.setItem("role", JSON.stringify(data.roles));
-        setUserData(data);
-      } catch (error) {
-        console.error('Error fetching user data:', error);
-      }
-    };
-
-    fetchUserData();
-  }, []);
+  // TODO: Implement actual user data fetching
+  const userData = {
+    name: "John Doe",
+    email: "john@example.com",
+    avatar: null // Will be implemented with actual user avatar
+  };
 
   return (
     <nav className="fixed top-0 left-0 right-0 bg-[#f7f7f7] z-50">
@@ -56,48 +27,35 @@ const Navbar = () => {
 
           {/* Profile Section */}
           <div className="flex items-center">
-            <button
+            <button 
               onClick={() => setIsProfileModalOpen(true)}
-              className="flex items-center gap-2 px-2 py-1 rounded-lg hover:bg-gray-200 transition-colors"
+              className="flex items-center gap-2 hover:bg-gray-100 rounded-full p-1.5 transition-colors group"
             >
-              {userData?.avatar ? (
-                <Image
-                  src={userData.avatar}
-                  alt="Profile"
-                  width={24}
-                  height={24}
-                  className="rounded-full"
-                />
-              ) : (
-                <FaUserCircle className="w-6 h-6 text-gray-600" />
-              )}
-              <span className="text-sm font-medium text-gray-700">
-                {userData?.name || 'Loading...'}
-              </span>
+              <div className="w-7 h-7 rounded-full overflow-hidden bg-gray-100 ring-2 ring-gray-200">
+                {userData.avatar ? (
+                  <Image 
+                    src={userData.avatar} 
+                    alt="Profile" 
+                    width={28} 
+                    height={28} 
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center">
+                    <FaRegUser className="text-gray-400 text-sm" />
+                  </div>
+                )}
+              </div>
+              <span className="text-sm font-medium text-gray-700 group-hover:text-gray-900">{userData.name}</span>
             </button>
           </div>
         </div>
       </div>
 
       {/* Profile Modal */}
-      <ProfileModal
-        isOpen={isProfileModalOpen}
-        onClose={() => {
-          setIsProfileModalOpen(false);
-          // Refresh user data when modal closes
-          const userId = localStorage.getItem('id');
-          if (userId) {
-            const token = Cookies.get('token');
-            fetch(`${process.env.NEXT_PUBLIC_API_URL}/user/${userId}`, {
-              headers: {
-                'Authorization': `Bearer ${token}`
-              }
-            })
-              .then(res => res.json())
-              .then(data => setUserData(data))
-              .catch(console.error);
-          }
-        }}
+      <ProfileModal 
+        isOpen={isProfileModalOpen} 
+        onClose={() => setIsProfileModalOpen(false)}
         userData={userData}
       />
     </nav>
