@@ -13,8 +13,10 @@ const TagsPage = () => {
   const [error, setError] = useState(null);
   const [newTag, setNewTag] = useState({ name: '', slug: '', metaDescription: '' });
   const [searchQuery, setSearchQuery] = useState("");
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    setMounted(true);
     fetchDropDownData(`${process.env.NEXT_PUBLIC_API_URL}/tags`, 'tag');
   }, [fetchDropDownData]);
 
@@ -25,6 +27,10 @@ const TagsPage = () => {
       tag.slug.toLowerCase().includes(searchQuery.toLowerCase())
     );
   }, [allTags, searchQuery]);
+
+  if (!mounted) {
+    return null;
+  }
 
   if (error) {
     return (
@@ -49,11 +55,9 @@ const TagsPage = () => {
           'Authorization': `Bearer ${Cookies.get('token')}`
         },
         body: JSON.stringify({
-          tag: {
-            name: newTag.name,
-            slug: newTag.slug,
-            description: newTag.metaDescription || ""
-          }
+          name: newTag.name,
+          slug: newTag.slug,
+          description: newTag.metaDescription || ""
         })
       });
 
