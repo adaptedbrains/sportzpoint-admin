@@ -14,11 +14,68 @@ const TagsPage = () => {
   const [newTag, setNewTag] = useState({ name: '', slug: '', metaDescription: '' });
   const [searchQuery, setSearchQuery] = useState("");
   const [mounted, setMounted] = useState(false);
+  const [editingTag, setEditingTag] = useState(null);
 
   useEffect(() => {
     setMounted(true);
     fetchDropDownData(`${process.env.NEXT_PUBLIC_API_URL}/tags`, 'tag');
   }, [fetchDropDownData]);
+
+  const handleEditClick = (tag) => {
+    setEditingTag(tag);
+    setNewTag({
+      name: tag.name,
+      slug: tag.slug,
+      metaDescription: tag.description || ''
+    });
+    setIsModalOpen(true);
+  };
+
+  const resetForm = () => {
+    setNewTag({ name: '', slug: '', metaDescription: '' });
+    setEditingTag(null);
+    setIsModalOpen(false);
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+
+    try {
+      const url = editingTag
+        ? `${process.env.NEXT_PUBLIC_API_URL}/tags/${editingTag._id}`
+        : `${process.env.NEXT_PUBLIC_API_URL}/tags`;
+
+      const response = await fetch(url, {
+        method: editingTag ? 'PUT' : 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${Cookies.get('token')}`
+        },
+        body: JSON.stringify({
+          name: newTag.name,
+          slug: newTag.slug,
+          description: newTag.metaDescription || ""
+        })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || `Failed to ${editingTag ? 'update' : 'create'} tag`);
+      }
+
+      toast.success(editingTag ? 'Tag updated successfully' : 'Tag created successfully');
+      resetForm();
+      fetchDropDownData(`${process.env.NEXT_PUBLIC_API_URL}/tags`, 'tag');
+    } catch (err) {
+      setError(err.message);
+      toast.error(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const filteredTags = useMemo(() => {
     if (!searchQuery.trim()) return allTags;
@@ -41,43 +98,6 @@ const TagsPage = () => {
       </div>
     );
   }
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setError(null);
-
-    try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/tags`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${Cookies.get('token')}`
-        },
-        body: JSON.stringify({
-          name: newTag.name,
-          slug: newTag.slug,
-          description: newTag.metaDescription || ""
-        })
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || 'Failed to create tag');
-      }
-
-      toast.success('Tag created successfully');
-      setIsModalOpen(false);
-      setNewTag({ name: '', slug: '', metaDescription: '' });
-      fetchDropDownData(`${process.env.NEXT_PUBLIC_API_URL}/tags`, 'tag');
-    } catch (err) {
-      setError(err.message);
-      toast.error(err.message || 'Failed to create tag');
-    } finally {
-      setLoading(false);
-    }
-  };
 
   return (
     <div className="p-6 pt-24">
@@ -121,6 +141,7 @@ const TagsPage = () => {
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{tag.slug}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                     <button
+                      onClick={() => handleEditClick(tag)}
                       className="text-blue-600 hover:text-blue-900 mr-4"
                     >
                       <FaEdit className="w-4 h-4" />
@@ -133,14 +154,16 @@ const TagsPage = () => {
         </div>
       </div>
 
-      {/* Create Tag Modal */}
+      {/* Create/Edit Tag Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-semibold text-gray-900">Create New Tag</h2>
+              <h2 className="text-xl font-semibold text-gray-900">
+                {editingTag ? 'Edit Tag' : 'Create New Tag'}
+              </h2>
               <button
-                onClick={() => setIsModalOpen(false)}
+                onClick={resetForm}
                 className="text-gray-400 hover:text-gray-500"
               >
                 <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -188,7 +211,7 @@ const TagsPage = () => {
               <div className="mt-6 flex justify-end space-x-3">
                 <button
                   type="button"
-                  onClick={() => setIsModalOpen(false)}
+                  onClick={resetForm}
                   className="inline-flex justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                 >
                   Cancel
@@ -198,7 +221,7 @@ const TagsPage = () => {
                   className="inline-flex justify-center rounded-md border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                   disabled={loading}
                 >
-                  {loading ? 'Creating...' : 'Create Tag'}
+                  {loading ? (editingTag ? 'Updating...' : 'Creating...') : (editingTag ? 'Update Tag' : 'Create Tag')}
                 </button>
               </div>
             </form>
