@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect, useMemo } from 'react';
-import { FaEdit, FaTrash, FaPlus } from 'react-icons/fa';
+import { FaEdit, FaPlus } from 'react-icons/fa';
 import Cookies from 'js-cookie';
 import useDropDownDataStore from '../../store/dropDownDataStore';
 import SearchInput from '../../components/SearchInput';
@@ -12,7 +12,8 @@ const CategoriesPage = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [mounted, setMounted] = useState(false);
-  const [newCategory, setNewCategory] = useState({ name: '', slug: '', description: '' });
+  const [editingCategory, setEditingCategory] = useState(null);
+  const [formData, setFormData] = useState({ name: '', slug: '', description: '' });
   const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
@@ -30,8 +31,19 @@ const CategoriesPage = () => {
   }, [allCategory, searchQuery]);
 
   const resetForm = () => {
-    setNewCategory({ name: '', slug: '', description: '' });
+    setFormData({ name: '', slug: '', description: '' });
+    setEditingCategory(null);
     setIsModalOpen(false);
+  };
+
+  const handleEdit = (category) => {
+    setEditingCategory(category);
+    setFormData({
+      name: category.name,
+      slug: category.slug,
+      description: category.description || ''
+    });
+    setIsModalOpen(true);
   };
 
   const handleSubmit = async (e) => {
@@ -45,26 +57,30 @@ const CategoriesPage = () => {
         throw new Error('Authentication token not found');
       }
 
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/categories`, {
-        method: 'POST',
+      const url = editingCategory 
+        ? `${process.env.NEXT_PUBLIC_API_URL}/categories/${editingCategory._id}`
+        : `${process.env.NEXT_PUBLIC_API_URL}/categories`;
+
+      const response = await fetch(url, {
+        method: editingCategory ? 'PUT' : 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({
-          name: newCategory.name.trim(),
-          slug: newCategory.slug.trim(),
-          description: newCategory.description.trim()
+          name: formData.name.trim(),
+          slug: formData.slug.trim(),
+          description: formData.description.trim()
         })
       });
 
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.message || 'Failed to create category');
+        throw new Error(data.message || 'Failed to save category');
       }
 
-      toast.success('Category created successfully');
+      toast.success(editingCategory ? 'Category updated successfully' : 'Category created successfully');
       resetForm();
       fetchDropDownData(`${process.env.NEXT_PUBLIC_API_URL}/categories`, 'category');
     } catch (err) {
@@ -132,7 +148,10 @@ const CategoriesPage = () => {
                   <td className="px-6 py-4 text-sm text-gray-500 truncate max-w-0">{category.slug}</td>
                   <td className="px-6 py-4 text-sm text-gray-500 truncate max-w-0">{category.description}</td>
                   <td className="px-6 py-4 text-right text-sm font-medium whitespace-nowrap">
-                    <button className="text-blue-600 hover:text-blue-900 inline-flex items-center">
+                    <button 
+                      onClick={() => handleEdit(category)}
+                      className="text-blue-600 hover:text-blue-900 inline-flex items-center"
+                    >
                       <FaEdit className="w-4 h-4" />
                       <span className="ml-2">Edit</span>
                     </button>
@@ -144,12 +163,14 @@ const CategoriesPage = () => {
         </div>
       </div>
 
-      {/* Create Category Modal */}
+      {/* Category Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-semibold text-gray-900">Create New Category</h2>
+              <h2 className="text-xl font-semibold text-gray-900">
+                {editingCategory ? 'Edit Category' : 'Create New Category'}
+              </h2>
               <button
                 onClick={resetForm}
                 className="text-gray-400 hover:text-gray-500"
@@ -166,8 +187,8 @@ const CategoriesPage = () => {
                   <input
                     type="text"
                     id="name"
-                    value={newCategory.name}
-                    onChange={(e) => setNewCategory({ ...newCategory, name: e.target.value })}
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                     className="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm px-3 py-2"
                     required
                   />
@@ -177,8 +198,8 @@ const CategoriesPage = () => {
                   <input
                     type="text"
                     id="slug"
-                    value={newCategory.slug}
-                    onChange={(e) => setNewCategory({ ...newCategory, slug: e.target.value })}
+                    value={formData.slug}
+                    onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
                     className="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm px-3 py-2"
                     required
                   />
@@ -187,8 +208,8 @@ const CategoriesPage = () => {
                   <label htmlFor="description" className="block text-sm font-medium text-gray-700">Description</label>
                   <textarea
                     id="description"
-                    value={newCategory.description}
-                    onChange={(e) => setNewCategory({ ...newCategory, description: e.target.value })}
+                    value={formData.description}
+                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                     className="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm px-3 py-2"
                     rows={3}
                   />
@@ -207,7 +228,7 @@ const CategoriesPage = () => {
                   className="inline-flex justify-center rounded-md border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                   disabled={loading}
                 >
-                  {loading ? 'Creating...' : 'Create Category'}
+                  {loading ? (editingCategory ? 'Updating...' : 'Creating...') : (editingCategory ? 'Update Category' : 'Create Category')}
                 </button>
               </div>
             </form>
