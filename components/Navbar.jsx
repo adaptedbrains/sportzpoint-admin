@@ -1,18 +1,44 @@
 'use client';
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import ProfileModal from "./ProfileModal";
 import { FaRegUser } from "react-icons/fa6";
 
 const Navbar = () => {
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
-  // TODO: Implement actual user data fetching
-  const userData = {
+  const [userData, setUserData] = useState({
     name: "John Doe",
     email: "john@example.com",
     avatar: null // Will be implemented with actual user avatar
-  };
+  });
+  const token = localStorage.getItem("token");
+  const userId = localStorage.getItem("userId");
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      if (!userId) {
+        return;
+      }
+
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/user/profile/${userId}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch user data');
+      }
+
+      const data = await response.json();
+     
+      localStorage.setItem("role", JSON.stringify(data.roles));
+      setUserData(data);
+    };
+
+    fetchUserData();
+  }, [userId, token]);
 
   return (
     <nav className="fixed top-0 left-0 right-0 bg-[#f7f7f7] z-50">
