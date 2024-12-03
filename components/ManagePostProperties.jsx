@@ -310,8 +310,17 @@ function ManagePostProperties({ type, id }) {
   return (
     <div className="flex flex-col gap-2">
       <div className="sticky top-0 left-0 right-0 z-10 bg-white border-b border-gray-100 shadow-sm">
-        <div className="w-full px-4 sm:px-6 py-3">
-          <div className="flex justify-end gap-4">
+        <div className="flex justify-between items-center p-4">
+          <button
+            onClick={() => router.back()}
+            className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+          >
+            <svg className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            Back
+          </button>
+          <div className="flex gap-4">
             <button
               disabled={isSubmitting}
               className={`px-4 py-2 text-sm font-medium transition-colors duration-200 ${
