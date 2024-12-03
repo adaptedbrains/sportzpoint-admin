@@ -1,12 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FaEdit, FaEye, FaEllipsisV, FaSearch } from "react-icons/fa";
 import { GoLink } from "react-icons/go";
 import { useRouter, usePathname } from "next/navigation";
 import CalendarModal from "./CalendarModal";
 import { formatDate } from "../util/timeFormat";
 import useAllPostDataStore from "../store/useAllPostDataStore";
+import { RxCross1 } from "react-icons/rx";
 
 export default function Table({
   posts,
@@ -18,7 +19,7 @@ export default function Table({
   totalPage,
   loading,
 }) {
-  const {fetchAllPostedData}=useAllPostDataStore()
+  const { fetchAllPostedData } = useAllPostDataStore();
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -43,13 +44,16 @@ export default function Table({
     console.log("Date Range:", { startDate, endDate });
     // Update your table data based on the selected date range
   };
-  const handleSearch = async () => {
-   
-    const apiUrl = `${
-      process.env.NEXT_PUBLIC_API_URL
-    }/articles/search?title=${searchQuery}&type=${type}`;
+  const handleCross = async () => {
+    const apiUrl = `${process.env.NEXT_PUBLIC_API_URL}/articles/search?title=""&type=${type}`;
+    setSearchQuery("")
+    fetchAllPostedData(apiUrl);
+  };
 
-    fetchAllPostedData(apiUrl)
+  const handleSearch = async () => {
+    const apiUrl = `${process.env.NEXT_PUBLIC_API_URL}/articles/search?title=${searchQuery}&type=${type}`;
+
+    fetchAllPostedData(apiUrl);
   };
 
   return (
@@ -75,16 +79,28 @@ export default function Table({
               }}
               className="border rounded "
             >
-              <div className="search-bar">
-                <input
-                  type="text"
-                  placeholder="Search..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="search-input px-4 py-1 border-0   outline-none focus:outline-none"
-                />
-                <button type="submit" className="search-icon px-2 py-2  border-0 border-l ">
-                <FaSearch className=" text-gray-400" />
+              <div className="search-bar flex">
+                <div className="relative">
+                  <input
+                    type="text"
+                    placeholder="Search..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="search-input  px-4 py-1 border-0   outline-none focus:outline-none"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleCross}
+                    className="search-icon absolute bg-white pl-2 py-2 end-1  border-0 border-l "
+                  >
+                    <RxCross1 className=" text-gray-400" />
+                  </button>
+                </div>
+                <button
+                  type="submit"
+                  className="search-icon px-2 py-2  border-0 border-l "
+                >
+                  <FaSearch className=" text-gray-400" />
                 </button>
               </div>
             </form>
@@ -119,8 +135,8 @@ export default function Table({
           >
             Draft
           </button>
-          {typeof window !== "undefined" &&
-            JSON.parse(localStorage.getItem("role"))?.includes("Admin") && (
+         
+           
               <button
                 className={`${
                   filter === "PendingApproval"
@@ -134,7 +150,7 @@ export default function Table({
               >
                 Pending Approval
               </button>
-            )}
+          
           {/* <button
             className={`${
               filter === "Scheduled"
@@ -228,7 +244,9 @@ export default function Table({
                 <td className="px-4 py-3">
                   <div className="text-sm text-gray-500">
                     {}
-                    {article.status==='draft'?  formatDate(article.updatedAt ):  formatDate(article.published_at_datetime)}
+                    {article.status === "draft"
+                      ? formatDate(article.updatedAt)
+                      : formatDate(article.published_at_datetime)}
                   </div>
                 </td>
                 <td className="px-4 py-3 text-center">
