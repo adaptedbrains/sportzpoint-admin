@@ -9,6 +9,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import useAllPostDataStore from "../store/useAllPostDataStore";
 import LiveBlogUpdate from "./LiveBlogUpdate";
+import toast from "react-hot-toast";
 
 function ManagePostProperties({ type, id }) {
   const router = useRouter();
@@ -16,8 +17,9 @@ function ManagePostProperties({ type, id }) {
   const pathname = usePathname();
   const [post, setPost] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [view, setView] = useState("main"); // Track active view ("main" or "updates")
-  const [webStory, setWebStory] = useState([]); // Track active view ("main" or "updates")
+  const [error, setError] = useState(null);
+  const [view, setView] = useState("main");
+  const [webStory, setWebStory] = useState([]);
 
   const [formData, setFormData] = useState({
     primaryCategory: null,
@@ -44,6 +46,7 @@ function ManagePostProperties({ type, id }) {
     const loadPostData = async () => {
       try {
         setLoading(true);
+        setError(null);
         const token = Cookies.get('token');
         if (!token) {
           throw new Error('No authentication token found');
@@ -66,6 +69,8 @@ function ManagePostProperties({ type, id }) {
           initializeFormWithPost(currentPost);
         }
       } catch (error) {
+        setError(error.message);
+        toast.error(error.message);
         console.error('Error loading post:', error.message);
       } finally {
         setLoading(false);
@@ -73,7 +78,7 @@ function ManagePostProperties({ type, id }) {
     };
 
     loadPostData();
-  }, [id, type]);
+  }, [id, type, allPosts]);
 
   const resetForm = () => {
     setWebStory([]);
@@ -143,9 +148,11 @@ function ManagePostProperties({ type, id }) {
   const htmlContentGrab = (data) => {
     setHtmlContent(data);
   };
-  const htmlJsonGrab=(data)=>{
-    setWebStory(data)
-  }
+
+  const htmlJsonGrab = (data) => {
+    setWebStory(data);
+  };
+
   const handleArticleFromData = (name, value) => {
     setFormDataPostEdit((prev) => ({
       ...prev,
@@ -306,6 +313,18 @@ function ManagePostProperties({ type, id }) {
       </div>
     );
   };
+
+  if (loading) {
+    return <div className="flex justify-center items-center min-h-screen">
+      <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
+    </div>;
+  }
+
+  if (error) {
+    return <div className="flex justify-center items-center min-h-screen text-red-500">
+      {error}
+    </div>;
+  }
 
   return (
     <div className="flex flex-col gap-2">
