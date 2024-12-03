@@ -2,13 +2,14 @@ import Image from "next/image";
 import React, { useState, useEffect } from "react";
 import Cookies from "js-cookie";
 
-const ImageGalleryPopup = ({ onSelect, onClose, caption }) => {
+const ImageGalleryPopup = ({ onSelect, onClose, onImageSelect }) => {
   const [images, setImages] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedImage, setSelectedImage] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
-  const [altText, setAltText] = useState(caption || "");
+  const [altText, setAltText] = useState("");
+  const [imageAltTexts, setImageAltTexts] = useState({});
   const [error, setError] = useState("");
 
   const IMAGES_PER_PAGE = 8;
@@ -29,6 +30,9 @@ const ImageGalleryPopup = ({ onSelect, onClose, caption }) => {
         );
         const data = await response.json();
         setImages(data.files || []);
+        if (data.altTexts) {
+          setImageAltTexts(data.altTexts);
+        }
         setIsLoading(false);
       } catch (error) {
         console.error("Error fetching images:", error);
@@ -38,6 +42,16 @@ const ImageGalleryPopup = ({ onSelect, onClose, caption }) => {
     
     fetchImages();
   }, []);
+
+  useEffect(() => {
+    // When an image is selected, populate alt text if it exists
+    if (selectedImage && imageAltTexts[selectedImage]) {
+      setAltText(imageAltTexts[selectedImage]);
+    } else {
+      setAltText(""); // Reset alt text when selecting a new image
+    }
+    setError(""); // Clear any previous errors
+  }, [selectedImage, imageAltTexts]);
 
   const filteredImages = images.filter((img) =>
     img.toLowerCase().includes(searchQuery.toLowerCase())
@@ -51,17 +65,10 @@ const ImageGalleryPopup = ({ onSelect, onClose, caption }) => {
 
   const handleImageClick = (img) => {
     setSelectedImage(img);
-    setAltText(""); // Clear alt text when a new image is selected
-    setError("");
   };
 
   const handlePageChange = (newPage) => {
     setCurrentPage(newPage);
-  };
-
-  const handleAltTextChange = (e) => {
-    setAltText(e.target.value);
-    setError("");
   };
 
   const validateAndConfirm = () => {
@@ -70,10 +77,22 @@ const ImageGalleryPopup = ({ onSelect, onClose, caption }) => {
       return;
     }
     if (!altText.trim()) {
-      setError("Alt text is required");
+      setError("Alt text is required for accessibility. Please describe the image.");
       return;
     }
-    onSelect(selectedImage, { altText: altText.trim() });
+
+    // Store the alt text for this image
+    setImageAltTexts(prev => ({
+      ...prev,
+      [selectedImage]: altText.trim()
+    }));
+    
+    if (onImageSelect) {
+      onImageSelect(`https://dmpsza32x691.cloudfront.net/${selectedImage}`, altText.trim());
+    }
+    if (onSelect) {
+      onSelect(selectedImage);
+    }
     onClose();
   };
 
@@ -86,7 +105,6 @@ const ImageGalleryPopup = ({ onSelect, onClose, caption }) => {
       
       try {
         setIsLoading(true);
-        setAltText(""); // Clear alt text when uploading new image
         const token = Cookies.get("token");
         const response = await fetch(
           `${process.env.NEXT_PUBLIC_API_URL}/media/upload`,
@@ -119,6 +137,10 @@ const ImageGalleryPopup = ({ onSelect, onClose, caption }) => {
           );
           const updatedData = await updatedResponse.json();
           setImages(updatedData.files || []);
+          setImageAltTexts(prev => ({
+            ...prev,
+            [data.fileName]: "" // No default alt text
+          }));
           setCurrentPage(1);
           setError("");
         }
@@ -174,7 +196,7 @@ const ImageGalleryPopup = ({ onSelect, onClose, caption }) => {
                   <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                     {displayedImages.map((img, index) => (
                       <div
-                        key={index}
+                        key={`image-${img}-${index}`}
                         className={`group aspect-square relative cursor-pointer rounded-lg overflow-hidden transition-transform hover:scale-[1.02] ${
                           selectedImage === img
                             ? "ring-2 ring-blue-500 ring-offset-2"
@@ -184,7 +206,7 @@ const ImageGalleryPopup = ({ onSelect, onClose, caption }) => {
                       >
                         <Image
                           src={`https://dmpsza32x691.cloudfront.net/${img}`}
-                          alt={`Image ${index + 1}`}
+                          alt={imageAltTexts[img] || `Image ${index + 1}`}
                           layout="fill"
                           objectFit="cover"
                           className="transition-transform group-hover:scale-105"
@@ -196,32 +218,31 @@ const ImageGalleryPopup = ({ onSelect, onClose, caption }) => {
                             </svg>
                           </div>
                         )}
+                        {imageAltTexts[img] && (
+                          <div className="absolute bottom-0 left-0 right-0 bg-black/60 text-white text-xs p-1 truncate">
+                            {imageAltTexts[img]}
+                          </div>
+                        )}
                       </div>
                     ))}
                   </div>
                 </div>
 
-                {totalPages > 1 && (
-                  <div className="flex justify-between items-center mt-6 pt-4 border-t">
+                <div className="flex justify-center mt-4 space-x-2">
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
                     <button
-                      disabled={currentPage === 1}
-                      className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
-                      onClick={() => handlePageChange(currentPage - 1)}
+                      key={`page-${page}`}
+                      onClick={() => handlePageChange(page)}
+                      className={`px-3 py-1 rounded ${
+                        currentPage === page
+                          ? "bg-blue-500 text-white"
+                          : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                      }`}
                     >
-                      Previous
+                      {page}
                     </button>
-                    <span className="text-sm text-gray-600">
-                      Page {currentPage} of {totalPages}
-                    </span>
-                    <button
-                      disabled={currentPage === totalPages}
-                      className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
-                      onClick={() => handlePageChange(currentPage + 1)}
-                    >
-                      Next
-                    </button>
-                  </div>
-                )}
+                  ))}
+                </div>
               </>
             )}
           </div>
@@ -235,7 +256,10 @@ const ImageGalleryPopup = ({ onSelect, onClose, caption }) => {
               <input
                 type="text"
                 value={altText}
-                onChange={handleAltTextChange}
+                onChange={(e) => {
+                  setAltText(e.target.value);
+                  setError("");
+                }}
                 placeholder="Alt text is required"
                 className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 ${
                   error && !altText.trim() ? 'border-red-500' : 'border-gray-300'
