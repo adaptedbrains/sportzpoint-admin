@@ -12,7 +12,7 @@ const Page = () => {
   useEffect(() => {
     fetchDropDownData(`https://sportzpoint-be.onrender.com/user`, 'roleBaseUser');
   }, [fetchDropDownData]);
-
+  
   useEffect(() => {
     setUsers(allRoleBaseUser)
   }, [allRoleBaseUser])
